@@ -72,7 +72,7 @@ set(Plot1Attribs.Title, 'String', 'Live Plot 1', 'FontSize', 8, 'Color', 'w', 'F
 Plot2Attribs = get(BpodSystem.GUIHandles.LivePlot2);
 set(Plot2Attribs.Title, 'String', 'Live Plot 2', 'FontSize', 8, 'Color', 'w', 'FontName', 'arial', 'fontweight', 'bold');
 
-OutcomePlot(BpodSystem.GUIHandles.OutcomePlot,'init', S.TrialParams.LeftCorrect);
+OutcomePlot(BpodSystem.GUIHandles.OutcomePlot,'init', S.TrialParams.LeftCorrect');
 
 set(BpodSystem.GUIHandles.SubjectNameDisplay, 'String', S.animal);
 set(BpodSystem.GUIHandles.ProtocolNameDisplay, 'String', S.sessionname);
@@ -104,8 +104,8 @@ for x = 1:MaxTrials
     end
          
     S.currentTrial=currentTrial;
-    S = JHOverride_bpodV05 (S);
-%     S = BpodParameterGUI('sync', S); % Sync parameters with BpodParameterGUI plugin
+%     S = JHOverride_bpodV05 (S);
+    S = BpodParameterGUI('sync', S); % Sync parameters with BpodParameterGUI plugin
 
  % add state
     sma = JH_TrialParams2StateMatrix3(S);
