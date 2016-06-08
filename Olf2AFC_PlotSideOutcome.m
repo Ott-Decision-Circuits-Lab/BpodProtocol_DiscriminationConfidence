@@ -56,21 +56,15 @@ global BpodSystem
 switch Action
     case 'init'
         %initialize pokes plot
-        Baited = varargin{1};
-        
         nTrialsToShow = 90; %default number of trials to display
         
-        if nargin > 3 %custom number of trials
-            nTrialsToShow =varargin{3};
+        if nargin >=3  %custom number of trials
+            nTrialsToShow =varargin{1};
         end
         axes(AxesHandle);
         %         Xdata = 1:numel(SideList); Ydata = SideList(Xdata);
         %plot in specified axes
-        BpodSystem.GUIHandles.BaitL = line(-1,1,'LineStyle','none','Marker','o','MarkerEdge','y',...
-            'MarkerFace','none', 'MarkerSize',8);%
-        BpodSystem.GUIHandles.BaitR = line(-1,0,'LineStyle','none','Marker','o','MarkerEdge','y',...
-            'MarkerFace','none', 'MarkerSize',8);
-        
+        BpodSystem.GUIHandles.OdorID = line(1:numel(BpodSystem.Data.Custom.OdorID),BpodSystem.Data.Custom.OdorID-1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
         BpodSystem.GUIHandles.CurrentTrialCircle = line(-1,0.5, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.CurrentTrialCross = line(-1,0.5, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.RewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','g','MarkerFace','g', 'MarkerSize',6);
@@ -78,16 +72,13 @@ switch Action
         BpodSystem.GUIHandles.UnrewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','r','MarkerFace','r', 'MarkerSize',6);
         BpodSystem.GUIHandles.UnrewardedR = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','r','MarkerFace','r', 'MarkerSize',6);
         BpodSystem.GUIHandles.NoResponseL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);
-        BpodSystem.GUIHandles.NoResponseR = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);
-        BpodSystem.GUIHandles.BrokeFix = line(-1,0.5, 'LineStyle','none','Marker','d','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);
-        BpodSystem.GUIHandles.LogOdds = line([0 1],[0 1], 'LineStyle','--','Color','k');
+        BpodSystem.GUIHandles.NoResponseR = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);        
         set(AxesHandle,'TickDir', 'out','YLim', [-1, 2], 'YTick', [0 1],'YTickLabel', {'Right','Left'}, 'FontSize', 16);
         xlabel(AxesHandle, 'Trial#', 'FontSize', 18);
         hold(AxesHandle, 'on');
         
     case 'update'
         CurrentTrial = varargin{1};
-        Baited = BpodSystem.Data.Custom.Baited;
         OutcomeRecord = BpodSystem.Data.Custom.OutcomeRecord;
         
         % recompute xlim
@@ -95,23 +86,16 @@ switch Action
         
         %axes(AxesHandle); %cla;
         %plot future trials
-        if any(Baited.Left)
-            set(BpodSystem.GUIHandles.BaitL,'xdata',find(Baited.Left),'ydata',ones(1,sum(Baited.Left)));
-        end
-        if any(Baited.Right)
-            set(BpodSystem.GUIHandles.BaitR,'xdata',find(Baited.Right),'ydata',zeros(1,sum(Baited.Right)));
-        end
-        
         %         FutureTrialsIndx = CurrentTrial:mx;
         %         Xdata = FutureTrialsIndx; Ydata = SideList(Xdata);
         %         set(BpodSystem.GUIHandles.FutureTrialLine, 'xdata', [Xdata,Xdata], 'ydata', [Ydata,Ydata]);
         %Plot current trial
-        set(BpodSystem.GUIHandles.CurrentTrialCircle, 'xdata', CurrentTrial, 'ydata', .5);
-        set(BpodSystem.GUIHandles.CurrentTrialCross, 'xdata', CurrentTrial, 'ydata', .5);
+        set(BpodSystem.GUIHandles.CurrentTrialCircle, 'xdata', CurrentTrial+1, 'ydata', .5);
+        set(BpodSystem.GUIHandles.CurrentTrialCross, 'xdata', CurrentTrial+1, 'ydata', .5);
         
         %Plot past trials
         if ~isempty(OutcomeRecord)
-            indxToPlot = mn:CurrentTrial-1;
+            indxToPlot = mn:CurrentTrial;
             %Plot Rewarded Left
             ndxRwdL = OutcomeRecord(indxToPlot) == 4;
             Xdata = indxToPlot(ndxRwdL); Ydata = ones(1,sum(ndxRwdL));
@@ -122,18 +106,12 @@ switch Action
             set(BpodSystem.GUIHandles.RewardedR, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Unrewarded Left
             ndxUrdL = OutcomeRecord(indxToPlot) == 6;
-            Xdata = indxToPlot(ndxUrdL); Ydata = ones(1,sum(ndxUrdL));
+            Xdata = indxToPlot(ndxUrdL); Ydata = zeros(1,sum(ndxUrdL));
             set(BpodSystem.GUIHandles.UnrewardedL, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Unrewarded Right
             ndxUrdR = OutcomeRecord(indxToPlot) == 7;
-            Xdata = indxToPlot(ndxUrdR); Ydata = zeros(1,sum(ndxUrdR));
+            Xdata = indxToPlot(ndxUrdR); Ydata = ones(1,sum(ndxUrdR));
             set(BpodSystem.GUIHandles.UnrewardedR, 'xdata', Xdata, 'ydata', Ydata);
-            %Plot Broken Fixation
-            ndxBroke = OutcomeRecord(indxToPlot) == 12;
-            Xdata = indxToPlot(ndxBroke); Ydata = ones(1,sum(ndxBroke))*.5;
-            set(BpodSystem.GUIHandles.BrokeFix, 'xdata', Xdata, 'ydata', Ydata);
-            %Plot LogOdds of Reward
-            set(BpodSystem.GUIHandles.LogOdds, 'xdata', indxToPlot, 'ydata', .5+log10(BpodSystem.Data.Custom.CumpL(1:end-1)./BpodSystem.Data.Custom.CumpR(1:end-1)));
         end
 end
 
