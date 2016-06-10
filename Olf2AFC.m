@@ -10,6 +10,8 @@ if isempty(fieldnames(TaskParameters))
     %TaskParameters.GUI.ChoiceDeadLine = 5;
     %TaskParameters.GUI.timeOut = 5; % (s)
     %TaskParameters.GUI.rwdDelay = 0; % (s)
+    TaskParameters.GUI.odorAbank = 3;
+    TaskParameters.GUI.odorBbank = 4;
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
 end
 BpodParameterGUI('init', TaskParameters);
@@ -24,13 +26,28 @@ BpodSystem.Data.Custom.ChoiceLeft = NaN;
 BpodSystem.Data.Custom.Rewarded = NaN;
 BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
 BpodSystem.Data.Custom.OdorID = randi(2,1,100);
+BpodSystem.Data.Custom.OdorAbank = TaskParameters.GUI.odorAbank;
+BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
 %BpodSystem.Data.Custom.OdorContrast = randsample([0 logspace(log10(.05),log10(.6), 3)],100,1);
 
 %% Olfactometer Madness
 
 if ~BpodSystem.EmulatorMode
     SetCarrierFlowRate(900);
-    OlfIp = FindOlfactometer;
+    BpodSystem.Data.Custom.OlfIp = FindOlfactometer;
+    OlfactometerLink = TCPClient('create', num2str(BpodSystem.Data.Custom.OlfIp), 3336);
+    if ~strcmp('ok',TCPClient('connect', OlfactometerLink))
+        error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
+    end
+    
+    %%
+    %function SetBankFlowRate(OlfIP, Bank, FlowRate)
+    IPString = [num2str(OlfIP(1)) '.' num2str(OlfIP(2)) '.' num2str(OlfIP(3)) '.' num2str(OlfIP(4))];
+    try
+        TCPWrite(IPString, 3336, ['WRITE BankFlow' num2str(Bank) '_Actuator ' num2str(FlowRate)]);
+    catch
+        error('Connection Error!')
+    end
 end
 BpodSystem.SoftCodeHandlerFunction = 'Deliver_Odor';
 
@@ -38,7 +55,7 @@ BpodSystem.SoftCodeHandlerFunction = 'Deliver_Odor';
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 200],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
 BpodSystem.GUIHandles.SideOutcomePlot = axes('Position', [.075 .3 .89 .6]);
 Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'init');
-BpodNotebook('init');
+%BpodNotebook('init');
 
 %% Main loop
 RunSession = true;
@@ -59,7 +76,7 @@ while RunSession
         return
     end
     
-    updateCustomDataFields;%(TaskParameters)
+    updateCustomDataFields(TaskParameters);
     Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
 end
@@ -94,7 +111,7 @@ sma = AddState(sma, 'Name', 'odor_delivery',...
 sma = AddState(sma, 'Name', 'wait_Sin',...
     'Timer',0,...
     'StateChangeConditions', {'Port1In',LeftPokeAction,'Port3In',RightPokeAction},...
-    'OutputActions',{'PWM1',255,'PWM3',255});
+    'OutputActions',{'SoftCode',0,'PWM1',255,'PWM3',255});
 sma = AddState(sma, 'Name', 'rewarded_Lin',...
     'Timer', 0,...
     'StateChangeConditions', {'Tup','water_L'},...
@@ -129,7 +146,7 @@ sma = AddState(sma, 'Name', 'ITI',...
 %     'OutputActions', {});
 end
 
-function updateCustomDataFields()
+function updateCustomDataFields(TaskParameters)
 global BpodSystem
 %% OutcomeRecord
 % Searches for state names and not number, so won't be affected by
@@ -162,6 +179,9 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, randi(2,1,100)];
     %BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, randsample([0 logspace(log10(.05),log10(.6), 3)],100,1)];
 end
+%% Olfactometer banks
+BpodSystem.Data.Custom.OdorAbank = TaskParameters.GUI.odorAbank;
+BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
 %% Block count
 % nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
 % if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax
