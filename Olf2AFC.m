@@ -26,6 +26,7 @@ BpodSystem.Data.Custom.ChoiceLeft = NaN;
 BpodSystem.Data.Custom.Rewarded = NaN;
 BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
 BpodSystem.Data.Custom.OdorID = randi(2,1,100);
+BpodSystem.Data.Custom.OdorContrast = ones(1,100)*.9;
 BpodSystem.Data.Custom.OdorAbank = TaskParameters.GUI.odorAbank;
 BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
 %BpodSystem.Data.Custom.OdorContrast = randsample([0 logspace(log10(.05),log10(.6), 3)],100,1);
@@ -33,21 +34,11 @@ BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
 %% Olfactometer Madness
 
 if ~BpodSystem.EmulatorMode
-    SetCarrierFlowRate(900);
     BpodSystem.Data.Custom.OlfIp = FindOlfactometer;
-    OlfactometerLink = TCPClient('create', num2str(BpodSystem.Data.Custom.OlfIp), 3336);
-    if ~strcmp('ok',TCPClient('connect', OlfactometerLink))
+    if isempty(BpodSystem.Data.Custom.OlfIp)
         error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
     end
-    
-    %%
-    %function SetBankFlowRate(OlfIP, Bank, FlowRate)
-    IPString = [num2str(OlfIP(1)) '.' num2str(OlfIP(2)) '.' num2str(OlfIP(3)) '.' num2str(OlfIP(4))];
-    try
-        TCPWrite(IPString, 3336, ['WRITE BankFlow' num2str(Bank) '_Actuator ' num2str(FlowRate)]);
-    catch
-        error('Connection Error!')
-    end
+%     SetCarrierFlowRate()
 end
 BpodSystem.SoftCodeHandlerFunction = 'Deliver_Odor';
 
@@ -63,6 +54,9 @@ iTrial = 1;
 
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
+    
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 3, 100)
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 3, 100)
     
     sma = stateMatrix(TaskParameters,iTrial);
     SendStateMatrix(sma);
@@ -177,6 +171,7 @@ BpodSystem.Data.Custom.ChoiceLeft(end+1) = NaN;
 BpodSystem.Data.Custom.Rewarded(end+1) = NaN;
 if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorID)
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, randi(2,1,100)];
+    BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, ones(1,100)*.9];
     %BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, randsample([0 logspace(log10(.05),log10(.6), 3)],100,1)];
 end
 %% Olfactometer banks
