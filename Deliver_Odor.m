@@ -7,8 +7,23 @@ firstbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorAbank)];
 secbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorBbank)];
 
 if ~BpodSystem.EmulatorMode
-    CommandValve = Valves2EthernetString(firstbank, odorPair, secbank, odorPair); % odorPair := desired valve number
-    TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
+    if odorPair < 32
+        CommandValve = Valves2EthernetString(firstbank, odorPair, secbank, odorPair); % odorPair := desired valve number
+        TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
+    elseif odorPair == 32
+        nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
+        OdorContrast = BpodSystem.Data.Custom.OdorContrast(nextTrial);
+        OdorID = BpodSystem.Data.Custom.OdorID(nextTrial);
+        if OdorID == 1
+            flowA = 100*(.5 + OdorContrast/2);
+            flowB = 100*(.5 - OdorContrast/2);
+        else
+            flowA = 100*(.5 - OdorContrast/2);
+            flowB = 100*(.5 + OdorContrast/2);
+        end
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 3, flowA)
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 4, flowB)
+    end
 end
 
 % switch odorID

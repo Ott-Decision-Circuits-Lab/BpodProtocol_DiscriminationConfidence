@@ -97,19 +97,19 @@ switch Action
         if ~isempty(OutcomeRecord)
             indxToPlot = mn:CurrentTrial;
             %Plot Rewarded Left
-            ndxRwdL = OutcomeRecord(indxToPlot) == 4;
+            ndxRwdL = OutcomeRecord(indxToPlot) ==  find(strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxRwdL); Ydata = ones(1,sum(ndxRwdL));
             set(BpodSystem.GUIHandles.RewardedL, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Rewarded Right
-            ndxRwdR = OutcomeRecord(indxToPlot) == 5;
+            ndxRwdR = OutcomeRecord(indxToPlot) ==  find(strcmp('rewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxRwdR); Ydata = zeros(1,sum(ndxRwdR));
             set(BpodSystem.GUIHandles.RewardedR, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Unrewarded Left
-            ndxUrdL = OutcomeRecord(indxToPlot) == 6;
+            ndxUrdL = OutcomeRecord(indxToPlot) ==  find(strcmp('unrewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxUrdL); Ydata = zeros(1,sum(ndxUrdL));
             set(BpodSystem.GUIHandles.UnrewardedL, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Unrewarded Right
-            ndxUrdR = OutcomeRecord(indxToPlot) == 7;
+            ndxUrdR = OutcomeRecord(indxToPlot) ==  find(strcmp('unrewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxUrdR); Ydata = ones(1,sum(ndxUrdR));
             set(BpodSystem.GUIHandles.UnrewardedR, 'xdata', Xdata, 'ydata', Ydata);
         end
