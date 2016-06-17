@@ -5,17 +5,17 @@ global BpodSystem
 %% Task parameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
-    TaskParameters.GUI.iti = 0; % (s)
-    TaskParameters.GUI.rewardAmount = 30;
-    TaskParameters.GUI.stimDelayMin = .2; % UNUSED
-    TaskParameters.GUI.stimDelayMax = .5;% UNUSED
-    TaskParameters.GUIPanels.General = {'iti','rewardAmount','stimDelayMin','stimDelayMax'};
+    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.RewardAmount = 30;
+    TaskParameters.GUI.StimDelayMin = .2;
+    TaskParameters.GUI.StimDelayMax = .5;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','StimDelayMin','StimDelayMax'};
     %TaskParameters.GUI.ChoiceDeadLine = 5;
     %TaskParameters.GUI.timeOut = 5; % (s)
     %TaskParameters.GUI.rwdDelay = 0; % (s)
-    TaskParameters.GUI.odorAbank = 3;
-    TaskParameters.GUI.odorBbank = 4;
-    TaskParameters.GUIPanels.Olfactometer = {'odorAbank', 'odorBbank'};
+    TaskParameters.GUI.OdorA_bank = 3;
+    TaskParameters.GUI.OdorB_bank = 4;
+    TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
 end
 BpodParameterGUI('init', TaskParameters);
@@ -28,13 +28,15 @@ BpodSystem.Data.Custom.TrialValid = true;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
 BpodSystem.Data.Custom.Rewarded = NaN;
-BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
 BpodSystem.Data.Custom.OdorID = randi(2,1,100);
 BpodSystem.Data.Custom.OdorContrast = ones(1,100)*.9; % Future: control difficulties via GUI
-BpodSystem.Data.Custom.OdorPair = 1 + ones(1,100); % Valve1=MinOil. Future: Present more than one pair
-BpodSystem.Data.Custom.OdorAbank = TaskParameters.GUI.odorAbank;
-BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
-BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.stimDelayMin,TaskParameters.GUI.stimDelayMax);
+BpodSystem.Data.Custom.OdorPair = ones(1,100); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
+BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
+BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
+BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+BpodSystem.Data.Custom.TrialNumber = 1;
+BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
+
 %BpodSystem.Data.Custom.OdorContrast = randsample([0 logspace(log10(.05),log10(.6), 3)],100,1);
 
 %% Olfactometer Madness
@@ -44,7 +46,19 @@ if ~BpodSystem.EmulatorMode
     if isempty(BpodSystem.Data.Custom.OlfIp)
         error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
     end
-%     SetCarrierFlowRate()
+    %SetCarrierFlowRate()
+    OdorContrast = BpodSystem.Data.Custom.OdorContrast(1);
+    OdorID = BpodSystem.Data.Custom.OdorID(1);
+    if OdorID == 1
+        OdorA_flow = 100*(.5 + OdorContrast/2);
+        OdorB_flow = 100*(.5 - OdorContrast/2);
+    else
+        OdorA_flow = 100*(.5 - OdorContrast/2);
+        OdorB_flow = 100*(.5 + OdorContrast/2);
+    end
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
+    clear Odor* flow*
 else
     BpodSystem.Data.Custom.OlfIp = '198.162.0.0';
 end
@@ -63,20 +77,6 @@ iTrial = 1;
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
     
-    if ~BpodSystem.EmulatorMode
-        OdorContrast = BpodSystem.Data.Custom.OdorContrast(iTrial);
-        OdorID = BpodSystem.Data.Custom.OdorID(iTrial);
-        if OdorID == 1
-            flowA = 100*(.5 + OdorContrast/2);
-            flowB = 100*(.5 - OdorContrast/2);
-        else
-            flowA = 100*(.5 - OdorContrast/2);
-            flowB = 100*(.5 + OdorContrast/2);
-        end
-        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 3, flowA)
-        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, 4, flowB)
-    end
-    
     sma = stateMatrix(TaskParameters,iTrial);
     SendStateMatrix(sma);
     RawEvents = RunStateMatrix;
@@ -92,20 +92,21 @@ while RunSession
     updateCustomDataFields(TaskParameters);
     Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
+    BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;    
 end
 end
 
 function sma = stateMatrix(TaskParameters,iTrial)
 global BpodSystem
-ValveTimes  = GetValveTimes(TaskParameters.GUI.rewardAmount, [1 3]);
+ValveTimes  = GetValveTimes(TaskParameters.GUI.RewardAmount, [1 3]);
 LeftValveTime = ValveTimes(1);
 RightValveTime = ValveTimes(2);
 clear ValveTimes
 
-if BpodSystem.Data.Custom.OdorID(iTrial) == 2
+if BpodSystem.Data.Custom.OdorID(iTrial) == 1
     LeftPokeAction = 'rewarded_Lin';
     RightPokeAction = 'unrewarded_Rin';
-elseif BpodSystem.Data.Custom.OdorID(iTrial) == 1
+elseif BpodSystem.Data.Custom.OdorID(iTrial) == 2
     LeftPokeAction = 'unrewarded_Lin';
     RightPokeAction = 'rewarded_Rin';
 else
@@ -116,7 +117,7 @@ sma = NewStateMatrix();
 sma = AddState(sma, 'Name', 'wait_Cin',...
     'Timer', 0,...
     'StateChangeConditions', {'Port2In', 'stay_Cin'},...
-    'OutputActions', {'PWM2',255});
+    'OutputActions', {'SoftCode',2,'PWM2',255});
 sma = AddState(sma, 'Name', 'stay_Cin',...
     'Timer', BpodSystem.Data.Custom.StimDelay(end),...
     'StateChangeConditions', {'Port2Out','broke_fixation','Tup', 'odor_delivery'},...
@@ -132,7 +133,7 @@ sma = AddState(sma, 'Name', 'odor_delivery',...
 sma = AddState(sma, 'Name', 'wait_Sin',...
     'Timer',0,...
     'StateChangeConditions', {'Port1In',LeftPokeAction,'Port3In',RightPokeAction},...
-    'OutputActions',{'SoftCode',1,'PWM1',255,'PWM3',255});
+    'OutputActions',{'SoftCode',2,'PWM1',255,'PWM3',255});
 sma = AddState(sma, 'Name', 'rewarded_Lin',...
     'Timer', 0,...
     'StateChangeConditions', {'Tup','water_L'},...
@@ -144,11 +145,11 @@ sma = AddState(sma, 'Name', 'rewarded_Rin',...
 sma = AddState(sma, 'Name', 'unrewarded_Lin',...
     'Timer', 0,...
     'StateChangeConditions', {'Tup','ITI'},...
-    'OutputActions', {});
+    'OutputActions', {'BNCState',1}); % SHOULD WRITE WAVEFORM TO PULSEPAL WITHIN THIS CODE
 sma = AddState(sma, 'Name', 'unrewarded_Rin',...
     'Timer', 0,...
     'StateChangeConditions', {'Tup','ITI'},...
-    'OutputActions', {});
+    'OutputActions', {'BNCState',1});% RATHER THAN PLAYING WHATEVER IS THERE
 sma = AddState(sma, 'Name', 'water_L',...
     'Timer', LeftValveTime,...
     'StateChangeConditions', {'Tup','ITI'},...
@@ -158,9 +159,9 @@ sma = AddState(sma, 'Name', 'water_R',...
     'StateChangeConditions', {'Tup','ITI'},...
     'OutputActions', {'ValveState', 4});
 sma = AddState(sma, 'Name', 'ITI',...
-    'Timer',TaskParameters.GUI.iti,...
+    'Timer',TaskParameters.GUI.ITI,...
     'StateChangeConditions',{'Tup','exit'},...
-    'OutputActions',{});
+    'OutputActions',{'SoftCode',32}); % Sets flow rates for next trial
 % sma = AddState(sma, 'Name', 'state_name',...
 %     'Timer', 0,...
 %     'StateChangeConditions', {},...
@@ -196,17 +197,17 @@ end
 BpodSystem.Data.Custom.OutcomeRecord(end+1) = nan;
 BpodSystem.Data.Custom.ChoiceLeft(end+1) = NaN;
 BpodSystem.Data.Custom.Rewarded(end+1) = NaN;
-if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorID)
+if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorID) - 10
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, randi(2,1,100)];
     BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, ones(1,100)*.9];
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair ones(1,100)];
     %BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, randsample([0 logspace(log10(.05),log10(.6), 3)],100,1)];
 end
 %% Olfactometer banks
-BpodSystem.Data.Custom.OdorAbank = TaskParameters.GUI.odorAbank;
-BpodSystem.Data.Custom.OdorBbank = TaskParameters.GUI.odorBbank;
+BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
+BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
 %% Delays
-BpodSystem.Data.Custom.StimDelay(end+1) = random('unif',TaskParameters.GUI.stimDelayMin,TaskParameters.GUI.stimDelayMax);
+BpodSystem.Data.Custom.StimDelay(end+1) = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
 %% Block count
 % nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
 % if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax

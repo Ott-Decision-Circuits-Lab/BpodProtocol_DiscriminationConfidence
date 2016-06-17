@@ -3,12 +3,27 @@ function [ output_args ] = Deliver_Odor( odorPair )
 %   Detailed explanation goes here
 global BpodSystem
 
-firstbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorAbank)];
-secbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorBbank)];
+firstbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorA_bank)];
+secbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorB_bank)];
 
 if ~BpodSystem.EmulatorMode
-    CommandValve = Valves2EthernetString(firstbank, odorPair, secbank, odorPair); % odorPair := desired valve number
-    TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
+    if odorPair < 32
+        CommandValve = Valves2EthernetString(firstbank, odorPair, secbank, odorPair); % odorPair := desired valve number
+        TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
+    elseif odorPair == 32
+        nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
+        OdorContrast = BpodSystem.Data.Custom.OdorContrast(nextTrial);
+        OdorID = BpodSystem.Data.Custom.OdorID(nextTrial);
+        if OdorID == 1
+            OdorA_flow = 100*(.5 + OdorContrast/2);
+            OdorB_flow = 100*(.5 - OdorContrast/2);
+        else
+            OdorA_flow = 100*(.5 - OdorContrast/2);
+            OdorB_flow = 100*(.5 + OdorContrast/2);
+        end
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
+    end
 end
 
 % switch odorID
