@@ -21,6 +21,7 @@ if ~BpodSystem.EmulatorMode
             OdorA_flow = 100*(.5 - OdorContrast/2);
             OdorB_flow = 100*(.5 + OdorContrast/2);
         end
+        BpodSystem.Data.Custom.OdorFracA(nextTrial) = OdorA_flow;
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
     end

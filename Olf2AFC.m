@@ -7,8 +7,8 @@ TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 30;
-    TaskParameters.GUI.StimDelayMin = .2;
-    TaskParameters.GUI.StimDelayMax = .5;
+    TaskParameters.GUI.StimDelayMin = 0;%.2;
+    TaskParameters.GUI.StimDelayMax = 0;%.5;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','StimDelayMin','StimDelayMax'};
     %TaskParameters.GUI.ChoiceDeadLine = 5;
     %TaskParameters.GUI.timeOut = 5; % (s)
@@ -24,6 +24,8 @@ BpodParameterGUI('init', TaskParameters);
 
 BpodSystem.Data.Custom.OutcomeRecord = nan;
 BpodSystem.Data.Custom.TrialValid = true;
+BpodSystem.Data.Custom.BrokeFix = false;
+BpodSystem.Data.Custom.BrokeFixTime = NaN;
 % BpodSystem.Data.Custom.BlockNumber = 1;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
@@ -31,6 +33,7 @@ BpodSystem.Data.Custom.Rewarded = NaN;
 BpodSystem.Data.Custom.OdorID = randi(2,1,100);
 BpodSystem.Data.Custom.OdorContrast = ones(1,100)*.9; % Future: control difficulties via GUI
 BpodSystem.Data.Custom.OdorPair = ones(1,100); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
+BpodSystem.Data.Custom.OdorFracA = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
 BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
@@ -56,6 +59,7 @@ if ~BpodSystem.EmulatorMode
         OdorA_flow = 100*(.5 - OdorContrast/2);
         OdorB_flow = 100*(.5 + OdorContrast/2);
     end
+    BpodSystem.Data.Custom.OdorFracA(1) = OdorA_flow;
     SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
     SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
     clear Odor* flow*
@@ -65,9 +69,11 @@ end
 BpodSystem.SoftCodeHandlerFunction = 'Deliver_Odor';
 
 %% Initialize plots
-BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 200],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
-BpodSystem.GUIHandles.SideOutcomePlot = axes('Position', [.075 .3 .89 .6]);
-Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'init');
+BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
+BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position', [.075 .15 .89 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsyc = axes('Position', [.075 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position', [2*.075+.12 .6 .12 .3]);
+Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.OutcomePlot,'init');
 %BpodNotebook('init');
 
 %% Main loop
@@ -90,7 +96,7 @@ while RunSession
     end
     
     updateCustomDataFields(TaskParameters);
-    Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'update',iTrial);
+    Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
     BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;    
 end
@@ -176,7 +182,8 @@ global BpodSystem
 stOI = find(strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}) |...
     strcmp('rewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}) |...
     strcmp('unrewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}) |...
-    strcmp('unrewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end})); % States of interest
+    strcmp('unrewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}) |...
+    strcmp('broke_fixation',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end})); % States of interest
 if any(ismember(stOI,BpodSystem.Data.RawData.OriginalStateData{end}))
     BpodSystem.Data.Custom.OutcomeRecord(end) = stOI(ismember(stOI,BpodSystem.Data.RawData.OriginalStateData{end}));
     if strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.Custom.OutcomeRecord(end)))
@@ -191,12 +198,19 @@ if any(ismember(stOI,BpodSystem.Data.RawData.OriginalStateData{end}))
     elseif strcmp('unrewarded_Rin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.Custom.OutcomeRecord(end)))
         BpodSystem.Data.Custom.ChoiceLeft(end) = 0;
         BpodSystem.Data.Custom.Rewarded(end) = 0;
+    elseif strcmp('broke_fixation',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.Custom.OutcomeRecord(end)))
+        BpodSystem.Data.Custom.BrokeFix(end) = true;
+        BpodSystem.Data.Custom.BrokeFixTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.stay_Cin);
+        BpodSystem.Data.Custom.TrialValid(end) = false;
     end
     disp(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.Custom.OutcomeRecord(end)))
 end
 BpodSystem.Data.Custom.OutcomeRecord(end+1) = nan;
 BpodSystem.Data.Custom.ChoiceLeft(end+1) = NaN;
 BpodSystem.Data.Custom.Rewarded(end+1) = NaN;
+BpodSystem.Data.Custom.BrokeFix(end+1) = false;
+BpodSystem.Data.Custom.BrokeFixTime(end+1) = NaN;
+BpodSystem.Data.Custom.TrialValid(end+1) = true;
 if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorID) - 10
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, randi(2,1,100)];
     BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, ones(1,100)*.9];
