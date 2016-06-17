@@ -64,7 +64,7 @@ switch Action
         axes(AxesHandle);
         %         Xdata = 1:numel(SideList); Ydata = SideList(Xdata);
         %plot in specified axes
-        BpodSystem.GUIHandles.OdorID = line(1:numel(BpodSystem.Data.Custom.OdorID),BpodSystem.Data.Custom.OdorID-1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
+        BpodSystem.GUIHandles.OdorID = line(1:numel(BpodSystem.Data.Custom.OdorID),BpodSystem.Data.Custom.OdorID==1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
         BpodSystem.GUIHandles.CurrentTrialCircle = line(1,0.5, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.CurrentTrialCross = line(1,0.5, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.RewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','g','MarkerFace','g', 'MarkerSize',6);
@@ -92,6 +92,7 @@ switch Action
         %Plot current trial
         set(BpodSystem.GUIHandles.CurrentTrialCircle, 'xdata', CurrentTrial+1, 'ydata', .5);
         set(BpodSystem.GUIHandles.CurrentTrialCross, 'xdata', CurrentTrial+1, 'ydata', .5);
+        set(BpodSystem.GUIHandles.OdorID, 'xdata', 1:numel(BpodSystem.Data.Custom.OdorID), 'ydata',double(BpodSystem.Data.Custom.OdorID==1));
         
         %Plot past trials
         if ~isempty(OutcomeRecord)

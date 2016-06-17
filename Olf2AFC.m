@@ -91,8 +91,8 @@ while RunSession
     
     updateCustomDataFields(TaskParameters);
     Olf2AFC_PlotSideOutcome(BpodSystem.GUIHandles.SideOutcomePlot,'update',iTrial);
-    BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;
     iTrial = iTrial + 1;
+    BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;    
 end
 end
 
@@ -103,10 +103,10 @@ LeftValveTime = ValveTimes(1);
 RightValveTime = ValveTimes(2);
 clear ValveTimes
 
-if BpodSystem.Data.Custom.OdorID(iTrial) == 2
+if BpodSystem.Data.Custom.OdorID(iTrial) == 1
     LeftPokeAction = 'rewarded_Lin';
     RightPokeAction = 'unrewarded_Rin';
-elseif BpodSystem.Data.Custom.OdorID(iTrial) == 1
+elseif BpodSystem.Data.Custom.OdorID(iTrial) == 2
     LeftPokeAction = 'unrewarded_Lin';
     RightPokeAction = 'rewarded_Rin';
 else
