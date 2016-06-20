@@ -1,4 +1,4 @@
-function [ output_args ] = Deliver_Odor( odorPair )
+function [ output_args ] = SoftCodeHandler( odorPair )
 %DELIVER_ODOR Summary of this function goes here
 %   Detailed explanation goes here
 global BpodSystem

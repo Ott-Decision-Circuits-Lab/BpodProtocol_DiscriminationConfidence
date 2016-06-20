@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %}
 % function OutcomePlot(AxesHandle,TrialTypeSides, OutcomeRecord, CurrentTrial)
-function Olf2AFC_PlotSideOutcome(AxesHandles, Action, varargin)
+function MainPlot(AxesHandles, Action, varargin)
 %%
 % Plug in to Plot reward side and trial outcome.
 % For non-sided trial types, use the TrialTypeOutcomePlot plugin.
@@ -68,6 +68,7 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.OdorID = line(1:numel(BpodSystem.Data.Custom.OdorID),BpodSystem.Data.Custom.OdorID==1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle = line(1,0.5, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross = line(1,0.5, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
+        BpodSystem.GUIHandles.OutcomePlot.CumRwd = text(2,0.5,'0mL','verticalalignment','middle','horizontalalignment','left');
         BpodSystem.GUIHandles.OutcomePlot.RewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','g','MarkerFace','g', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.RewardedR = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','g','MarkerFace','g', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.UnrewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','r','MarkerFace','r', 'MarkerSize',6);
@@ -82,9 +83,9 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.Psyc = line(AxesHandles.HandlePsyc,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6);  
         AxesHandles.HandlePsyc.YLim = [-.05 1.05];
         AxesHandles.HandlePsyc.XLim = 100*[-.05 1.05];
-        AxesHandles.HandleTrialRate.XLabel.String = '% odor A'; % FIGURE OUT UNIT
-        AxesHandles.HandleTrialRate.YLabel.String = '% choice A';
-        AxesHandles.HandleTrialRate.Title.String = 'Psychometric';
+        AxesHandles.HandlePsyc.XLabel.String = '% odor A'; % FIGURE OUT UNIT
+        AxesHandles.HandlePsyc.YLabel.String = '% choice A';
+        AxesHandles.HandlePsyc.Title.String = 'Psychometric';
         %% Trial rate
         hold(AxesHandles.HandleTrialRate,'on')
         BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k'); %#ok<NBRAK>
@@ -112,6 +113,9 @@ switch Action
         %Plot past trials
         if any(~isnan(OutcomeRecord))
             indxToPlot = mn:CurrentTrial;
+            %Cumulative Reward Amount
+            set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [CurrentTrial + 1.6 .5], 'string', ...
+                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1) / 1000) ' mL']);
             %Plot Rewarded Left
             ndxRwdL = OutcomeRecord(indxToPlot) == find(strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxRwdL); Ydata = ones(1,sum(ndxRwdL));
