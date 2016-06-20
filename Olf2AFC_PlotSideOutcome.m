@@ -82,6 +82,9 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.Psyc = line(AxesHandles.HandlePsyc,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6);  
         AxesHandles.HandlePsyc.YLim = [-.05 1.05];
         AxesHandles.HandlePsyc.XLim = 100*[-.05 1.05];
+        AxesHandles.HandleTrialRate.XLabel.String = '% odor A'; % FIGURE OUT UNIT
+        AxesHandles.HandleTrialRate.YLabel.String = '% choice A';
+        AxesHandles.HandleTrialRate.Title.String = 'Psychometric';
         %% Trial rate
         hold(AxesHandles.HandleTrialRate,'on')
         BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k'); %#ok<NBRAK>
@@ -141,7 +144,7 @@ switch Action
         end
         BpodSystem.GUIHandles.OutcomePlot.Psyc.YData = psyc;
         %% Trial rate
-        BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = (BpodSystem.Data.TrialStartTimestamp-min(BpodSystem.Data.TrialStartTimestamp));
+        BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = (BpodSystem.Data.TrialStartTimestamp-min(BpodSystem.Data.TrialStartTimestamp))/60;
         BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = 1:numel(BpodSystem.Data.Custom.ChoiceLeft)-1;
 end
 

@@ -5,7 +5,7 @@ global BpodSystem
 %% Task parameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
-    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.ITI = 2; % (s)
     TaskParameters.GUI.RewardAmount = 30;
     TaskParameters.GUI.StimDelayMin = 0;%.2;
     TaskParameters.GUI.StimDelayMax = 0;%.5;
