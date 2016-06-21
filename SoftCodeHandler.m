@@ -6,22 +6,27 @@ global BpodSystem
 firstbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorA_bank)];
 secbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorB_bank)];
 
-if ~BpodSystem.EmulatorMode
-    if odorPair < 32
+if odorPair < 32
+    if ~BpodSystem.EmulatorMode
         CommandValve = Valves2EthernetString(firstbank, odorPair, secbank, odorPair); % odorPair := desired valve number
         TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
-    elseif odorPair == 32
-        nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
-        OdorContrast = BpodSystem.Data.Custom.OdorContrast(nextTrial);
-        OdorID = BpodSystem.Data.Custom.OdorID(nextTrial);
-        if OdorID == 1
+    end
+elseif odorPair == 32
+    nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
+    OdorContrast = BpodSystem.Data.Custom.OdorContrast(nextTrial);
+    OdorID = BpodSystem.Data.Custom.OdorID(nextTrial);
+    switch OdorID 
+        case 1
             OdorA_flow = 100*(.5 + OdorContrast/2);
             OdorB_flow = 100*(.5 - OdorContrast/2);
-        else
+        case 2
             OdorA_flow = 100*(.5 - OdorContrast/2);
             OdorB_flow = 100*(.5 + OdorContrast/2);
-        end
-        BpodSystem.Data.Custom.OdorFracA(nextTrial) = OdorA_flow;
+        otherwise
+            error('Undefined odorID')
+    end
+    BpodSystem.Data.Custom.OdorFracA(nextTrial) = OdorA_flow;
+    if ~BpodSystem.EmulatorMode
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
     end
