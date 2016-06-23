@@ -23,23 +23,30 @@ if any(ismember(ndxOutcome,BpodSystem.Data.RawData.OriginalStateData{end}))
         BpodSystem.Data.Custom.ChoiceLeft(end) = 0;
         BpodSystem.Data.Custom.Rewarded(end) = 0;
     elseif strcmp('broke_fixation',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.Custom.OutcomeRecord(end)))
-        BpodSystem.Data.Custom.BrokeFix(end) = true;
-        BpodSystem.Data.Custom.BrokeFixTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.stay_Cin);
+        BpodSystem.Data.Custom.FixBroke(end) = true;
         BpodSystem.Data.Custom.TrialValid(end) = false;
     end
     if any(strcmp('skipped_feedback',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.RawData.OriginalStateData{end})))
         BpodSystem.Data.Custom.TrialValid(end) = false;
-        BpodSystem.Data.Custom.Feedback(end) = false;
-        BpodSystem.Data.Custom.FeedbackTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)}));
+        BpodSystem.Data.Custom.Feedback(end) = false;        
     end
 end
+if ismember(find(strcmp('odor_delivery',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end})),...
+        BpodSystem.Data.RawData.OriginalStateData{end})
+    BpodSystem.Data.Custom.OST(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.odor_delivery);
+end
+if ~BpodSystem.Data.Custom.FixBroke(end)
+    BpodSystem.Data.Custom.FeedbackTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)}));
+end
+
 BpodSystem.Data.Custom.GotFeedback = 1;
 BpodSystem.Data.Custom.OutcomeRecord(end+1) = nan;
 BpodSystem.Data.Custom.ChoiceLeft(end+1) = NaN;
 BpodSystem.Data.Custom.Rewarded(end+1) = NaN;
-BpodSystem.Data.Custom.BrokeFix(end+1) = false;
-BpodSystem.Data.Custom.BrokeFixTime(end+1) = NaN;
-BpodSystem.Data.Custom.OST = NaN;
+BpodSystem.Data.Custom.FixBroke(end+1) = false;
+BpodSystem.Data.Custom.FixDur(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.stay_Cin);
+BpodSystem.Data.Custom.FixDur(end+1) = NaN;
+BpodSystem.Data.Custom.OST(end+1) = NaN;
 BpodSystem.Data.Custom.TrialValid(end+1) = true;
 BpodSystem.Data.Custom.Feedback(end+1) = true;
 BpodSystem.Data.Custom.FeedbackTime(end+1) = NaN;
@@ -70,7 +77,9 @@ end
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
 %% Delays
-BpodSystem.Data.Custom.StimDelay(end+1) = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+if ~BpodSystem.Data.Custom.FixBroke(end-1)
+    BpodSystem.Data.Custom.StimDelay(end+1) = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+end
 %% Block count
 % nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
 % if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax

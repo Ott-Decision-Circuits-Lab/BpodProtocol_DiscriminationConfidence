@@ -5,14 +5,14 @@ global BpodSystem
 %% Task parameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
-    TaskParameters.GUI.ITI = 2; % (s)
+    TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 30;
-    TaskParameters.GUI.StimDelayMin = 0;%.2;
-    TaskParameters.GUI.StimDelayMax = 0;%.6;
+    TaskParameters.GUI.StimDelayMin = .2;
+    TaskParameters.GUI.StimDelayMax = .6;
     %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.FeedbackDelay = 0; % (s) % UNUSED
+    TaskParameters.GUI.FeedbackDelay = 1; % (s) % UNUSED
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','StimDelayMin','StimDelayMax','FeedbackDelay'};
-    TaskParameters.GUI.TimeOut = 2; % (s)
+    TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting'};
@@ -28,8 +28,8 @@ BpodParameterGUI('init', TaskParameters);
 
 BpodSystem.Data.Custom.OutcomeRecord = nan;
 BpodSystem.Data.Custom.TrialValid = true;
-BpodSystem.Data.Custom.BrokeFix = false;
-BpodSystem.Data.Custom.BrokeFixTime = NaN;
+BpodSystem.Data.Custom.FixBroke = false;
+BpodSystem.Data.Custom.FixDur = NaN;
 % BpodSystem.Data.Custom.BlockNumber = 1;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
