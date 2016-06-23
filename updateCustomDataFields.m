@@ -39,6 +39,7 @@ BpodSystem.Data.Custom.ChoiceLeft(end+1) = NaN;
 BpodSystem.Data.Custom.Rewarded(end+1) = NaN;
 BpodSystem.Data.Custom.BrokeFix(end+1) = false;
 BpodSystem.Data.Custom.BrokeFixTime(end+1) = NaN;
+BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.TrialValid(end+1) = true;
 BpodSystem.Data.Custom.Feedback(end+1) = true;
 BpodSystem.Data.Custom.FeedbackTime(end+1) = NaN;

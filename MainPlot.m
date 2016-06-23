@@ -42,6 +42,11 @@ switch Action
         AxesHandles.HandleTrialRate.XLabel.String = 'Time (min)'; % FIGURE OUT UNIT
         AxesHandles.HandleTrialRate.YLabel.String = 'nTrials';
         AxesHandles.HandleTrialRate.Title.String = 'Trial rate';
+        %% OST histogram
+        hold(AxesHandles.HandleOST,'on')
+        AxesHandles.HandleOST.XLabel.String = 'Time (ms)';
+        AxesHandles.HandleOST.YLabel.String = 'nTrials';
+        AxesHandles.HandleOST.Title.String = 'OST';
         %% Feedback Delay histogram
         hold(AxesHandles.HandleFeedback,'on')
         AxesHandles.HandleFeedback.XLabel.String = 'Time (s)';
@@ -70,7 +75,8 @@ switch Action
             indxToPlot = mn:CurrentTrial;
             %Cumulative Reward Amount
             set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [CurrentTrial + 1.6 .5], 'string', ...
-                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1) / 1000) ' mL']);
+                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1 & ...
+                BpodSystem.Data.Custom.Feedback) / 1000) ' mL']);
             %Plot Rewarded Left
             ndxRwdL = OutcomeRecord(indxToPlot) == find(strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxRwdL); Ydata = ones(1,sum(ndxRwdL));
@@ -111,10 +117,24 @@ switch Action
         %% Trial rate
         BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = (BpodSystem.Data.TrialStartTimestamp-min(BpodSystem.Data.TrialStartTimestamp))/60;
         BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = 1:numel(BpodSystem.Data.Custom.ChoiceLeft)-1;
+        %% Stimulus delay
+        cla(AxesHandles.HandleFix)
+        BpodSystem.GUIHandles.OutcomePlot.HistFix = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.BrokeFixTime(BpodSystem.Data.Custom.BrokeFix));
+        BpodSystem.GUIHandles.OutcomePlot.HistFix.NumBins = 10;
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.OST(~BpodSystem.Data.Custom.BrokeFix));
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke.NumBins = 10;
+        
+        %% OST
+        cla(AxesHandles.HandleFeedback)
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTbroke = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.OST(BpodSystem.Data.Custom.BrokeFix));
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTbroke.NumBins = 10;
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTok = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.OST(~BpodSystem.Data.Custom.BrokeFix));
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTbroke.NumBins = 10;
+        HandleOST
         %% Feedback delay
         cla(AxesHandles.HandleFeedback)
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback));
-        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.NumBins = 5;
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.NumBins = 10;
 end
 
 end
