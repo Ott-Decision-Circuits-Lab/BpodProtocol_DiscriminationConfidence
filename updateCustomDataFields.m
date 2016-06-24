@@ -1,5 +1,6 @@
-function updateCustomDataFields(TaskParameters)
+function updateCustomDataFields
 global BpodSystem
+global TaskParameters
 %% OutcomeRecord
 % Searches for state names and not number, so won't be affected by
 % modifications in state matrix
@@ -31,8 +32,7 @@ if any(ismember(ndxOutcome,BpodSystem.Data.RawData.OriginalStateData{end}))
         BpodSystem.Data.Custom.Feedback(end) = false;        
     end
 end
-if ismember(find(strcmp('odor_delivery',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end})),...
-        BpodSystem.Data.RawData.OriginalStateData{end})
+if any(strcmp('odor_delivery',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.RawData.OriginalStateData{end})))
     BpodSystem.Data.Custom.OST(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.odor_delivery);
 end
 if ~BpodSystem.Data.Custom.FixBroke(end)
@@ -77,9 +77,22 @@ end
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
 %% Delays
-if ~BpodSystem.Data.Custom.FixBroke(end-1)
-    BpodSystem.Data.Custom.StimDelay(end+1) = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+if BpodSystem.Data.Custom.FixBroke(end-1)
+    BpodSystem.Data.Custom.StimDelay(end+1) = max(TaskParameters.GUI.StimDelayMin,...
+        BpodSystem.Data.Custom.StimDelay(end)-TaskParameters.GUI.StimDelayDecr);
+else
+    BpodSystem.Data.Custom.StimDelay(end+1) = min(TaskParameters.GUI.StimDelayTarget,...
+        BpodSystem.Data.Custom.StimDelay(end)+TaskParameters.GUI.StimDelayIncr);
 end
+TaskParameters.GUI.StimDelay = BpodSystem.Data.Custom.StimDelay(end);
+if ~BpodSystem.Data.Custom.Feedback(end-1)
+    BpodSystem.Data.Custom.FeedbackDelay(end+1) = max(TaskParameters.GUI.FeedbackDelayMin,...
+        BpodSystem.Data.Custom.FeedbackDelay(end)-TaskParameters.GUI.FeedbackDelayDecr);
+else
+    BpodSystem.Data.Custom.FeedbackDelay(end+1) = min(TaskParameters.GUI.FeedbackDelayTarget,...
+        BpodSystem.Data.Custom.FeedbackDelay(end)+TaskParameters.GUI.FeedbackDelayIncr);
+end
+TaskParameters.GUI.FeedbackDelay = BpodSystem.Data.Custom.FeedbackDelay(end);
 %% Block count
 % nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
 % if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax

@@ -3,15 +3,29 @@ function Olf2AFC
 
 global BpodSystem
 %% Task parameters
+global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 30;
-    TaskParameters.GUI.StimDelayMin = .2;
-    TaskParameters.GUI.StimDelayMax = .6;
+    TaskParameters.GUI.RewardAmount = 30;    
     %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.FeedbackDelay = 1; % (s) % UNUSED
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','StimDelayMin','StimDelayMax','FeedbackDelay'};
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
+    %%
+    TaskParameters.GUI.StimDelayMin = 0;
+    TaskParameters.GUI.StimDelayTarget = 0.6;
+    TaskParameters.GUI.StimDelayIncr = 0.01;
+    TaskParameters.GUI.StimDelayDecr = 0.01;
+    TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
+    TaskParameters.GUIMeta.StimDelay.Style = 'text';
+    TaskParameters.GUIPanels.StimDelay = {'StimDelayMin','StimDelayTarget','StimDelayIncr','StimDelayDecr','StimDelay'};
+    TaskParameters.GUI.FeedbackDelayMin = 0;
+    TaskParameters.GUI.FeedbackDelayTarget = 1;
+    TaskParameters.GUI.FeedbackDelayIncr = 0.01;
+    TaskParameters.GUI.FeedbackDelayDecr = 0.01;
+    TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
+    TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayMin','FeedbackDelayTarget','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
+    %%
     TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -41,7 +55,8 @@ BpodSystem.Data.Custom.OdorFracA = NaN;
 BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
-BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+BpodSystem.Data.Custom.StimDelay = TaskParameters.GUI.StimDelayMin;%random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+BpodSystem.Data.Custom.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
 BpodSystem.Data.Custom.TrialNumber = 1;
 BpodSystem.Data.Custom.Feedback = true;
 BpodSystem.Data.Custom.FeedbackTime = NaN;
@@ -107,7 +122,7 @@ while RunSession
         return
     end
     
-    updateCustomDataFields(TaskParameters);
+    updateCustomDataFields;
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
     BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;    
