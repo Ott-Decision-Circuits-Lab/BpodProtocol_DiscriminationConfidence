@@ -55,7 +55,7 @@ switch Action
         %% Feedback Delay histogram
         hold(AxesHandles.HandleFeedback,'on')
         AxesHandles.HandleFeedback.XLabel.String = 'Time (ms)';
-        AxesHandles.HandleFeedback.YLabel.String = 'normalized trial counts';
+        AxesHandles.HandleFeedback.YLabel.String = 'trial counts';
         AxesHandles.HandleFeedback.Title.String = 'Feedback delay';
     case 'update'
         %% Outcome
@@ -142,12 +142,12 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.BinWidth = 100;
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeColor = 'none';
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = 'r';
-        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
+        %BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
         BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(BpodSystem.Data.Custom.Feedback)*1000);
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.BinWidth = 100;
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = 'none';
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.FaceColor = 'b';
-        BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
+%         BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
 end
 
 end
