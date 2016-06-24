@@ -11,20 +11,24 @@ if isempty(fieldnames(TaskParameters))
     %TaskParameters.GUI.ChoiceDeadLine = 5;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
     %%
+    TaskParameters.GUI.StimDelayAutoincrement = 1;
+    TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
     TaskParameters.GUI.StimDelayMin = 0;
-    TaskParameters.GUI.StimDelayTarget = 0.6;
+    TaskParameters.GUI.StimDelayMax = 0.6;
     TaskParameters.GUI.StimDelayIncr = 0.01;
     TaskParameters.GUI.StimDelayDecr = 0.01;
     TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
     TaskParameters.GUIMeta.StimDelay.Style = 'text';
-    TaskParameters.GUIPanels.StimDelay = {'StimDelayMin','StimDelayTarget','StimDelayIncr','StimDelayDecr','StimDelay'};
+    TaskParameters.GUIPanels.StimDelay = {'StimDelayMin','StimDelayMax','StimDelayIncr','StimDelayDecr','StimDelay'};
+    TaskParameters.GUI.FeedbackDelayAutoincrement = 1;
+    TaskParameters.GUIMeta.FeedbackDelayAutoincrement.Style = 'checkbox';
     TaskParameters.GUI.FeedbackDelayMin = 0;
-    TaskParameters.GUI.FeedbackDelayTarget = 1;
+    TaskParameters.GUI.FeedbackDelayMax = 1;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
-    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayMin','FeedbackDelayTarget','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
     %%
     TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
@@ -55,7 +59,11 @@ BpodSystem.Data.Custom.OdorFracA = NaN;
 BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
-BpodSystem.Data.Custom.StimDelay = TaskParameters.GUI.StimDelayMin;%random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+if TaskParameters.GUI.StimDelayAutoincrement
+    BpodSystem.Data.Custom.StimDelay = TaskParameters.GUI.StimDelayMin;
+else
+    BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
+end
 BpodSystem.Data.Custom.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
 BpodSystem.Data.Custom.TrialNumber = 1;
 BpodSystem.Data.Custom.Feedback = true;
