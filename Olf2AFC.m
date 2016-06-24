@@ -5,14 +5,14 @@ global BpodSystem
 %% Task parameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
-    TaskParameters.GUI.ITI = 2; % (s)
+    TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 30;
-    TaskParameters.GUI.StimDelayMin = 0;%.2;
-    TaskParameters.GUI.StimDelayMax = 0;%.6;
+    TaskParameters.GUI.StimDelayMin = .2;
+    TaskParameters.GUI.StimDelayMax = .6;
     %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.FeedbackDelay = 0; % (s) % UNUSED
+    TaskParameters.GUI.FeedbackDelay = 1; % (s) % UNUSED
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','StimDelayMin','StimDelayMax','FeedbackDelay'};
-    TaskParameters.GUI.TimeOut = 2; % (s)
+    TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting'};
@@ -28,8 +28,8 @@ BpodParameterGUI('init', TaskParameters);
 
 BpodSystem.Data.Custom.OutcomeRecord = nan;
 BpodSystem.Data.Custom.TrialValid = true;
-BpodSystem.Data.Custom.BrokeFix = false;
-BpodSystem.Data.Custom.BrokeFixTime = NaN;
+BpodSystem.Data.Custom.FixBroke = false;
+BpodSystem.Data.Custom.FixDur = NaN;
 % BpodSystem.Data.Custom.BlockNumber = 1;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
@@ -38,6 +38,7 @@ BpodSystem.Data.Custom.OdorID = randi(2,1,20);
 BpodSystem.Data.Custom.OdorContrast = ones(1,20)*.9; % Future: control difficulties via GUI
 BpodSystem.Data.Custom.OdorPair = ones(1,20); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
 BpodSystem.Data.Custom.OdorFracA = NaN;
+BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
 BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
@@ -79,7 +80,10 @@ BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000
 BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position', [.075 .15 .89 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandlePsyc = axes('Position', [.075 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position', [2*.075+.12 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position', [3*.075+2*.12 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position', [3*.075+2*.12 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleOST = axes('Position', [4*.075+3*.12 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position', [5*.075+4*.12 .6 .12 .3]);
+
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 %BpodNotebook('init');
 

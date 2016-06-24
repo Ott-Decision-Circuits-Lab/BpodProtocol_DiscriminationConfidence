@@ -42,10 +42,20 @@ switch Action
         AxesHandles.HandleTrialRate.XLabel.String = 'Time (min)'; % FIGURE OUT UNIT
         AxesHandles.HandleTrialRate.YLabel.String = 'nTrials';
         AxesHandles.HandleTrialRate.Title.String = 'Trial rate';
+        %% Stimulus delay
+        hold(AxesHandles.HandleFix,'on')
+        AxesHandles.HandleFix.XLabel.String = 'Time (ms)';
+        AxesHandles.HandleFix.YLabel.String = 'trial counts';
+        AxesHandles.HandleFix.Title.String = 'Pre-stimulus delay';
+        %% OST histogram
+        hold(AxesHandles.HandleOST,'on')
+        AxesHandles.HandleOST.XLabel.String = 'Time (ms)';
+        AxesHandles.HandleOST.YLabel.String = 'trial counts';
+        AxesHandles.HandleOST.Title.String = 'Odor sampling time';
         %% Feedback Delay histogram
         hold(AxesHandles.HandleFeedback,'on')
-        AxesHandles.HandleFeedback.XLabel.String = 'Time (s)';
-        AxesHandles.HandleFeedback.YLabel.String = 'nTrials';
+        AxesHandles.HandleFeedback.XLabel.String = 'Time (ms)';
+        AxesHandles.HandleFeedback.YLabel.String = 'normalized trial counts';
         AxesHandles.HandleFeedback.Title.String = 'Feedback delay';
     case 'update'
         %% Outcome
@@ -70,7 +80,8 @@ switch Action
             indxToPlot = mn:CurrentTrial;
             %Cumulative Reward Amount
             set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [CurrentTrial + 1.6 .5], 'string', ...
-                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1) / 1000) ' mL']);
+                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1 & ...
+                BpodSystem.Data.Custom.Feedback) / 1000) ' mL']);
             %Plot Rewarded Left
             ndxRwdL = OutcomeRecord(indxToPlot) == find(strcmp('rewarded_Lin',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
             Xdata = indxToPlot(ndxRwdL); Ydata = ones(1,sum(ndxRwdL));
@@ -111,10 +122,32 @@ switch Action
         %% Trial rate
         BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = (BpodSystem.Data.TrialStartTimestamp-min(BpodSystem.Data.TrialStartTimestamp))/60;
         BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = 1:numel(BpodSystem.Data.Custom.ChoiceLeft)-1;
+        %% Stimulus delay
+        cla(AxesHandles.HandleFix)
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke = histogram(AxesHandles.HandleFix,BpodSystem.Data.Custom.FixDur(BpodSystem.Data.Custom.FixBroke)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke.BinWidth = 50;
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke.EdgeColor = 'none';
+        BpodSystem.GUIHandles.OutcomePlot.HistBroke.FaceColor = 'r';
+        BpodSystem.GUIHandles.OutcomePlot.HistFix = histogram(AxesHandles.HandleFix,BpodSystem.Data.Custom.FixDur(~BpodSystem.Data.Custom.FixBroke)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistFix.BinWidth = 50;
+        BpodSystem.GUIHandles.OutcomePlot.HistFix.FaceColor = 'b';
+        BpodSystem.GUIHandles.OutcomePlot.HistFix.EdgeColor = 'none';
+        %% OST
+        cla(AxesHandles.HandleOST)
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTbroke = histogram(AxesHandles.HandleOST,BpodSystem.Data.Custom.OST*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistOSTbroke.BinWidth = 50;
         %% Feedback delay
         cla(AxesHandles.HandleFeedback)
-        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback));
-        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.NumBins = 5;
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.BinWidth = 100;
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeColor = 'none';
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = 'r';
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(BpodSystem.Data.Custom.Feedback)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed.BinWidth = 100;
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = 'none';
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed.FaceColor = 'b';
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
 end
 
 end
