@@ -104,10 +104,12 @@ if TaskParameters.GUI.FeedbackDelayAutoincrement
     end
     TaskParameters.GUI.FeedbackDelay = BpodSystem.Data.Custom.FeedbackDelay(end);
 else
-    if ~strcmp('edit',TaskParameters.GUIMeta.FeedbackDelay.Style)
-        TaskParameters.GUIMeta.FeedbackDelay.Style = 'edit';
-    end
-    BpodSystem.Data.Custom.FeedbackDelay(end+1) = TaskParameters.GUI.FeedbackDelay;
+%     ATTEMPT TO GRAY OUT FIELDS
+%     if ~strcmp('edit',TaskParameters.GUIMeta.FeedbackDelay.Style)
+%         TaskParameters.GUIMeta.FeedbackDelay.Style = 'edit';
+%     end
+    BpodSystem.Data.Custom.FeedbackDelay(end+1) = TaskParameters.GUI.FeedbackDelayMax;
+    TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMax;
 end
 %% Block count
 % nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
