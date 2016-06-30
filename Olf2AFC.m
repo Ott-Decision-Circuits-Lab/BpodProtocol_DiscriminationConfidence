@@ -6,13 +6,10 @@ global BpodSystem
 global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
-    TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 30;    
-    %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
-    %%
+    %% StimDelay
     TaskParameters.GUI.StimDelayAutoincrement = 1;
-    TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
+    TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'togglebutton';
+    TaskParameters.GUIMeta.StimDelayAutoincrement.String = 'Auto';
     TaskParameters.GUI.StimDelayMin = 0;
     TaskParameters.GUI.StimDelayMax = 0.6;
     TaskParameters.GUI.StimDelayIncr = 0.01;
@@ -20,6 +17,27 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
     TaskParameters.GUIMeta.StimDelay.Style = 'text';
     TaskParameters.GUIPanels.StimDelay = {'StimDelayAutoincrement','StimDelayMin','StimDelayMax','StimDelayIncr','StimDelayDecr','StimDelay'};
+    %% General
+    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.RewardAmount = 30;    
+    %TaskParameters.GUI.ChoiceDeadLine = 5;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
+    %% BiasControl
+    TaskParameters.GUI.TimeOut = 0; % (s)
+    TaskParameters.GUI.TrialSelection = 3;
+    TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
+    TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting'};
+    TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
+    %% OdorParams
+    TaskParameters.GUI.OdorA_bank = 3;
+    TaskParameters.GUI.OdorB_bank = 4;
+    TaskParameters.GUI.OdorSettings = 0;
+    TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
+    TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
+    TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
+    TaskParameters.GUIPanels.OdorParams = {'OdorA_bank', 'OdorB_bank','OdorSettings'};
+    TaskParameters.GUI = orderfields(TaskParameters.GUI);
+    %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelayAutoincrement = 1;
     TaskParameters.GUIMeta.FeedbackDelayAutoincrement.Style = 'checkbox';
     TaskParameters.GUI.FeedbackDelayMin = 0;
@@ -29,16 +47,6 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
     TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayAutoincrement','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
-    %%
-    TaskParameters.GUI.TimeOut = 0; % (s)
-    TaskParameters.GUI.TrialSelection = 3;
-    TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
-    TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting'};
-    TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
-    TaskParameters.GUI.OdorA_bank = 3;
-    TaskParameters.GUI.OdorB_bank = 4;
-    TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
-    TaskParameters.GUI = orderfields(TaskParameters.GUI);
 end
 BpodParameterGUI('init', TaskParameters);
 
@@ -110,7 +118,6 @@ BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position', [2*.075+.12
 BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position', [3*.075+2*.12 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleOST = axes('Position', [4*.075+3*.12 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position', [5*.075+4*.12 .6 .12 .3]);
-
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 %BpodNotebook('init');
 
