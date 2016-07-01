@@ -47,6 +47,10 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
     TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayAutoincrement','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
+    %% Tabs
+    TaskParameters.GUITabs.General = {'General','BiasControl'};
+    TaskParameters.GUITabs.Delays = {'StimDelay','FeedbackDelay'};
+    TaskParameters.GUITabs.Odor = {'OdorParams'};
 end
 BpodParameterGUI('init', TaskParameters);
 
