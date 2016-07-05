@@ -13,19 +13,8 @@ if odorPair < 32
     end
 elseif odorPair == 32
     nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
-    OdorContrast = BpodSystem.Data.Custom.OdorContrast(nextTrial);
-    OdorID = BpodSystem.Data.Custom.OdorID(nextTrial);
-    switch OdorID 
-        case 1
-            OdorA_flow = 100*(.5 + OdorContrast/2);
-            OdorB_flow = 100*(.5 - OdorContrast/2);
-        case 2
-            OdorA_flow = 100*(.5 - OdorContrast/2);
-            OdorB_flow = 100*(.5 + OdorContrast/2);
-        otherwise
-            error('Undefined odorID')
-    end
-    BpodSystem.Data.Custom.OdorFracA(nextTrial) = OdorA_flow;
+    OdorA_flow = BpodSystem.Data.Custom.OdorFracA(nextTrial);
+    OdorB_flow = 100 - OdorA_flow;
     if ~BpodSystem.EmulatorMode
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)

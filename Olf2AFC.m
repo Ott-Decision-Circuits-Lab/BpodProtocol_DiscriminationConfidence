@@ -6,6 +6,17 @@ global BpodSystem
 global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
+    %% General
+    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.RewardAmount = 30;    
+    %TaskParameters.GUI.ChoiceDeadLine = 5;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
+    %% BiasControl
+    TaskParameters.GUI.TimeOut = 0; % (s)
+    TaskParameters.GUI.TrialSelection = 3;
+    TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
+    TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting','Competitive'};
+    TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
     %% StimDelay
     TaskParameters.GUI.StimDelayAutoincrement = 1;
     TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'togglebutton';
@@ -17,26 +28,6 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
     TaskParameters.GUIMeta.StimDelay.Style = 'text';
     TaskParameters.GUIPanels.StimDelay = {'StimDelayAutoincrement','StimDelayMin','StimDelayMax','StimDelayIncr','StimDelayDecr','StimDelay'};
-    %% General
-    TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 30;    
-    %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
-    %% BiasControl
-    TaskParameters.GUI.TimeOut = 0; % (s)
-    TaskParameters.GUI.TrialSelection = 3;
-    TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
-    TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting'};
-    TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
-    %% OdorParams
-    TaskParameters.GUI.OdorA_bank = 3;
-    TaskParameters.GUI.OdorB_bank = 4;
-    TaskParameters.GUI.OdorSettings = 0;
-    TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
-    TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
-    TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
-    TaskParameters.GUIPanels.OdorParams = {'OdorA_bank', 'OdorB_bank','OdorSettings'};
-    TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelayAutoincrement = 1;
     TaskParameters.GUIMeta.FeedbackDelayAutoincrement.Style = 'checkbox';
@@ -47,10 +38,26 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
     TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayAutoincrement','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelay'};
+    %% OdorParams
+    TaskParameters.GUI.OdorA_bank = 3;
+    TaskParameters.GUI.OdorB_bank = 4;
+%     TaskParameters.GUI.OdorSettings = 0;
+    TaskParameters.GUI.OdorTable.OdorFracA = 50+[-1; 1]*round(logspace(log10(6),log10(90),3)/2);
+    TaskParameters.GUI.OdorTable.OdorFracA = sort(TaskParameters.GUI.OdorTable.OdorFracA(:));
+    TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorFracA));
+    TaskParameters.GUIMeta.OdorTable.Style = 'table';
+    TaskParameters.GUIMeta.OdorTable.String = 'Odor probabilities';
+    TaskParameters.GUIMeta.OdorTable.ColumnLabel = {'a = Frac Odor A','P(a)'};
+%     TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
+%     TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
+%     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
+    TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
+    TaskParameters.GUIPanels.Stimuli = {'OdorTable'};
+    TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
-    TaskParameters.GUITabs.General = {'General','BiasControl'};
-    TaskParameters.GUITabs.Delays = {'StimDelay','FeedbackDelay'};
-    TaskParameters.GUITabs.Odor = {'OdorParams'};
+    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay'};
+    TaskParameters.GUITabs.Odor = {'Olfactometer','Stimuli'};
+    
 end
 BpodParameterGUI('init', TaskParameters);
 
@@ -64,10 +71,10 @@ BpodSystem.Data.Custom.FixDur = NaN;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
 BpodSystem.Data.Custom.Rewarded = NaN;
-BpodSystem.Data.Custom.OdorID = randi(2,1,20);
-BpodSystem.Data.Custom.OdorContrast = ones(1,20)*.9; % Future: control difficulties via GUI
+% BpodSystem.Data.Custom.OdorContrast = ones(1,20)*.9; % Future: control difficulties via GUI
 BpodSystem.Data.Custom.OdorPair = ones(1,20); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
-BpodSystem.Data.Custom.OdorFracA = NaN;
+BpodSystem.Data.Custom.OdorFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,20,1,TaskParameters.GUI.OdorTable.OdorProb);
+BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
 BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
@@ -96,16 +103,17 @@ if ~BpodSystem.EmulatorMode
         error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
     end
     %SetCarrierFlowRate()
-    OdorContrast = BpodSystem.Data.Custom.OdorContrast(1);
-    OdorID = BpodSystem.Data.Custom.OdorID(1);
-    if OdorID == 1
-        OdorA_flow = 100*(.5 + OdorContrast/2);
-        OdorB_flow = 100*(.5 - OdorContrast/2);
-    else
-        OdorA_flow = 100*(.5 - OdorContrast/2);
-        OdorB_flow = 100*(.5 + OdorContrast/2);
-    end
-    BpodSystem.Data.Custom.OdorFracA(1) = OdorA_flow;
+%     OdorContrast = BpodSystem.Data.Custom.OdorContrast(1);
+%     OdorID = BpodSystem.Data.Custom.OdorID(1);
+%     if OdorID == 1
+%         OdorA_flow = 100*(.5 + OdorContrast/2);
+%         OdorB_flow = 100*(.5 - OdorContrast/2);
+%     else
+%         OdorA_flow = 100*(.5 - OdorContrast/2);
+%         OdorB_flow = 100*(.5 + OdorContrast/2);
+%     end
+    OdorA_flow = BpodSystem.Data.Custom.OdorFracA(1);
+    OdorB_flow = 100 - OdorA_flow;
     SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
     SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
     clear Odor* flow*
