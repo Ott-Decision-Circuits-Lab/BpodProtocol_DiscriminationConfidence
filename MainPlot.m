@@ -26,7 +26,7 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.NoResponseR = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.BrokeFix = line(-1,0.5, 'LineStyle','none','Marker','d','MarkerEdge','b','MarkerFace','none', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.NoFeedback = line(-1,0.5, 'LineStyle','none','Marker','o','MarkerEdge','none','MarkerFace','w', 'MarkerSize',6);
-        set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-1, 2], 'YTick', [0 1],'YTickLabel', {'Right','Left'}, 'FontSize', 16);
+        set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-.25, 1.25], 'YTick', [0 1],'YTickLabel', {'Right','Left'}, 'FontSize', 16);
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', 18);
         hold(AxesHandles.HandleOutcome, 'on');
         %% Psyc
@@ -84,11 +84,13 @@ switch Action
                 BpodSystem.Data.Custom.Feedback) / 1000) ' mL']);
             %Plot Rewarded
             ndxRwd = ismember(OutcomeRecord(indxToPlot), find(strncmp('rewarded',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end},8)));
-            Xdata = indxToPlot(ndxRwd); Ydata = BpodSystem.Data.Custom.OdorFracA(ndxRwd)/100;
+            Xdata = indxToPlot(ndxRwd);
+            Ydata = BpodSystem.Data.Custom.OdorFracA(indxToPlot); Ydata = Ydata(ndxRwd)/100;
             set(BpodSystem.GUIHandles.OutcomePlot.Rewarded, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Unrewarded
             ndxUrd = ismember(OutcomeRecord(indxToPlot),find(strncmp('unrewarded',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end},10)));
-            Xdata = indxToPlot(ndxUrd); Ydata = BpodSystem.Data.Custom.OdorFracA(ndxUrd)/100;
+            Xdata = indxToPlot(ndxUrd);
+            Ydata = BpodSystem.Data.Custom.OdorFracA(indxToPlot); Ydata = Ydata(ndxUrd)/100;
             set(BpodSystem.GUIHandles.OutcomePlot.Unrewarded, 'xdata', Xdata, 'ydata', Ydata);
             %Plot Broken Fixation
             ndxBroke = OutcomeRecord(indxToPlot) == find(strcmp('broke_fixation',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}));
@@ -96,9 +98,9 @@ switch Action
             set(BpodSystem.GUIHandles.OutcomePlot.BrokeFix, 'xdata', Xdata, 'ydata', Ydata);
             %Plot NoFeedback trials
             ndxNoFeedback = ~BpodSystem.Data.Custom.Feedback(indxToPlot);
-            OdorID = BpodSystem.Data.Custom.OdorID(indxToPlot);
+            OdorFracA = BpodSystem.Data.Custom.OdorFracA(indxToPlot)/100;
             Xdata = indxToPlot(ndxNoFeedback);
-            Ydata = double(OdorID(ndxNoFeedback)==1);
+            Ydata = OdorFracA(ndxNoFeedback);
             set(BpodSystem.GUIHandles.OutcomePlot.NoFeedback, 'xdata', Xdata, 'ydata', Ydata);
         end
         %% Psyc

@@ -58,10 +58,15 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
         case 'Manual'
             
         case 'Competitive'
-            for iStim = TaskParameters.GUI.OdorTable.OdorFracA(2)
-                ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.Rewarded)) == iStim;
-                TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = ...
-                    1 - nansum(BpodSystem.Data.Custom.Rewarded(ndxOdor))/sum(ndxOdor);                    
+            ndxValid = [BpodSystem.Data.Custom.TrialValid(1:end-1); false(1+numel(BpodSystem.Data.Custom.OdorFracA)-numel(BpodSystem.Data.Custom.TrialValid),1)];
+            if numel(BpodSystem.Data.Custom.OdorFracA(ndxValid))/numel(unique(BpodSystem.Data.Custom.OdorFracA)) > 8
+                for iStim = TaskParameters.GUI.OdorTable.OdorFracA'
+                    ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.Rewarded)) == iStim;
+                    if any(ndxOdor)
+                        TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = ...
+                            1 - sum(BpodSystem.Data.Custom.Rewarded(ndxOdor)==1)/sum(ndxOdor);
+                    end
+                end
             end
         case 'BiasCorrecting' % Favors side with fewer rewards. Contrast drawn flat & independently.
             ndxCorrect = BpodSystem.Data.Custom.Rewarded(1:end-1) == 1; ndxCorrect = ndxCorrect(:);
@@ -71,13 +76,14 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
     end
     newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,20,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
-    newOdorPair = ones(1,10);
+    newOdorPair = ones(1,20);
     BpodSystem.Data.Custom.OdorFracA = [BpodSystem.Data.Custom.OdorFracA; newFracA];
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, newOdorID];
 %     BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, newOdorContrast];
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
     clear newOdor* oldOdorID
 end
+TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
 %% Olfactometer banks
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;

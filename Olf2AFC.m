@@ -19,7 +19,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
     %% StimDelay
     TaskParameters.GUI.StimDelayAutoincrement = 1;
-    TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'togglebutton';
+    TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
     TaskParameters.GUIMeta.StimDelayAutoincrement.String = 'Auto';
     TaskParameters.GUI.StimDelayMin = 0;
     TaskParameters.GUI.StimDelayMax = 0.6;
