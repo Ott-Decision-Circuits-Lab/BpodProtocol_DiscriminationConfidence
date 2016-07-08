@@ -71,8 +71,8 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
         case 'BiasCorrecting' % Favors side with fewer rewards. Contrast drawn flat & independently.
             ndxCorrect = BpodSystem.Data.Custom.Rewarded(1:end-1) == 1; ndxCorrect = ndxCorrect(:);
             oldOdorID = BpodSystem.Data.Custom.OdorID(1:numel(ndxCorrect)); oldOdorID = oldOdorID(:);
-            TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA<50) = 1-sum(oldOdorID==1 & ndxCorrect)/sum(ndxCorrect);
-            TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA>50) = 1-sum(oldOdorID==2 & ndxCorrect)/sum(ndxCorrect);            
+            TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA<50) = 1-sum(oldOdorID==2 & ndxCorrect)/sum(ndxCorrect);
+            TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA>50) = 1-sum(oldOdorID==1 & ndxCorrect)/sum(ndxCorrect);            
     end
     newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,20,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
