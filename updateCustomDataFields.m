@@ -58,8 +58,9 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
         case 'Manual'
             
         case 'Competitive'
-            ndxValid = [BpodSystem.Data.Custom.TrialValid(1:end-1); false(1+numel(BpodSystem.Data.Custom.OdorFracA)-numel(BpodSystem.Data.Custom.TrialValid),1)];
-            if numel(BpodSystem.Data.Custom.OdorFracA(ndxValid))/numel(unique(BpodSystem.Data.Custom.OdorFracA)) > 8
+            ndxValid = [or(BpodSystem.Data.Custom.TrialValid(1:end-1),BpodSystem.Data.Custom.Feedback(1:end-1)==0)...
+                false(1,1+numel(BpodSystem.Data.Custom.OdorFracA)-numel(BpodSystem.Data.Custom.TrialValid))];
+            if numel(BpodSystem.Data.Custom.OdorFracA(ndxValid))/numel(unique(BpodSystem.Data.Custom.OdorFracA)) >= 8
                 for iStim = TaskParameters.GUI.OdorTable.OdorFracA'
                     ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.Rewarded)) == iStim;
                     if any(ndxOdor)
