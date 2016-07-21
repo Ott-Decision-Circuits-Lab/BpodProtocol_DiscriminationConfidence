@@ -139,9 +139,7 @@ iTrial = 1;
 
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
-    if ntrials > x
-        rewMag = 2*rewMag;
-    end
+    
     sma = stateMatrix(TaskParameters,iTrial);
     SendStateMatrix(sma);
     RawEvents = RunStateMatrix;
