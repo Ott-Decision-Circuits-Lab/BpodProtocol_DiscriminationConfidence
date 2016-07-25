@@ -1,9 +1,11 @@
 function sma = stateMatrix(TaskParameters,iTrial)
 global BpodSystem
-ValveTimes  = GetValveTimes(TaskParameters.GUI.RewardAmount, [1 3]);
-LeftValveTime = ValveTimes(1);
-RightValveTime = ValveTimes(2);
-clear ValveTimes
+
+rewMag = TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(end));
+LeftValveTime  = GetValveTimes(TaskParameters.GUI.RewardAmount*rewMag, 1);
+rewMag = TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(end));
+RightValveTime  = GetValveTimes(TaskParameters.GUI.RewardAmount*rewMag, 3);
+clear rewMag
 
 if BpodSystem.Data.Custom.OdorID(iTrial) == 1
     LeftPokeAction = 'rewarded_Lin';

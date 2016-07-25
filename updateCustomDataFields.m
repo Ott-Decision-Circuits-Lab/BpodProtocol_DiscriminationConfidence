@@ -51,22 +51,21 @@ BpodSystem.Data.Custom.TrialValid(end+1) = true;
 BpodSystem.Data.Custom.Feedback(end+1) = true;
 BpodSystem.Data.Custom.FeedbackTime(end+1) = NaN;
 
-if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorFracA) - 10
+if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     switch TaskParameters.GUIMeta.TrialSelection.String{TaskParameters.GUI.TrialSelection}
         case 'Flat'
             TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorProb));
         case 'Manual'
             
         case 'Competitive'
-            ndxValid = [or(BpodSystem.Data.Custom.TrialValid(1:end-1),BpodSystem.Data.Custom.Feedback(1:end-1)==0)...
-                false(1,1+numel(BpodSystem.Data.Custom.OdorFracA)-numel(BpodSystem.Data.Custom.TrialValid))];
-            if numel(BpodSystem.Data.Custom.OdorFracA(ndxValid))/numel(unique(BpodSystem.Data.Custom.OdorFracA)) >= 8
-                for iStim = TaskParameters.GUI.OdorTable.OdorFracA'
-                    ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.Rewarded)) == iStim;
-                    if any(ndxOdor)
-                        TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = ...
-                            1 - sum(BpodSystem.Data.Custom.Rewarded(ndxOdor)==1)/sum(ndxOdor);
-                    end
+            ndxValid = or(BpodSystem.Data.Custom.TrialValid,BpodSystem.Data.Custom.Feedback==0)';
+            for iStim = TaskParameters.GUI.OdorTable.OdorFracA'
+                ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.Rewarded)) == iStim;
+                if sum(ndxOdor&ndxValid) >= 8
+                    TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = ...
+                        sum(BpodSystem.Data.Custom.Rewarded(ndxOdor&ndxValid)==0)/sum(ndxOdor&ndxValid);
+                else
+                    TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = 0.5;
                 end
             end
         case 'BiasCorrecting' % Favors side with fewer rewards. Contrast drawn flat & independently.
@@ -75,16 +74,20 @@ if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.Od
             TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA<50) = 1-sum(oldOdorID==2 & ndxCorrect)/sum(ndxCorrect);
             TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA>50) = 1-sum(oldOdorID==1 & ndxCorrect)/sum(ndxCorrect);            
     end
-    newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,20,1,TaskParameters.GUI.OdorTable.OdorProb);
+    newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,10,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
-    newOdorPair = ones(1,20);
+    newOdorPair = ones(1,10);
     BpodSystem.Data.Custom.OdorFracA = [BpodSystem.Data.Custom.OdorFracA; newFracA];
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID, newOdorID];
 %     BpodSystem.Data.Custom.OdorContrast = [BpodSystem.Data.Custom.OdorContrast, newOdorContrast];
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
-    clear newOdor* oldOdorID
+    clear newFracA newOdor* oldOdorID
+    if any(TaskParameters.GUI.OdorTable.OdorProb==0)
+        TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorProb==0) = ...
+            min(TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorProb>0));
+        TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
+    end
 end
-TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
 %% Olfactometer banks
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
 BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
@@ -124,19 +127,16 @@ else
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMax;
 end
 %% Block count
-% nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
-% if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax
-%     % If current block len exceeds new max block size, will transition
-%     BpodSystem.Data.Custom.BlockLen(end) = nTrialsThisBlock;
-% end
-% if nTrialsThisBlock >= BpodSystem.Data.Custom.BlockLen(end)
-%     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end)+1;
-%     BpodSystem.Data.Custom.BlockLen(end+1) = drawBlockLen(TaskParameters);
-%     BpodSystem.Data.Custom.LeftHi(end+1) = ~BpodSystem.Data.Custom.LeftHi(end);
-% else
-%     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end);
-%     BpodSystem.Data.Custom.LeftHi(end+1) = BpodSystem.Data.Custom.LeftHi(end);
-% end
+
+if BpodSystem.Data.Custom.BlockTrial(end) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
+        ==BpodSystem.Data.Custom.BlockNumber(end))
+    BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end) + 1;
+    BpodSystem.Data.Custom.BlockTrial(end+1) = 1;
+else
+    BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end);
+    BpodSystem.Data.Custom.BlockTrial(end+1) = BpodSystem.Data.Custom.BlockTrial(end) + 1;
+end
+
 %display(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.RawData.OriginalStateData{end}))
 
 end

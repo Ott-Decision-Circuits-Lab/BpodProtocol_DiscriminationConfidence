@@ -8,7 +8,7 @@ TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
     TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 30;    
+    TaskParameters.GUI.RewardAmount = 25;    
     %TaskParameters.GUI.ChoiceDeadLine = 5;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
     %% BiasControl
@@ -42,9 +42,10 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.OdorA_bank = 3;
     TaskParameters.GUI.OdorB_bank = 4;
 %     TaskParameters.GUI.OdorSettings = 0;
-    TaskParameters.GUI.OdorTable.OdorFracA = 50+[-1; 1]*round(logspace(log10(6),log10(90),3)/2);
-    TaskParameters.GUI.OdorTable.OdorFracA = sort(TaskParameters.GUI.OdorTable.OdorFracA(:));
-    TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorFracA));
+%     TaskParameters.GUI.OdorTable.OdorFracA = 50+[-1; 1]*round(logspace(log10(6),log10(90),3)/2);
+%     TaskParameters.GUI.OdorTable.OdorFracA = sort(TaskParameters.GUI.OdorTable.OdorFracA(:));
+    TaskParameters.GUI.OdorTable.OdorFracA = [5, 30, 45, 55, 70, 95]';
+    TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorFracA))/numel(TaskParameters.GUI.OdorTable.OdorFracA);
     TaskParameters.GUIMeta.OdorTable.Style = 'table';
     TaskParameters.GUIMeta.OdorTable.String = 'Odor probabilities';
     TaskParameters.GUIMeta.OdorTable.ColumnLabel = {'a = Frac Odor A','P(a)'};
@@ -53,9 +54,19 @@ if isempty(fieldnames(TaskParameters))
 %     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
     TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
     TaskParameters.GUIPanels.Stimuli = {'OdorTable'};
+    %% Block structure
+    TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
+    TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
+    TaskParameters.GUI.BlockTable.RewL = [1 randsample([1 .6],2) 1]';
+    TaskParameters.GUI.BlockTable.RewR = flipud(TaskParameters.GUI.BlockTable.RewL);
+    TaskParameters.GUIMeta.BlockTable.Style = 'table';
+    TaskParameters.GUIMeta.BlockTable.String = 'Block structure';
+    TaskParameters.GUIMeta.BlockTable.ColumnLabel = {'Block#','Block Length','Rew L', 'Rew R'};
+    TaskParameters.GUIPanels.BlockStructure = {'BlockTable'};
+    %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
-    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay'};
+    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','Stimuli'};
     
 end
@@ -71,9 +82,9 @@ BpodSystem.Data.Custom.FixDur = NaN;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
 BpodSystem.Data.Custom.Rewarded = NaN;
-% BpodSystem.Data.Custom.OdorContrast = ones(1,20)*.9; % Future: control difficulties via GUI
-BpodSystem.Data.Custom.OdorPair = ones(1,20); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
-BpodSystem.Data.Custom.OdorFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,20,1,TaskParameters.GUI.OdorTable.OdorProb);
+% BpodSystem.Data.Custom.OdorContrast = ones(1,10)*.9; % Future: control difficulties via GUI
+BpodSystem.Data.Custom.OdorPair = ones(1,10); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
+BpodSystem.Data.Custom.OdorFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,10,1,TaskParameters.GUI.OdorTable.OdorProb);
 BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
 BpodSystem.Data.Custom.OST = NaN;
 BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
@@ -93,6 +104,8 @@ BpodSystem.Data.Custom.Feedback = true;
 BpodSystem.Data.Custom.FeedbackTime = NaN;
 BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
 
+BpodSystem.Data.Custom.BlockNumber = 1;
+BpodSystem.Data.Custom.BlockTrial = 1;
 %BpodSystem.Data.Custom.OdorContrast = randsample([0 logspace(log10(.05),log10(.6), 3)],100,1);
 
 %% Olfactometer Madness
