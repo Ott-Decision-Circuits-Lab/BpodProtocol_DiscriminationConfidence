@@ -79,9 +79,13 @@ switch Action
         if any(~isnan(OutcomeRecord))
             indxToPlot = mn:CurrentTrial;
             %Cumulative Reward Amount
+            R = BpodSystem.Data.Custom.RewardMagnitude;
+            ndxRwd = BpodSystem.Data.Custom.Rewarded;
+            C = zeros(size(R)); C(BpodSystem.Data.Custom.ChoiceLeft==1&ndxRwd,1) = 1; C(BpodSystem.Data.Custom.ChoiceLeft==0&ndxRwd,2) = 1;
+            R = R.*C;
             set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [CurrentTrial+1 1], 'string', ...
-                [num2str(BpodSystem.Data.TrialSettings(end).GUI.RewardAmount * sum(BpodSystem.Data.Custom.Rewarded==1 & ...
-                BpodSystem.Data.Custom.Feedback) / 1000) ' mL']);
+                [num2str(sum(R(:))/1000) ' mL']);
+            clear R C
             %Plot Rewarded
             ndxRwd = ismember(OutcomeRecord(indxToPlot), find(strncmp('rewarded',BpodSystem.Data.RawData.OriginalStateNamesByNumber{end},8)));
             Xdata = indxToPlot(ndxRwd);

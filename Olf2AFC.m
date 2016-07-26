@@ -81,7 +81,9 @@ BpodSystem.Data.Custom.FixDur = NaN;
 % BpodSystem.Data.Custom.BlockNumber = 1;
 % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
 BpodSystem.Data.Custom.ChoiceLeft = NaN;
-BpodSystem.Data.Custom.Rewarded = NaN;
+BpodSystem.Data.Custom.ChoiceCorrect = NaN;
+BpodSystem.Data.Custom.Rewarded = false;
+BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 % BpodSystem.Data.Custom.OdorContrast = ones(1,10)*.9; % Future: control difficulties via GUI
 BpodSystem.Data.Custom.OdorPair = ones(1,10); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
 BpodSystem.Data.Custom.OdorFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,10,1,TaskParameters.GUI.OdorTable.OdorProb);
@@ -153,7 +155,7 @@ iTrial = 1;
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
     
-    sma = stateMatrix(TaskParameters,iTrial);
+    sma = stateMatrix(iTrial);
     SendStateMatrix(sma);
     RawEvents = RunStateMatrix;
     if ~isempty(fieldnames(RawEvents))
