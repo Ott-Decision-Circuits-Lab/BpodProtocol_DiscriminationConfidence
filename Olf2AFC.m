@@ -9,8 +9,8 @@ if isempty(fieldnames(TaskParameters))
     %% General
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
-    %TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount'};
+    TaskParameters.GUI.ChoiceDeadLine = 5;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine'};    
     %% BiasControl
     TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
