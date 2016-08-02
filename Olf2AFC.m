@@ -10,13 +10,15 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
     TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine'};    
+    TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
+    TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
+    TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback'};    
     %% BiasControl
-    TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting','Competitive'};
-    TaskParameters.GUIPanels.BiasControl = {'TimeOut','TrialSelection'};
+    TaskParameters.GUIPanels.BiasControl = {'TrialSelection'};
     %% StimDelay
     TaskParameters.GUI.StimDelayAutoincrement = 1;
     TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
