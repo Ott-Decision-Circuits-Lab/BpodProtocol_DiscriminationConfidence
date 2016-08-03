@@ -10,7 +10,6 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
     TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.TimeOut = 0; % (s)
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
