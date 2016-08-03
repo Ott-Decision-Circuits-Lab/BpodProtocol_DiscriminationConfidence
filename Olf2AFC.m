@@ -41,8 +41,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelayTau = 0.05;
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
-    %% OdorParams
     TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelay'};
+    %% OdorParams
     TaskParameters.GUI.OdorA_bank = 3;
     TaskParameters.GUI.OdorB_bank = 4;
 %     TaskParameters.GUI.OdorSettings = 0;
