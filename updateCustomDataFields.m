@@ -123,8 +123,7 @@ TaskParameters.GUI.StimDelay = BpodSystem.Data.Custom.StimDelay(end);
 
 % if TaskParameters.GUI.FeedbackDelayAutoincrement
 switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.FeedbackDelaySelection}
-    case 'FixAuto'
-        
+    case 'AutoIncr'
         if ~BpodSystem.Data.Custom.Feedback(end-1)
             BpodSystem.Data.Custom.FeedbackDelay(end+1) = max(TaskParameters.GUI.FeedbackDelayMin,...
                 BpodSystem.Data.Custom.FeedbackDelay(end)-TaskParameters.GUI.FeedbackDelayDecr);

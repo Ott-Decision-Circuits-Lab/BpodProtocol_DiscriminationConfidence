@@ -33,7 +33,7 @@ if isempty(fieldnames(TaskParameters))
     %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelaySelection = 2;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
-    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','FixAuto','TruncExp'};
+    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp'};
     TaskParameters.GUI.FeedbackDelayMin = 0;
     TaskParameters.GUI.FeedbackDelayMax = 1;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
@@ -101,7 +101,7 @@ else
     BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
 end
 switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.FeedbackDelaySelection}
-    case 'FixAuto'      
+    case 'AutoIncr'      
         BpodSystem.Data.Custom.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
         
     case 'TruncExp'
