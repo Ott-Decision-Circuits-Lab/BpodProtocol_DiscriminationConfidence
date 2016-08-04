@@ -142,29 +142,4 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
         BpodSystem.Data.Custom.FeedbackDelay(end+1) = TaskParameters.GUI.FeedbackDelayMax;
 end
 TaskParameters.GUI.FeedbackDelay = BpodSystem.Data.Custom.FeedbackDelay(end);
-
-%% Block count
-% nTrialsThisBlock = sum(BpodSystem.Data.Custom.BlockNumber == BpodSystem.Data.Custom.BlockNumber(end));
-% if nTrialsThisBlock >= TaskParameters.GUI.blockLenMax
-%     % If current block len exceeds new max block size, will transition
-%     BpodSystem.Data.Custom.BlockLen(end) = nTrialsThisBlock;
-% end
-% if nTrialsThisBlock >= BpodSystem.Data.Custom.BlockLen(end)
-%     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end)+1;
-%     BpodSystem.Data.Custom.BlockLen(end+1) = drawBlockLen(TaskParameters);
-%     BpodSystem.Data.Custom.LeftHi(end+1) = ~BpodSystem.Data.Custom.LeftHi(end);
-% else
-%     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end);
-%     BpodSystem.Data.Custom.LeftHi(end+1) = BpodSystem.Data.Custom.LeftHi(end);
-% end
-
-%display(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}(BpodSystem.Data.RawData.OriginalStateData{end}))
-
 end
-
-% function BlockLen = drawBlockLen(TaskParameters)
-% BlockLen = 0;
-% while BlockLen < TaskParameters.GUI.blockLenMin || BlockLen > TaskParameters.GUI.blockLenMax
-%     BlockLen = ceil(exprnd(sqrt(TaskParameters.GUI.blockLenMin*TaskParameters.GUI.blockLenMax)));
-% end
-% end
