@@ -41,12 +41,16 @@ end
 if ~BpodSystem.Data.Custom.FixBroke(end)
     BpodSystem.Data.Custom.FeedbackTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)}));
 end
+if BpodSystem.Data.Custom.BlockNumber(end) < max(TaskParameters.GUI.BlockTable.BlockNumber)
 if BpodSystem.Data.Custom.BlockTrial(end) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
         ==BpodSystem.Data.Custom.BlockNumber(end))
     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end) + 1;
     BpodSystem.Data.Custom.BlockTrial(end+1) = 1;
 else
     BpodSystem.Data.Custom.BlockNumber(end+1) = BpodSystem.Data.Custom.BlockNumber(end);
+    BpodSystem.Data.Custom.BlockTrial(end+1) = BpodSystem.Data.Custom.BlockTrial(end) + 1;
+end
+else
     BpodSystem.Data.Custom.BlockTrial(end+1) = BpodSystem.Data.Custom.BlockTrial(end) + 1;
 end
 BpodSystem.Data.Custom.RewardMagnitude(end+1,:) = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(BpodSystem.Data.Custom.BlockNumber(end)),...
