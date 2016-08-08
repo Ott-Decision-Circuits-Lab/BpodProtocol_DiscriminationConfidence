@@ -62,6 +62,7 @@ BpodSystem.Data.Custom.OST(end+1) = NaN;
 BpodSystem.Data.Custom.TrialValid(end+1) = true;
 BpodSystem.Data.Custom.Feedback(end+1) = true;
 BpodSystem.Data.Custom.FeedbackTime(end+1) = NaN;
+BpodSystem.Data.Custom.FeedbackDelayGrace(end+1) = TaskParameters.GUI.FeedbackDelayGrace;
 
 if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     switch TaskParameters.GUIMeta.TrialSelection.String{TaskParameters.GUI.TrialSelection}
