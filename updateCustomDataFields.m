@@ -39,7 +39,9 @@ if any(strcmp('odor_delivery',BpodSystem.Data.RawData.OriginalStateNamesByNumber
     BpodSystem.Data.Custom.OST(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.odor_delivery);
 end
 if ~BpodSystem.Data.Custom.FixBroke(end)
-    BpodSystem.Data.Custom.FeedbackTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)}));
+    FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)})
+    BpodSystem.Data.Custom.FeedbackTime(end) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+BpodSystem.Data.Custom.FeedbackTime(end)
 end
 if BpodSystem.Data.Custom.BlockTrial(end) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
         ==BpodSystem.Data.Custom.BlockNumber(end))
