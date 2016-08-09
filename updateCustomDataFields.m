@@ -39,7 +39,8 @@ if any(strcmp('odor_delivery',BpodSystem.Data.RawData.OriginalStateNamesByNumber
     BpodSystem.Data.Custom.OST(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.odor_delivery);
 end
 if ~BpodSystem.Data.Custom.FixBroke(end)
-    BpodSystem.Data.Custom.FeedbackTime(end) = diff(BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)}));
+    FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.(BpodSystem.Data.RawData.OriginalStateNamesByNumber{end}{BpodSystem.Data.Custom.OutcomeRecord(end)});
+    BpodSystem.Data.Custom.FeedbackTime(end) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
 end
 if BpodSystem.Data.Custom.BlockNumber(end) < max(TaskParameters.GUI.BlockTable.BlockNumber)
 if BpodSystem.Data.Custom.BlockTrial(end) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
@@ -66,6 +67,7 @@ BpodSystem.Data.Custom.OST(end+1) = NaN;
 BpodSystem.Data.Custom.TrialValid(end+1) = true;
 BpodSystem.Data.Custom.Feedback(end+1) = true;
 BpodSystem.Data.Custom.FeedbackTime(end+1) = NaN;
+BpodSystem.Data.Custom.FeedbackDelayGrace(end+1) = TaskParameters.GUI.FeedbackDelayGrace;
 
 if numel(BpodSystem.Data.Custom.OutcomeRecord) > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     switch TaskParameters.GUIMeta.TrialSelection.String{TaskParameters.GUI.TrialSelection}
