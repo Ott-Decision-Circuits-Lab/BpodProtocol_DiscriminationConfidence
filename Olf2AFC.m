@@ -105,8 +105,8 @@ if ~BpodSystem.EmulatorMode
     end
     OdorA_flow = BpodSystem.Data.Custom.OdorFracA(1);
     OdorB_flow = 100 - OdorA_flow;
-    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
-    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
+    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
     clear Odor* flow*
 else
     BpodSystem.Data.Custom.OlfIp = '198.162.0.0';
