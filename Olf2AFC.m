@@ -81,20 +81,20 @@ BpodParameterGUI('init', TaskParameters);
 
 BpodSystem.Data.Custom.BlockNumber = 1;
 BpodSystem.Data.Custom.BlockTrial = 1;
-BpodSystem.Data.Custom.ChoiceLeft = NaN;
-BpodSystem.Data.Custom.ChoiceCorrect = NaN;
-BpodSystem.Data.Custom.Feedback = true;
-BpodSystem.Data.Custom.FeedbackTime = NaN;
-BpodSystem.Data.Custom.FixBroke = false;
-BpodSystem.Data.Custom.FixDur = NaN;
-BpodSystem.Data.Custom.MT = NaN;
+BpodSystem.Data.Custom.ChoiceLeft = [];
+BpodSystem.Data.Custom.ChoiceCorrect = [];
+BpodSystem.Data.Custom.Feedback = false(0);
+BpodSystem.Data.Custom.FeedbackTime = [];
+BpodSystem.Data.Custom.FixBroke = false(0);
+BpodSystem.Data.Custom.FixDur = [];
+BpodSystem.Data.Custom.MT = [];
 BpodSystem.Data.Custom.OdorFracA = randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';
 BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
 BpodSystem.Data.Custom.OdorPair = ones(1,2);
-BpodSystem.Data.Custom.OST = NaN;
-BpodSystem.Data.Custom.Rewarded = false;
+BpodSystem.Data.Custom.OST = [];
+BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
-BpodSystem.Data.Custom.TrialNumber = 1;
+BpodSystem.Data.Custom.TrialNumber = [];
 
 %% Olfactometer Madness
 

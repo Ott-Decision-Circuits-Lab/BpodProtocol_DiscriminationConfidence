@@ -13,7 +13,7 @@ if odorPair < 32
         TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
     end
 elseif odorPair == 32
-    nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
+    nextTrial = numel(BpodSystem.Data.Custom.TrialNumber) + 2;
     OdorA_flow = BpodSystem.Data.Custom.OdorFracA(nextTrial);
     OdorB_flow = 100 - OdorA_flow;
     if ~BpodSystem.EmulatorMode
