@@ -96,46 +96,6 @@ BpodSystem.Data.Custom.Rewarded = false;
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = 1;
 
-% BpodSystem.Data.Custom.FixBroke = false;
-% BpodSystem.Data.Custom.FixDur = NaN;
-% % BpodSystem.Data.Custom.BlockNumber = 1;
-% % BpodSystem.Data.Custom.BlockLen = drawBlockLen(TaskParameters);
-% BpodSystem.Data.Custom.ChoiceLeft = NaN;
-% BpodSystem.Data.Custom.ChoiceCorrect = NaN;
-% BpodSystem.Data.Custom.Rewarded = false;
-% % BpodSystem.Data.Custom.OdorContrast = ones(1,10)*.9; % Future: control difficulties via GUI
-% BpodSystem.Data.Custom.OdorPair = ones(1,10); % DEBUG THIS. SHOULD BE: Valve1=MinOil. Future: Present more than one pair
-% BpodSystem.Data.Custom.OdorFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,10,1,TaskParameters.GUI.OdorTable.OdorProb);
-% BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
-% BpodSystem.Data.Custom.OST = NaN;
-% BpodSystem.Data.Custom.OdorA_bank = TaskParameters.GUI.OdorA_bank;
-% BpodSystem.Data.Custom.OdorB_bank = TaskParameters.GUI.OdorB_bank;
-% if TaskParameters.GUI.StimDelayAutoincrement
-%     BpodSystem.Data.Custom.StimDelay = TaskParameters.GUI.StimDelayMin;
-% else
-%     BpodSystem.Data.Custom.StimDelay = random('unif',TaskParameters.GUI.StimDelayMin,TaskParameters.GUI.StimDelayMax);
-% end
-% switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.FeedbackDelaySelection}
-%     case 'AutoIncr'      
-%         BpodSystem.Data.Custom.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
-%         
-%     case 'TruncExp'
-%         BpodSystem.Data.Custom.FeedbackDelay = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin,...
-%             TaskParameters.GUI.FeedbackDelayMax,TaskParameters.GUI.FeedbackDelayTau);
-%         
-%     case 'Fix'
-%         BpodSystem.Data.Custom.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMax;
-% end
-% BpodSystem.Data.Custom.FeedbackDelayGrace = TaskParameters.GUI.FeedbackDelayGrace;
-% BpodSystem.Data.Custom.TrialNumber = 1;
-% BpodSystem.Data.Custom.Feedback = true;
-% BpodSystem.Data.Custom.FeedbackTime = NaN;
-% BpodSystem.Data.Custom = orderfields(BpodSystem.Data.Custom);
-% 
-% BpodSystem.Data.Custom.BlockNumber = 1;
-% BpodSystem.Data.Custom.BlockTrial = 1;
-% %BpodSystem.Data.Custom.OdorContrast = randsample([0 logspace(log10(.05),log10(.6), 3)],100,1);
-
 %% Olfactometer Madness
 
 if ~BpodSystem.EmulatorMode
@@ -143,16 +103,6 @@ if ~BpodSystem.EmulatorMode
     if isempty(BpodSystem.Data.Custom.OlfIp)
         error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
     end
-    %SetCarrierFlowRate()
-%     OdorContrast = BpodSystem.Data.Custom.OdorContrast(1);
-%     OdorID = BpodSystem.Data.Custom.OdorID(1);
-%     if OdorID == 1
-%         OdorA_flow = 100*(.5 + OdorContrast/2);
-%         OdorB_flow = 100*(.5 - OdorContrast/2);
-%     else
-%         OdorA_flow = 100*(.5 - OdorContrast/2);
-%         OdorB_flow = 100*(.5 + OdorContrast/2);
-%     end
     OdorA_flow = BpodSystem.Data.Custom.OdorFracA(1);
     OdorB_flow = 100 - OdorA_flow;
     SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
