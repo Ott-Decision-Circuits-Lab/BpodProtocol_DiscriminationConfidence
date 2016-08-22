@@ -113,6 +113,10 @@ else
 end
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
+%% Configuring PulsePal
+PulsePal
+load pulsePalWhiteNoise.mat
+
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position', [.075 .15 .89 .3]);
