@@ -114,8 +114,11 @@ end
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 %% Configuring PulsePal
-PulsePal
-load pulsePalWhiteNoise.mat
+load PulsPalParam.mat
+ProgramPulsePal(PulsPalParam);
+SyncPulsePalParams;
+SendCustomPulseTrain(1,cumsum(randi(19,1,301))/10000,(rand(1,301)-.5)*20); % White(?) noise on channel 1
+SendCustomPulseTrain(2,[0:.001:.30],(ones(1,301)*10));  % Beep on channel 2
 
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
