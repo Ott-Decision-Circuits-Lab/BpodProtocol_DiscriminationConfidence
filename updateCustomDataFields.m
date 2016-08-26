@@ -158,8 +158,8 @@ if iTrial > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
     newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
-    if any((newFracA-50)<3*eps)
-        ndxZeroInf = (newFracA-50)<10*eps;
+    if any(abs(newFracA-50)<(10*eps))
+        ndxZeroInf = abs(newFracA-50)<(10*eps);
         newOdorID(ndxZeroInf) = randsample(2,sum(ndxZeroInf),1);
     end
     newOdorPair = ones(1,5);
