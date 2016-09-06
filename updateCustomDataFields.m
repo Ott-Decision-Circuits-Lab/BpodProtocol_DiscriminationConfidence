@@ -76,8 +76,9 @@ else % Final block
     BpodSystem.Data.Custom.BlockNumber(iTrial+1) = BpodSystem.Data.Custom.BlockNumber(iTrial);
 end
 
-BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(BpodSystem.Data.Custom.BlockNumber(iTrial+1)),...
-    TaskParameters.GUI.BlockTable.RewR(BpodSystem.Data.Custom.BlockNumber(iTrial+1))];
+BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAmount*...
+    [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(iTrial+1)),...
+    TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(iTrial+1))];
 
 %% Updating Delays
 if TaskParameters.GUI.StimDelayAutoincrement
@@ -106,8 +107,8 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
                 BpodSystem.Data.Custom.FeedbackDelay(iTrial)+TaskParameters.GUI.FeedbackDelayIncr);
         end
     case 'TruncExp'
-        TaskParameters.GUI.FeedbackDelay = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin,...
-            TaskParameters.GUI.FeedbackDelayMax,TaskParameters.GUI.FeedbackDelayTau);
+            TaskParameters.GUI.FeedbackDelay = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin,...
+                TaskParameters.GUI.FeedbackDelayMax,TaskParameters.GUI.FeedbackDelayTau);
     case 'Fix'
         %     ATTEMPT TO GRAY OUT FIELDS
         %     if ~strcmp('edit',TaskParameters.GUIMeta.FeedbackDelay.Style)
@@ -155,6 +156,10 @@ if iTrial > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
     newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
+    if any(abs(newFracA-50)<(10*eps))
+        ndxZeroInf = abs(newFracA-50)<(10*eps);
+        newOdorID(ndxZeroInf) = randsample(2,sum(ndxZeroInf),1);
+    end
     newOdorPair = ones(1,5);
     BpodSystem.Data.Custom.OdorFracA = [BpodSystem.Data.Custom.OdorFracA; newFracA];
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID; newOdorID];
