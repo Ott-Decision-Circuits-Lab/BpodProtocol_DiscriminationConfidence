@@ -107,10 +107,8 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
                 BpodSystem.Data.Custom.FeedbackDelay(iTrial)+TaskParameters.GUI.FeedbackDelayIncr);
         end
     case 'TruncExp'
-        if BpodSystem.Data.Custom.Feedback(iTrial)
             TaskParameters.GUI.FeedbackDelay = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin,...
                 TaskParameters.GUI.FeedbackDelayMax,TaskParameters.GUI.FeedbackDelayTau);
-        end
     case 'Fix'
         %     ATTEMPT TO GRAY OUT FIELDS
         %     if ~strcmp('edit',TaskParameters.GUIMeta.FeedbackDelay.Style)
