@@ -2,9 +2,10 @@ function [ output_args ] = SoftCodeHandler( odorPair )
 %DELIVER_ODOR Summary of this function goes here
 %   Detailed explanation goes here
 global BpodSystem
+global TaskParameters
 
-firstbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorA_bank)];
-secbank = ['Bank' num2str(BpodSystem.Data.Custom.OdorB_bank)];
+firstbank = ['Bank' num2str(TaskParameters.GUI.OdorA_bank)];
+secbank = ['Bank' num2str(TaskParameters.GUI.OdorB_bank)];
 
 if odorPair < 32
     if ~BpodSystem.EmulatorMode
@@ -12,12 +13,12 @@ if odorPair < 32
         TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
     end
 elseif odorPair == 32
-    nextTrial = max(BpodSystem.Data.Custom.TrialNumber) + 1;
+    nextTrial = numel(BpodSystem.Data.Custom.TrialNumber) + 2;
     OdorA_flow = BpodSystem.Data.Custom.OdorFracA(nextTrial);
     OdorB_flow = 100 - OdorA_flow;
     if ~BpodSystem.EmulatorMode
-        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorA_bank, OdorA_flow)
-        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, BpodSystem.Data.Custom.OdorB_bank, OdorB_flow)
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
+        SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
     end
 end
 
