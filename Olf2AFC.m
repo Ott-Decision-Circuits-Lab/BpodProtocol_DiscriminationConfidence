@@ -13,7 +13,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback'};    
+    TaskParameters.GUI.PercentAuditory = 1;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback','PercentAuditory'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -58,7 +59,12 @@ if isempty(fieldnames(TaskParameters))
 %     TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
 %     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
     TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
-    TaskParameters.GUIPanels.Stimuli = {'OdorTable'};
+    TaskParameters.GUIPanels.OlfStimuli = {'OdorTable'};
+    %% Auditory Params
+    TaskParameters.GUI.AuditoryAlpha = 1;
+    TaskParameters.GUI.SumRates = 100;
+    TaskParameters.GUI.AuditoryStimulusTime = 3;
+    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
@@ -72,7 +78,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
     TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
-    TaskParameters.GUITabs.Odor = {'Olfactometer','Stimuli'};
+    TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
+    TaskParameters.GUITabs.Auditory = {'AudStimuli'};
     
 end
 BpodParameterGUI('init', TaskParameters);
@@ -95,30 +102,54 @@ BpodSystem.Data.Custom.OST = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
+BpodSystem.Data.Custom.AuditoryTrial = rand(1,1) < TaskParameters.GUI.PercentAuditory;
+BpodSystem.Data.Custom.OlfactometerStartup = false;
 
-%% Olfactometer Madness
-
-if ~BpodSystem.EmulatorMode
-    BpodSystem.Data.Custom.OlfIp = FindOlfactometer;
-    if isempty(BpodSystem.Data.Custom.OlfIp)
-        error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
+%make auditory stimuli for first trial
+if BpodSystem.Data.Custom.AuditoryTrial(1) 
+    BpodSystem.Data.Custom.AuditoryOmega(1) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
+    BpodSystem.Data.Custom.LeftClickRate(1) = round(BpodSystem.Data.Custom.AuditoryOmega(1)*TaskParameters.GUI.SumRates);
+    BpodSystem.Data.Custom.RightClickRate(1) = round((1-BpodSystem.Data.Custom.AuditoryOmega(1))*TaskParameters.GUI.SumRates);
+    BpodSystem.Data.Custom.LeftClickTrain{1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(1), TaskParameters.GUI.AuditoryStimulusTime);
+    BpodSystem.Data.Custom.RightClickTrain{1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.RightClickRate(1), TaskParameters.GUI.AuditoryStimulusTime);
+    %correct left/right click train
+    if ~isempty(BpodSystem.Data.Custom.LeftClickTrain{1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{1})
+        BpodSystem.Data.Custom.LeftClickTrain{1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{1}(1),BpodSystem.Data.Custom.RightClickTrain{1}(1));
+        BpodSystem.Data.Custom.RightClickTrain{1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{1}(1),BpodSystem.Data.Custom.RightClickTrain{1}(1));
+    elseif  isempty(BpodSystem.Data.Custom.LeftClickTrain{1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{1})
+        BpodSystem.Data.Custom.LeftClickTrain{1}(1) = BpodSystem.Data.Custom.RightClickTrain{1}(1);
+    elseif ~isempty(BpodSystem.Data.Custom.LeftClickTrain{1}) &&  isempty(BpodSystem.Data.Custom.RightClickTrain{1})
+        BpodSystem.Data.Custom.RightClickTrain{1}(1) = BpodSystem.Data.Custom.LeftClickTrain{1}(1);
+    else
+        BpodSystem.Data.Custom.LeftClickTrain{1} = round(1/BpodSystem.Data.Custom.LeftClickRate*10000)/10000;
+        BpodSystem.Data.Custom.RightClickTrain{1} = round(1/BpodSystem.Data.Custom.RightClickRate*10000)/10000;
     end
-    OdorA_flow = BpodSystem.Data.Custom.OdorFracA(1);
-    OdorB_flow = 100 - OdorA_flow;
-    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
-    SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
-    clear Odor* flow*
+    if length(BpodSystem.Data.Custom.LeftClickTrain{1}) > length(BpodSystem.Data.Custom.RightClickTrain{1})
+        BpodSystem.Data.Custom.MoreLeftClicks(1) = true;
+    elseif length(BpodSystem.Data.Custom.LeftClickTrain{1}) < length(BpodSystem.Data.Custom.RightClickTrain{1})
+        BpodSystem.Data.Custom.MoreLeftClicks(1) = false;
+    else
+        BpodSystem.Data.Custom.MoreLeftClicks(1) = NaN;
+    end
 else
-    BpodSystem.Data.Custom.OlfIp = '198.162.0.0';
+    BpodSystem.Data.Custom.AuditoryOmega(1) = NaN;
+    BpodSystem.Data.Custom.LeftClickRate(1) = NaN;
+    BpodSystem.Data.Custom.RightClickRate(1) = NaN;
+    BpodSystem.Data.Custom.LeftClickTrain{1} = [];
+    BpodSystem.Data.Custom.RightClickTrain{1} = [];
 end
+
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 %% Configuring PulsePal
-load PulsPalParam.mat
-ProgramPulsePal(PulsPalParam);
-SyncPulsePalParams;
-SendCustomPulseTrain(1,cumsum(randi(19,1,301))/10000,(rand(1,301)-.5)*20); % White(?) noise on channel 1
-SendCustomPulseTrain(2,[0:.001:.30],(ones(1,301)*10));  % Beep on channel 2
+load PulsePalParamStimulus.mat
+load PulsePalParamFeedback.mat
+BpodSystem.Data.Custom.PulsePalParamStimulus=PulsePalParamStimulus;
+BpodSystem.Data.Custom.PulsePalParamFeedback=PulsePalParamFeedback;
+clear PulsePalParamFeedback PulsePalParamStimulus
+if ~BpodSystem.EmulatorMode
+    ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+end
 
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
@@ -126,7 +157,7 @@ BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position', [.075 .15 .89
 BpodSystem.GUIHandles.OutcomePlot.HandlePsyc = axes('Position', [.075 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position', [2*.075+.12 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position', [3*.075+2*.12 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleOST = axes('Position', [4*.075+3*.12 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position', [4*.075+3*.12 .6 .12 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position', [5*.075+4*.12 .6 .12 .3]);
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 %BpodNotebook('init');
@@ -137,6 +168,8 @@ iTrial = 1;
 
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
+    
+    InitiateOlfactometer(iTrial);
     
     sma = stateMatrix(iTrial);
     SendStateMatrix(sma);
@@ -154,5 +187,6 @@ while RunSession
     updateCustomDataFields(iTrial);
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
+
 end
 end
