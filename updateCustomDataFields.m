@@ -81,7 +81,7 @@ if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
     if length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) > length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
         BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 1;
     elseif length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) < length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 2;
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 0;
     else
         BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = NaN;
     end

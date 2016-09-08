@@ -14,7 +14,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback','PercentAuditory'};    
+    TaskParameters.GUI.Ports_LMR = 123;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
