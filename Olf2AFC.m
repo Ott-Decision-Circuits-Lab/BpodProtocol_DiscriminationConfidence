@@ -14,7 +14,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
-    TaskParameters.GUI.Ports_LMR = 123;
+    TaskParameters.GUI.Ports_LMR = 423;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
@@ -155,6 +155,8 @@ BpodSystem.Data.Custom.PulsePalParamFeedback=PulsePalParamFeedback;
 clear PulsePalParamFeedback PulsePalParamStimulus
 if ~BpodSystem.EmulatorMode
     ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{1}))*5);
+    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{1}))*5);
 end
 
 %% Initialize plots

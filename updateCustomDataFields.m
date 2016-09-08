@@ -93,6 +93,11 @@ else
     BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = [];
 end
 
+if ~BpodSystem.EmulatorMode
+    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
+    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+end
+
 BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 BpodSystem.Data.Custom.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
 
