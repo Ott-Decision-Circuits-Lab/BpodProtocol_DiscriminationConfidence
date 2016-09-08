@@ -138,6 +138,11 @@ else
     BpodSystem.Data.Custom.LeftClickTrain{1} = [];
     BpodSystem.Data.Custom.RightClickTrain{1} = [];
 end
+if BpodSystem.Data.Custom.AuditoryTrial(1)
+    BpodSystem.Data.Custom.DV(1) = (length(BpodSystem.Data.Custom.LeftClickTrain{1}) - length(BpodSystem.Data.Custom.RightClickTrain{1}))./(length(BpodSystem.Data.Custom.LeftClickTrain{1}) + length(BpodSystem.Data.Custom.RightClickTrain{1}));
+else
+    BpodSystem.Data.Custom.DV(1) = (BpodSystem.Data.Custom.OdorFracA(1)-50)/100;
+end
 
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
@@ -153,12 +158,13 @@ end
 
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
-BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position', [.075 .15 .89 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandlePsyc = axes('Position', [.075 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position', [2*.075+.12 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position', [3*.075+2*.12 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position', [4*.075+3*.12 .6 .12 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position', [5*.075+4*.12 .6 .12 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .06          .15 .91 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.06          .6  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.06 + 1*.1   .6  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',  [3*.06 + 2*.1   .6  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position',        [4*.06 + 3*.1   .6  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position',         [5*.06 + 4*.1   .6  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position',   [6*.06 + 5*.1   .6  .1  .3]);
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 %BpodNotebook('init');
 

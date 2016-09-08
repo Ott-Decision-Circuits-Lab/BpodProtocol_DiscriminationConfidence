@@ -79,9 +79,9 @@ if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
         BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = round(1/BpodSystem.Data.Custom.RightClickRate*10000)/10000;
     end
     if length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) > length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = true;
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 1;
     elseif length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) < length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = false;
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 2;
     else
         BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = NaN;
     end
@@ -200,10 +200,10 @@ if iTrial > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
 end
 
-if BpodSystem.Data.Custom.AuditoryTrial(iTrial)
-    BpodSystem.Data.Custom.DV(iTrial) = (length(BpodSystem.Data.Custom.LeftClickTrain{iTrial}) - length(BpodSystem.Data.Custom.RightClickTrain{iTrial}))./(length(BpodSystem.Data.Custom.LeftClickTrain{iTrial}) + length(BpodSystem.Data.Custom.RightClickTrain{iTrial}));
+if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
+    BpodSystem.Data.Custom.DV(iTrial+1) = (length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) - length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))./(length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) + length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}));
 else
-    BpodSystem.Data.Custom.DV(iTrial) = (BpodSystem.Data.Custom.OdorFracA(iTrial)-50)/100;
+    BpodSystem.Data.Custom.DV(iTrial+1) = (BpodSystem.Data.Custom.OdorFracA(iTrial+1)-50)/100;
 end
 
 end
