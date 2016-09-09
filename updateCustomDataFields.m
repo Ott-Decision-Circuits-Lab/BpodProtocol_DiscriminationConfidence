@@ -87,10 +87,10 @@ BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAm
 if TaskParameters.GUI.StimDelayAutoincrement
     if BpodSystem.Data.Custom.FixBroke(iTrial)
         TaskParameters.GUI.StimDelay = max(TaskParameters.GUI.StimDelayMin,...
-            BpodSystem.Data.Custom.StimDelay(iTrial)-TaskParameters.GUI.StimDelayDecr);
+            min(TaskParameters.GUI.StimDelayMax,BpodSystem.Data.Custom.StimDelay(iTrial)-TaskParameters.GUI.StimDelayDecr));
     else
         TaskParameters.GUI.StimDelay = min(TaskParameters.GUI.StimDelayMax,...
-            BpodSystem.Data.Custom.StimDelay(iTrial)+TaskParameters.GUI.StimDelayIncr);
+            max(TaskParameters.GUI.StimDelayMin,BpodSystem.Data.Custom.StimDelay(iTrial)+TaskParameters.GUI.StimDelayIncr));
     end
 else
     if ~BpodSystem.Data.Custom.FixBroke(iTrial)
@@ -104,10 +104,10 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
     case 'AutoIncr'
         if ~BpodSystem.Data.Custom.Feedback(iTrial)
             TaskParameters.GUI.FeedbackDelay = max(TaskParameters.GUI.FeedbackDelayMin,...
-                BpodSystem.Data.Custom.FeedbackDelay(iTrial)-TaskParameters.GUI.FeedbackDelayDecr);
+                min(TaskParameters.GUI.FeedbackDelayMax,BpodSystem.Data.Custom.FeedbackDelay(iTrial)-TaskParameters.GUI.FeedbackDelayDecr));
         else
             TaskParameters.GUI.FeedbackDelay = min(TaskParameters.GUI.FeedbackDelayMax,...
-                BpodSystem.Data.Custom.FeedbackDelay(iTrial)+TaskParameters.GUI.FeedbackDelayIncr);
+                max(TaskParameters.GUI.FeedbackDelayMin,BpodSystem.Data.Custom.FeedbackDelay(iTrial)+TaskParameters.GUI.FeedbackDelayIncr));
         end
     case 'TruncExp'
             TaskParameters.GUI.FeedbackDelay = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin,...
@@ -133,9 +133,9 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
         case 'Manual'
             
         case 'Competitive'
-            ndxValid = ~isnan(BpodSystem.Data.Custom.ChoiceLeft);
+            ndxValid = ~isnan(BpodSystem.Data.Custom.ChoiceLeft); ndxValid = ndxValid(:);
             for iStim = reshape(TaskParameters.GUI.OdorTable.OdorFracA,1,[])
-                ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:iTrial) == iStim;
+                ndxOdor = BpodSystem.Data.Custom.OdorFracA(1:iTrial) == iStim; ndxOdor = ndxOdor(:);
                 if sum(ndxOdor&ndxValid) >= 8 % P(odor) = fraction of completed but unrewarded trials.
                     TaskParameters.GUI.OdorTable.OdorProb(iStim == TaskParameters.GUI.OdorTable.OdorFracA) = ...
                         sum(BpodSystem.Data.Custom.Rewarded(ndxOdor&ndxValid)==0)/sum(ndxOdor&ndxValid);
