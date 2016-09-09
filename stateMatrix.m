@@ -18,7 +18,7 @@ RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,2)
 LeftValve = 2^(LeftPort-1);
 RightValve = 2^(RightPort-1);
 
-if BpodSystem.Data.Custom.AuditoryTrial %auditory trial
+if BpodSystem.Data.Custom.AuditoryTrial(iTrial) %auditory trial
     LeftRewarded = BpodSystem.Data.Custom.MoreLeftClicks(iTrial);
     if isnan(LeftRewarded)
         LeftRewarded = rand(1,1)<0.5;
