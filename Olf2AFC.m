@@ -1,7 +1,9 @@
 function Olf2AFC
-% Reproduction on Bpod of protocol used in the PatonLab, MATCHINGvFix
+% 2-AFC olfactory and auditory discrimination task implented for Bpod fork https://github.com/KepecsLab/bpod
+% This project is available on https://github.com/KepecsLab/BpodProtocols_Olf2AFC/
 
 global BpodSystem
+
 %% Task parameters
 global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
@@ -89,7 +91,6 @@ end
 BpodParameterGUI('init', TaskParameters);
 
 %% Initializing data (trial type) vectors
-
 BpodSystem.Data.Custom.BlockNumber = 1;
 BpodSystem.Data.Custom.BlockTrial = 1;
 BpodSystem.Data.Custom.ChoiceLeft = [];
@@ -110,7 +111,7 @@ BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
 
-%make auditory stimuli for first trials
+% make auditory stimuli for first trials
 for a = 1:2
     if BpodSystem.Data.Custom.AuditoryTrial(a)
         BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
@@ -154,7 +155,7 @@ for a = 1:2
         BpodSystem.Data.Custom.DV(a) = (2*BpodSystem.Data.Custom.OdorFracA(a)-100)/100;
     end
 end%for a+1:2
- BpodSystem.Data.Custom.DV
+
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 %% Configuring PulsePal

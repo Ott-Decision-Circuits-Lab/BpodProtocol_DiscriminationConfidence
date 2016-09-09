@@ -163,7 +163,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     end
     TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
     
-    
+    % make future olfactory trials
     newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
     newOdorID =  2 - double(newFracA > 50);
     if any(abs(newFracA-50)<(10*eps))
@@ -178,7 +178,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     BpodSystem.Data.Custom.OdorID = [BpodSystem.Data.Custom.OdorID; newOdorID];
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
     
-    
+    % make future auditory trials
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
             BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
@@ -214,7 +214,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
         end%if auditory
     end%for a=1:5
     
-    %cross-modality difficulty for plotting
+    % cross-modality difficulty for plotting
     for a = 1 : 5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
             BpodSystem.Data.Custom.DV(lastidx+a) = (length(BpodSystem.Data.Custom.LeftClickTrain{lastidx+a}) - length(BpodSystem.Data.Custom.RightClickTrain{lastidx+a}))./(length(BpodSystem.Data.Custom.LeftClickTrain{lastidx+a}) + length(BpodSystem.Data.Custom.RightClickTrain{lastidx+a}));
@@ -225,9 +225,12 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     
 end%if trial > - 5
 
+% send auditory stimuli to PulsePal for next trial
 if ~BpodSystem.EmulatorMode
-    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
-    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+    if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
+        SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
+        SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+    end
 end
 
 end

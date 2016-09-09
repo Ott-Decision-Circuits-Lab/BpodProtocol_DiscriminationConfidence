@@ -1,6 +1,6 @@
-function output_args = SoftCodeHandler(softCode)
+function SoftCodeHandler(softCode)
 %soft codes 1-10 reserved for odor delivery
-%soft code 11-20 reserved for pulse pal sound delivery
+%soft code 11-20 reserved for PulsePal sound delivery
 
 global BpodSystem
 global TaskParameters
@@ -13,7 +13,7 @@ if softCode < 11 %for olfactory
         
         if softCode < 9
             if ~BpodSystem.EmulatorMode
-                CommandValve = Valves2EthernetString(firstbank, softCode, secbank, softCode); % odorPair := desired valve number
+                CommandValve = Valves2EthernetString(firstbank, softCode, secbank, softCode); % softCode := desired valve number
                 TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
             end
         elseif softCode == 9
@@ -25,10 +25,11 @@ if softCode < 11 %for olfactory
                 SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
             end
         end
-    end
-end
+        
+    end %if olfactometer initialized
+end %if olfactory soft codes
 
-if softCode > 10 && softCode < 20 %for auditory
+if softCode > 10 && softCode < 21 %for auditory
     if ~BpodSystem.EmulatorMode
         if softCode == 11 %noise on chan 1
             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);

@@ -2,6 +2,7 @@ function sma = stateMatrix(iTrial)
 global BpodSystem
 global TaskParameters
 
+%% Define ports
 LeftPort = floor(mod(TaskParameters.GUI.Ports_LMR/100,10));
 CenterPort = floor(mod(TaskParameters.GUI.Ports_LMR/10,10));
 RightPort = mod(TaskParameters.GUI.Ports_LMR,10);
@@ -12,38 +13,32 @@ LeftPortIn = strcat('Port',num2str(LeftPort),'In');
 CenterPortIn = strcat('Port',num2str(CenterPort),'In');
 RightPortIn = strcat('Port',num2str(RightPort),'In');
 
-LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,1), LeftPort);
-RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,2), RightPort);
-
 LeftValve = 2^(LeftPort-1);
 RightValve = 2^(RightPort-1);
+
+LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,1), LeftPort);
+RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,2), RightPort);
 
 if BpodSystem.Data.Custom.AuditoryTrial(iTrial) %auditory trial
     LeftRewarded = BpodSystem.Data.Custom.MoreLeftClicks(iTrial);
     if isnan(LeftRewarded)
         LeftRewarded = rand(1,1)<0.5;
     end
-    if LeftRewarded == 1
-        LeftPokeAction = 'rewarded_Lin';
-        RightPokeAction = 'unrewarded_Rin';
-    elseif LeftRewarded == 0
-        LeftPokeAction = 'unrewarded_Lin';
-        RightPokeAction = 'rewarded_Rin';
-    else
-        error('Bpod:Olf2AFC:unknownAuditoryStim','Undefined amount of clicks in auditory trial.');
-    end
 else %olfactory trial
-    if BpodSystem.Data.Custom.OdorID(iTrial) == 1
-        LeftPokeAction = 'rewarded_Lin';
-        RightPokeAction = 'unrewarded_Rin';
-    elseif BpodSystem.Data.Custom.OdorID(iTrial) == 2
-        LeftPokeAction = 'unrewarded_Lin';
-        RightPokeAction = 'rewarded_Rin';
-    else
-        error('Bpod:Olf2AFC:unknownOdorID','Undefined Odor ID')
-    end
+    LeftRewarded = BpodSystem.Data.Custom.OdorID(iTrial) == 1;
 end
 
+if LeftRewarded == 1
+    LeftPokeAction = 'rewarded_Lin';
+    RightPokeAction = 'unrewarded_Rin';
+elseif LeftRewarded == 0
+    LeftPokeAction = 'unrewarded_Lin';
+    RightPokeAction = 'rewarded_Rin';
+else
+    error('Bpod:Olf2AFC:unknownStim','Undefined stimulus');
+end
+
+%% Build state matrix
 sma = NewStateMatrix();
 sma = SetGlobalTimer(sma,1,TaskParameters.GUI.FeedbackDelay);
 sma = AddState(sma, 'Name', 'wait_Cin',...
