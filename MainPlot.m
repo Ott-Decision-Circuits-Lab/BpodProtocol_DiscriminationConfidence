@@ -62,7 +62,7 @@ switch Action
         hold(AxesHandles.HandleST,'on')
         AxesHandles.HandleST.XLabel.String = 'Time (ms)';
         AxesHandles.HandleST.YLabel.String = 'trial counts';
-        AxesHandles.HandleST.Title.String = 'Odor sampling time';
+        AxesHandles.HandleST.Title.String = 'Stim sampling time';
         %% Feedback Delay histogram
         hold(AxesHandles.HandleFeedback,'on')
         AxesHandles.HandleFeedback.XLabel.String = 'Time (ms)';
@@ -203,8 +203,14 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.HistFix.EdgeColor = 'none';
         %% ST
         cla(AxesHandles.HandleST)
-        BpodSystem.GUIHandles.OutcomePlot.HistSTbroke = histogram(AxesHandles.HandleST,BpodSystem.Data.Custom.ST*1000);
-        BpodSystem.GUIHandles.OutcomePlot.HistSTbroke.BinWidth = 50;
+        BpodSystem.GUIHandles.OutcomePlot.HistSTEarly = histogram(AxesHandles.HandleST,BpodSystem.Data.Custom.ST(BpodSystem.Data.Custom.EarlyWithdrawal)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.BinWidth = 50;
+        BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.FaceColor = 'r';
+        BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.EdgeColor = 'none';
+        BpodSystem.GUIHandles.OutcomePlot.HistST = histogram(AxesHandles.HandleST,BpodSystem.Data.Custom.ST(~BpodSystem.Data.Custom.EarlyWithdrawal)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistST.BinWidth = 50;
+        BpodSystem.GUIHandles.OutcomePlot.HistST.FaceColor = 'b';
+        BpodSystem.GUIHandles.OutcomePlot.HistST.EdgeColor = 'none';
         %% Feedback delay
         cla(AxesHandles.HandleFeedback)
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback)*1000);
