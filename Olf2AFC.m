@@ -16,8 +16,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
-    TaskParameters.GUI.PercentAuditory = 0.1;
-    TaskParameters.GUI.Ports_LMR = 423;
+    TaskParameters.GUI.PercentAuditory = 0.5;
+    TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
@@ -69,7 +69,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.AuditoryAlpha = 1;
     TaskParameters.GUI.SumRates = 100;
     TaskParameters.GUI.AuditoryStimulusTime = 3;
-    TaskParameters.GUI.AuditoryStimulusTimeMin = 1;
+    TaskParameters.GUI.AuditoryStimulusTimeMin = 0;
     TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime','AuditoryStimulusTimeMin'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
