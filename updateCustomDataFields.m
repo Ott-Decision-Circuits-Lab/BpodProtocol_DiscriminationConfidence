@@ -8,6 +8,7 @@ BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = NaN;
 BpodSystem.Data.Custom.Feedback(iTrial) = true;
 BpodSystem.Data.Custom.FeedbackTime(iTrial) = NaN;
 BpodSystem.Data.Custom.FixBroke(iTrial) = false;
+BpodSystem.Data.Custom.EarlyWithdrawal(iTrial) = false;
 BpodSystem.Data.Custom.FixDur(iTrial) = NaN;
 BpodSystem.Data.Custom.MT(iTrial) = NaN;
 BpodSystem.Data.Custom.ST(iTrial) = NaN;
@@ -47,6 +48,8 @@ elseif any(strcmp('unrewarded_Rin',statesThisTrial))
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
 elseif any(strcmp('broke_fixation',statesThisTrial))
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
+elseif any(strcmp('early_withdrawal',statesThisTrial))
+    BpodSystem.Data.Custom.EarlyWithdrawal(iTrial) = true;
 end
 if any(strcmp('missed_choice',statesThisTrial))
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
@@ -59,45 +62,6 @@ if any(strncmp('water_',statesThisTrial,6))
 end
 
 %% State-independent fields
-BpodSystem.Data.Custom.AuditoryTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.PercentAuditory;
-if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1) 
-    BpodSystem.Data.Custom.AuditoryOmega(iTrial+1) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
-    BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = round(BpodSystem.Data.Custom.AuditoryOmega(iTrial+1)*TaskParameters.GUI.SumRates);
-    BpodSystem.Data.Custom.RightClickRate(iTrial+1) = round((1-BpodSystem.Data.Custom.AuditoryOmega(iTrial+1))*TaskParameters.GUI.SumRates);
-    BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(iTrial+1), TaskParameters.GUI.AuditoryStimulusTime);
-    BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.RightClickRate(iTrial+1), TaskParameters.GUI.AuditoryStimulusTime);
-    %correct left/right click train
-    if ~isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1),BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1));
-        BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1),BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1));
-    elseif  isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1) = BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1);
-    elseif ~isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) &&  isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1) = BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1);
-    else
-        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = round(1/BpodSystem.Data.Custom.LeftClickRate*10000)/10000;
-        BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = round(1/BpodSystem.Data.Custom.RightClickRate*10000)/10000;
-    end
-    if length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) > length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 1;
-    elseif length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) < length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 0;
-    else
-        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = NaN;
-    end
-else
-    BpodSystem.Data.Custom.AuditoryOmega(iTrial+1) = NaN;
-    BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = NaN;
-    BpodSystem.Data.Custom.RightClickRate(iTrial+1) = NaN;
-    BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = [];
-    BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = [];
-end
-
-if ~BpodSystem.EmulatorMode
-    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
-    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
-end
-
 BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 BpodSystem.Data.Custom.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
 
@@ -157,6 +121,7 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
 end
 
 %% Drawing future trials
+%olfactory
 if iTrial > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     switch TaskParameters.GUIMeta.TrialSelection.String{TaskParameters.GUI.TrialSelection}
         case 'Flat'
@@ -205,6 +170,47 @@ if iTrial > numel(BpodSystem.Data.Custom.OdorFracA) - 5
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
 end
 
+%auditory
+BpodSystem.Data.Custom.AuditoryTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.PercentAuditory;
+if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1) 
+    BpodSystem.Data.Custom.AuditoryOmega(iTrial+1) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
+    BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = round(BpodSystem.Data.Custom.AuditoryOmega(iTrial+1)*TaskParameters.GUI.SumRates);
+    BpodSystem.Data.Custom.RightClickRate(iTrial+1) = round((1-BpodSystem.Data.Custom.AuditoryOmega(iTrial+1))*TaskParameters.GUI.SumRates);
+    BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(iTrial+1), TaskParameters.GUI.AuditoryStimulusTime);
+    BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.RightClickRate(iTrial+1), TaskParameters.GUI.AuditoryStimulusTime);
+    %correct left/right click train
+    if ~isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
+        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1),BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1));
+        BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1) = min(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1),BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1));
+    elseif  isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) && ~isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
+        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1) = BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1);
+    elseif ~isempty(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) &&  isempty(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
+        BpodSystem.Data.Custom.RightClickTrain{iTrial+1}(1) = BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}(1);
+    else
+        BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = round(1/BpodSystem.Data.Custom.LeftClickRate*10000)/10000;
+        BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = round(1/BpodSystem.Data.Custom.RightClickRate*10000)/10000;
+    end
+    if length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) > length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 1;
+    elseif length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) < length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1})
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = 0;
+    else
+        BpodSystem.Data.Custom.MoreLeftClicks(iTrial+1) = NaN;
+    end
+else
+    BpodSystem.Data.Custom.AuditoryOmega(iTrial+1) = NaN;
+    BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = NaN;
+    BpodSystem.Data.Custom.RightClickRate(iTrial+1) = NaN;
+    BpodSystem.Data.Custom.LeftClickTrain{iTrial+1} = [];
+    BpodSystem.Data.Custom.RightClickTrain{iTrial+1} = [];
+end
+
+if ~BpodSystem.EmulatorMode
+    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
+    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+end
+
+%cross-modality difficulty for plotting
 if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
     BpodSystem.Data.Custom.DV(iTrial+1) = (length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) - length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))./(length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}) + length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}));
 else

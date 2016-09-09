@@ -12,10 +12,11 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ChoiceDeadLine = 5;
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
+    TaskParameters.GUI.TimeOutEarlyWithdrawal = 1; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.Ports_LMR = 423;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -56,16 +57,18 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.OdorTable.Style = 'table';
     TaskParameters.GUIMeta.OdorTable.String = 'Odor probabilities';
     TaskParameters.GUIMeta.OdorTable.ColumnLabel = {'a = Frac Odor A','P(a)'};
+    TaskParameters.GUI.OdorStimulusTimeMin = 0;
 %     TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
 %     TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
 %     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
     TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
-    TaskParameters.GUIPanels.OlfStimuli = {'OdorTable'};
+    TaskParameters.GUIPanels.OlfStimuli = {'OdorTable','OdorStimulusTimeMin'};
     %% Auditory Params
     TaskParameters.GUI.AuditoryAlpha = 1;
     TaskParameters.GUI.SumRates = 100;
     TaskParameters.GUI.AuditoryStimulusTime = 3;
-    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime'};
+    TaskParameters.GUI.AuditoryStimulusTimeMin = 1;
+    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime','AuditoryStimulusTimeMin'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
@@ -94,6 +97,7 @@ BpodSystem.Data.Custom.ChoiceCorrect = [];
 BpodSystem.Data.Custom.Feedback = false(0);
 BpodSystem.Data.Custom.FeedbackTime = [];
 BpodSystem.Data.Custom.FixBroke = false(0);
+BpodSystem.Data.Custom.EarlyWithdrawal = false(0);
 BpodSystem.Data.Custom.FixDur = [];
 BpodSystem.Data.Custom.MT = [];
 BpodSystem.Data.Custom.OdorFracA = randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';
@@ -126,9 +130,9 @@ if BpodSystem.Data.Custom.AuditoryTrial(1)
         BpodSystem.Data.Custom.RightClickTrain{1} = round(1/BpodSystem.Data.Custom.RightClickRate*10000)/10000;
     end
     if length(BpodSystem.Data.Custom.LeftClickTrain{1}) > length(BpodSystem.Data.Custom.RightClickTrain{1})
-        BpodSystem.Data.Custom.MoreLeftClicks(1) = true;
+        BpodSystem.Data.Custom.MoreLeftClicks(1) = double(1);
     elseif length(BpodSystem.Data.Custom.LeftClickTrain{1}) < length(BpodSystem.Data.Custom.RightClickTrain{1})
-        BpodSystem.Data.Custom.MoreLeftClicks(1) = false;
+        BpodSystem.Data.Custom.MoreLeftClicks(1) = double(0);
     else
         BpodSystem.Data.Custom.MoreLeftClicks(1) = NaN;
     end
