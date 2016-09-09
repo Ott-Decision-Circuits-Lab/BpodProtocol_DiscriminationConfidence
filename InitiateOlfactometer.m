@@ -1,12 +1,12 @@
-function InitiateOlfactometer(trial)
+function InitiateOlfactometer(iTrial)
 global BpodSystem
-if ~BpodSystem.Data.Custom.AuditoryTrial(trial) && ~BpodSystem.Data.Custom.OlfactometerStartup
+if ~BpodSystem.Data.Custom.AuditoryTrial(iTrial) && ~BpodSystem.Data.Custom.OlfactometerStartup
     if ~BpodSystem.EmulatorMode
         BpodSystem.Data.Custom.OlfIp = FindOlfactometer;
         if isempty(BpodSystem.Data.Custom.OlfIp)
             error('Bpod:Olf2AFC:OlfComFail','Failed to connect to olfactometer')
         end
-        OdorA_flow = BpodSystem.Data.Custom.OdorFracA(1);
+        OdorA_flow = BpodSystem.Data.Custom.OdorFracA(iTrial);
         OdorB_flow = 100 - OdorA_flow;
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
         SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
