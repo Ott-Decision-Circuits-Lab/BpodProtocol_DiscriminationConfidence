@@ -68,6 +68,7 @@ end
 %% State-independent fields
 BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 BpodSystem.Data.Custom.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
+BpodSystem.Data.Custom.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
 if BpodSystem.Data.Custom.BlockNumber(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumber) % Not final block
     if BpodSystem.Data.Custom.BlockTrial(iTrial) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
@@ -88,6 +89,7 @@ BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAm
     TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(iTrial+1))];
 
 %% Updating Delays
+%stimulus delay
 if TaskParameters.GUI.StimDelayAutoincrement
     if BpodSystem.Data.Custom.FixBroke(iTrial)
         TaskParameters.GUI.StimDelay = max(TaskParameters.GUI.StimDelayMin,...
@@ -104,6 +106,29 @@ else
     end
 end
 
+%min sampling time
+if TaskParameters.GUI.MinSampleAudAutoincrement
+    History = 50;
+    Crit = 0.8;
+    if iTrial<10
+        ConsiderTrials = iTrial;
+    else
+        ConsiderTrials = max(1,iTrial-History):1:iTrial;
+    end
+    ConsiderTrials = ConsiderTrials(~isnan(BpodSystem.Data.Custom.ChoiceLeft(ConsiderTrials))...
+                    |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials)); %choice + early withdrawal trials
+    if sum(~BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))/length(ConsiderTrials) > Crit
+        TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
+            max(TaskParameters.GUI.MinSampleAudMin,BpodSystem.Data.Custom.MinSampleAud(iTrial) + TaskParameters.GUI.MinSampleAudIncr));
+    else
+        TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
+            min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+    end
+else
+    TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
+end
+
+%feedback delay
 switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.FeedbackDelaySelection}
     case 'AutoIncr'
         if ~BpodSystem.Data.Custom.Feedback(iTrial)

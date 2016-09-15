@@ -69,8 +69,16 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.AuditoryAlpha = 1;
     TaskParameters.GUI.SumRates = 100;
     TaskParameters.GUI.AuditoryStimulusTime = 3;
-    TaskParameters.GUI.AuditoryStimulusTimeMin = 0;
-    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime','AuditoryStimulusTimeMin'};
+    %min auditory stimulus
+    TaskParameters.GUI.MinSampleAudMin = 0.05;
+    TaskParameters.GUI.MinSampleAudMax = 0.5;
+    TaskParameters.GUI.MinSampleAudAutoincrement = true;
+    TaskParameters.GUIMeta.MinSampleAudAutoincrement.Style = 'checkbox';
+    TaskParameters.GUI.MinSampleAudIncr = 0.05;
+    TaskParameters.GUI.MinSampleAudDecr = 0.02;
+    TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
+    TaskParameters.GUIMeta.MinSampleAud.Style = 'text';
+    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime','MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
