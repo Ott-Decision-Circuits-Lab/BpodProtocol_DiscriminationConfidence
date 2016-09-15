@@ -108,11 +108,12 @@ end
 
 %min sampling time
 if TaskParameters.GUI.MinSampleAudAutoincrement
-    History = 5;
+    History = 50;
     Crit = 0.8;
-    if sum(BpodSystem.Data.Custom.AuditoryTrial)<3
+    if sum(BpodSystem.Data.Custom.AuditoryTrial)<10
         ConsiderTrials = iTrial;
     else
+        idxStart = find(cumsum(BpodSystem.Data.Custom.AuditoryTrial(iTrial:-1:1))>=History,1,'first');
         if isempty(idxStart)
             ConsiderTrials = 1:iTrial;
         else
@@ -121,6 +122,7 @@ if TaskParameters.GUI.MinSampleAudAutoincrement
     end
     ConsiderTrials = ConsiderTrials((~isnan(BpodSystem.Data.Custom.ChoiceLeft(ConsiderTrials))...
                     |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))&BpodSystem.Data.Custom.AuditoryTrial(ConsiderTrials)); %choice + early withdrawal + auditory trials
+    ConsiderTrials
     if ~isempty(ConsiderTrials) && BpodSystem.Data.Custom.AuditoryTrial(iTrial)
         if mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) > Crit
             TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
