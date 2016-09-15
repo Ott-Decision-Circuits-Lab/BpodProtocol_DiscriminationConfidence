@@ -106,8 +106,8 @@ else
     end
 end
 
-%min sampling time
-if TaskParameters.GUI.MinSampleAudAutoincrement
+%min sampling time auditory
+if TaskParameters.GUI.MinSampleAudAutoincrement 
     History = 50;
     Crit = 0.8;
     if sum(BpodSystem.Data.Custom.AuditoryTrial)<10
@@ -124,11 +124,17 @@ if TaskParameters.GUI.MinSampleAudAutoincrement
                     |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))&BpodSystem.Data.Custom.AuditoryTrial(ConsiderTrials)); %choice + early withdrawal + auditory trials
     if ~isempty(ConsiderTrials) && BpodSystem.Data.Custom.AuditoryTrial(iTrial)
         if mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) > Crit
-            TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
-                max(TaskParameters.GUI.MinSampleAudMin,BpodSystem.Data.Custom.MinSampleAud(iTrial) + TaskParameters.GUI.MinSampleAudIncr));
+            if ~BpodSystem.Data.Custom.EarlyWithdrawal(iTrial)
+                TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
+                    max(TaskParameters.GUI.MinSampleAudMin,BpodSystem.Data.Custom.MinSampleAud(iTrial) + TaskParameters.GUI.MinSampleAudIncr));
+            end
+        elseif mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) < Crit/2
+            if BpodSystem.Data.Custom.EarlyWithdrawal(iTrial)
+                TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
+                	in(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+            end
         else
-            TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
-                min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+            TaskParameters.GUI.MinSampleAud = BpodSystem.Data.Custom.MinSampleAud(iTrial);
         end
     end
 else
@@ -157,6 +163,14 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
 end
 
 %% Drawing future trials
+%set jackpot time
+if TaskParameters.GUI.JackpotAuditory
+    if sum(~isnan(BpodSystem.Data.Custom.ST))>50
+        TaskParameters.GUI.JackpotAuditoryTime = quantile(BpodSystem.Data.Custom.ST,0.95);
+    end
+end
+
+%create future trials
 if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     
     lastidx = numel(BpodSystem.Data.Custom.DV);
@@ -186,7 +200,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
             end
             TaskParameters.GUI.LeftBiasAud = 0.5;%auditory not implemented
         case 'BiasCorrecting' % Favors side with fewer rewards. Contrast drawn flat & independently.
-            %oldactory
+            %olfactory
             ndxRewd = BpodSystem.Data.Custom.Rewarded(1:iTrial) == 1 & ~BpodSystem.Data.Custom.AuditoryTrial(1:iTrial); ndxRewd = ndxRewd(:);
             oldOdorID = BpodSystem.Data.Custom.OdorID(1:numel(ndxRewd)); oldOdorID = oldOdorID(:);
             if any(ndxRewd) % To prevent division by zero
@@ -198,7 +212,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
             end
             %auditory
             ndxRewd = BpodSystem.Data.Custom.Rewarded(1:iTrial) == 1 & BpodSystem.Data.Custom.AuditoryTrial(1:iTrial);
-            if sum(ndxRewd)>2
+            if sum(ndxRewd)>10
                 TaskParameters.GUI.LeftBiasAud = sum(BpodSystem.Data.Custom.MoreLeftClicks(1:iTrial)==1&ndxRewd)/sum(ndxRewd);
             else
                 TaskParameters.GUI.LeftBiasAud = 0.5;

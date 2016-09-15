@@ -80,7 +80,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MinSampleAudDecr = 0.02;
     TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
     TaskParameters.GUIMeta.MinSampleAud.Style = 'text';
-    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','LeftBiasAud','SumRates','AuditoryStimulusTime','MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
+    TaskParameters.GUI.JackpotAuditory = true;
+    TaskParameters.GUIMeta.JackpotAuditory.Style = 'checkbox';
+    TaskParameters.GUI.JackpotAuditoryTime = 2;
+    TaskParameters.GUIMeta.JackpotAuditoryTime.Style = 'text';
+    TaskParameters.GUIPanels.AudGeneral = {'AuditoryAlpha','LeftBiasAud','SumRates','AuditoryStimulusTime'};
+    TaskParameters.GUIPanels.AudMinSample = {'MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
+    TaskParameters.GUIPanels.AudJackpot = {'JackpotAuditory','JackpotAuditoryTime'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
@@ -95,7 +101,7 @@ if isempty(fieldnames(TaskParameters))
     %% Tabs
     TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
-    TaskParameters.GUITabs.Auditory = {'AudStimuli'};
+    TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudJackpot'};
     
 end
 BpodParameterGUI('init', TaskParameters);
