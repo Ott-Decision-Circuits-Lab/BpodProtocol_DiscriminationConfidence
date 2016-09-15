@@ -16,7 +16,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
-    TaskParameters.GUI.PercentAuditory = 0.5;
+    TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
@@ -67,6 +67,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.OlfStimuli = {'OdorTable','OdorStimulusTimeMin'};
     %% Auditory Params
     TaskParameters.GUI.AuditoryAlpha = 1;
+    TaskParameters.GUI.LeftBiasAud = 0.5;
+    TaskParameters.GUIMeta.LeftBiasAud.Style = 'text';
     TaskParameters.GUI.SumRates = 100;
     TaskParameters.GUI.AuditoryStimulusTime = 3;
     %min auditory stimulus
@@ -78,7 +80,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MinSampleAudDecr = 0.02;
     TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
     TaskParameters.GUIMeta.MinSampleAud.Style = 'text';
-    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','SumRates','AuditoryStimulusTime','MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
+    TaskParameters.GUIPanels.AudStimuli = {'AuditoryAlpha','LeftBiasAud','SumRates','AuditoryStimulusTime','MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;

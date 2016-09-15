@@ -122,7 +122,6 @@ if TaskParameters.GUI.MinSampleAudAutoincrement
     end
     ConsiderTrials = ConsiderTrials((~isnan(BpodSystem.Data.Custom.ChoiceLeft(ConsiderTrials))...
                     |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))&BpodSystem.Data.Custom.AuditoryTrial(ConsiderTrials)); %choice + early withdrawal + auditory trials
-    ConsiderTrials
     if ~isempty(ConsiderTrials) && BpodSystem.Data.Custom.AuditoryTrial(iTrial)
         if mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) > Crit
             TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
@@ -167,6 +166,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     switch TaskParameters.GUIMeta.TrialSelection.String{TaskParameters.GUI.TrialSelection}
         case 'Flat'
             TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorProb));
+            TaskParameters.GUI.LeftBiasAud = 0.5;
         case 'Manual'
             
         case 'Competitive'
@@ -184,8 +184,10 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
                 TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorProb==0) = ...
                     min(TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorProb>0))/2;
             end
+            TaskParameters.GUI.LeftBiasAud = 0.5;%auditory not implemented
         case 'BiasCorrecting' % Favors side with fewer rewards. Contrast drawn flat & independently.
-            ndxRewd = BpodSystem.Data.Custom.Rewarded(1:iTrial) == 1; ndxRewd = ndxRewd(:);
+            %oldactory
+            ndxRewd = BpodSystem.Data.Custom.Rewarded(1:iTrial) == 1 & ~BpodSystem.Data.Custom.AuditoryTrial(1:iTrial); ndxRewd = ndxRewd(:);
             oldOdorID = BpodSystem.Data.Custom.OdorID(1:numel(ndxRewd)); oldOdorID = oldOdorID(:);
             if any(ndxRewd) % To prevent division by zero
                 TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA<50) = 1-sum(oldOdorID==2 & ndxRewd)/sum(ndxRewd);
@@ -193,6 +195,13 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
             else
                 TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA<50) = .5;
                 TaskParameters.GUI.OdorTable.OdorProb(TaskParameters.GUI.OdorTable.OdorFracA>50) = .5;
+            end
+            %auditory
+            ndxRewd = BpodSystem.Data.Custom.Rewarded(1:iTrial) == 1 & BpodSystem.Data.Custom.AuditoryTrial(1:iTrial);
+            if sum(ndxRewd)>2
+                TaskParameters.GUI.LeftBiasAud = sum(BpodSystem.Data.Custom.MoreLeftClicks(1:iTrial)==1&ndxRewd)/sum(ndxRewd);
+            else
+                TaskParameters.GUI.LeftBiasAud = 0.5;
             end
     end
     if sum(TaskParameters.GUI.OdorTable.OdorProb) == 0
@@ -216,9 +225,13 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     BpodSystem.Data.Custom.OdorPair = [BpodSystem.Data.Custom.OdorPair, newOdorPair];
     
     % make future auditory trials
+    %bias correcting
+    BetaRatio = (1 - TaskParameters.GUI.LeftBiasAud) / TaskParameters.GUI.LeftBiasAud; %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
+    BetaA =  (2*TaskParameters.GUI.AuditoryAlpha*BetaRatio) / (1+BetaRatio); %make a,b symmetric around AuditoryAlpha to make B symmetric
+    BetaB = (TaskParameters.GUI.AuditoryAlpha-BetaA) + TaskParameters.GUI.AuditoryAlpha;
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
-            BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(TaskParameters.GUI.AuditoryAlpha,TaskParameters.GUI.AuditoryAlpha,1,1);
+            BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(BetaA,BetaB,1,1);
             BpodSystem.Data.Custom.LeftClickRate(lastidx+a) = round(BpodSystem.Data.Custom.AuditoryOmega(lastidx+a).*TaskParameters.GUI.SumRates);
             BpodSystem.Data.Custom.RightClickRate(lastidx+a) = round((1-BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)).*TaskParameters.GUI.SumRates);
             BpodSystem.Data.Custom.LeftClickTrain{lastidx+a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(lastidx+a), TaskParameters.GUI.AuditoryStimulusTime);
