@@ -108,21 +108,27 @@ end
 
 %min sampling time
 if TaskParameters.GUI.MinSampleAudAutoincrement
-    History = 50;
+    History = 5;
     Crit = 0.8;
-    if iTrial<10
+    if sum(BpodSystem.Data.Custom.AuditoryTrial)<3
         ConsiderTrials = iTrial;
     else
-        ConsiderTrials = max(1,iTrial-History):1:iTrial;
+        if isempty(idxStart)
+            ConsiderTrials = 1:iTrial;
+        else
+            ConsiderTrials = iTrial-idxStart+1:iTrial;
+        end
     end
-    ConsiderTrials = ConsiderTrials(~isnan(BpodSystem.Data.Custom.ChoiceLeft(ConsiderTrials))...
-                    |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials)); %choice + early withdrawal trials
-    if sum(~BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))/length(ConsiderTrials) > Crit
-        TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
-            max(TaskParameters.GUI.MinSampleAudMin,BpodSystem.Data.Custom.MinSampleAud(iTrial) + TaskParameters.GUI.MinSampleAudIncr));
-    else
-        TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
-            min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+    ConsiderTrials = ConsiderTrials((~isnan(BpodSystem.Data.Custom.ChoiceLeft(ConsiderTrials))...
+                    |BpodSystem.Data.Custom.EarlyWithdrawal(ConsiderTrials))&BpodSystem.Data.Custom.AuditoryTrial(ConsiderTrials)); %choice + early withdrawal + auditory trials
+    if ~isempty(ConsiderTrials) && BpodSystem.Data.Custom.AuditoryTrial(iTrial)
+        if mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) > Crit
+            TaskParameters.GUI.MinSampleAud = min(TaskParameters.GUI.MinSampleAudMax,...
+                max(TaskParameters.GUI.MinSampleAudMin,BpodSystem.Data.Custom.MinSampleAud(iTrial) + TaskParameters.GUI.MinSampleAudIncr));
+        else
+            TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
+                min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+        end
     end
 else
     TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
