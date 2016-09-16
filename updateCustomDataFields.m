@@ -131,7 +131,7 @@ if TaskParameters.GUI.MinSampleAudAutoincrement
         elseif mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) < Crit/2
             if BpodSystem.Data.Custom.EarlyWithdrawal(iTrial)
                 TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
-                	in(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+                	min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
             end
         else
             TaskParameters.GUI.MinSampleAud = BpodSystem.Data.Custom.MinSampleAud(iTrial);
