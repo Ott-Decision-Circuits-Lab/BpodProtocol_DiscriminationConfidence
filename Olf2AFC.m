@@ -9,6 +9,8 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
+    TaskParameters.GUI.SendFigure = 1;
+    TaskParameters.GUIMeta.SendFigure.Style = 'checkbox';
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
     TaskParameters.GUI.ChoiceDeadLine = 5;
@@ -18,7 +20,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
