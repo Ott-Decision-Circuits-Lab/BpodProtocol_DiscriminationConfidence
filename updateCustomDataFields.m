@@ -131,11 +131,15 @@ if TaskParameters.GUI.MinSampleAudAutoincrement
         elseif mean(BpodSystem.Data.Custom.ST(ConsiderTrials)>TaskParameters.GUI.MinSampleAud) < Crit/2
             if BpodSystem.Data.Custom.EarlyWithdrawal(iTrial)
                 TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
-                	in(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
+                	min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial) - TaskParameters.GUI.MinSampleAudDecr));
             end
         else
-            TaskParameters.GUI.MinSampleAud = BpodSystem.Data.Custom.MinSampleAud(iTrial);
+            TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
+                	min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial)));
         end
+    else
+        TaskParameters.GUI.MinSampleAud = max(TaskParameters.GUI.MinSampleAudMin,...
+                	min(TaskParameters.GUI.MinSampleAudMax,BpodSystem.Data.Custom.MinSampleAud(iTrial)));
     end
 else
     TaskParameters.GUI.MinSampleAud = TaskParameters.GUI.MinSampleAudMin;
@@ -240,13 +244,14 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     
     % make future auditory trials
     %bias correcting
-    BetaRatio = (1 - TaskParameters.GUI.LeftBiasAud) / TaskParameters.GUI.LeftBiasAud; %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
+    BetaRatio = (1 - min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud))) / min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud)); %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
+                                                                                          %cut off between 0.1-0.9 to prevent extreme values (only one side) and div by zero
     BetaA =  (2*TaskParameters.GUI.AuditoryAlpha*BetaRatio) / (1+BetaRatio); %make a,b symmetric around AuditoryAlpha to make B symmetric
     BetaB = (TaskParameters.GUI.AuditoryAlpha-BetaA) + TaskParameters.GUI.AuditoryAlpha;
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
-            BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(BetaA,BetaB,1,1);
-            BpodSystem.Data.Custom.LeftClickRate(lastidx+a) = round(BpodSystem.Data.Custom.AuditoryOmega(lastidx+a).*TaskParameters.GUI.SumRates);
+            BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1);
+            BpodSystem.Data.Custom.LeftClickRate(lastidx+a) = round(BpodSystem.Data.Custom.AuditoryOmega(lastidx+a).*TaskParameters.GUI.SumRates); %prevent negative parameters
             BpodSystem.Data.Custom.RightClickRate(lastidx+a) = round((1-BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)).*TaskParameters.GUI.SumRates);
             BpodSystem.Data.Custom.LeftClickTrain{lastidx+a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(lastidx+a), TaskParameters.GUI.AuditoryStimulusTime);
             BpodSystem.Data.Custom.RightClickTrain{lastidx+a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.RightClickRate(lastidx+a), TaskParameters.GUI.AuditoryStimulusTime);
