@@ -9,7 +9,7 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.SendFigure = 1;
+    TaskParameters.GUI.SendFigure = 0;
     TaskParameters.GUIMeta.SendFigure.Style = 'checkbox';
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
@@ -104,6 +104,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudJackpot'};
+    %%Non-GUI Parameters (but saved)
+    TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
+    TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
     
 end
 BpodParameterGUI('init', TaskParameters);
@@ -189,7 +192,7 @@ if ~BpodSystem.EmulatorMode
 end
 
 %% Initialize plots
-BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', [200 200 1000 400],'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
+BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .06          .15 .91 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.06          .6  .1  .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.06 + 1*.1   .6  .1  .3]);
@@ -198,6 +201,7 @@ BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position',        [4*.06 + 3
 BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position',         [5*.06 + 4*.1   .6  .1  .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position',   [6*.06 + 5*.1   .6  .1  .3]);
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
+BpodSystem.ProtocolFigures.ParameterGUI.Position = TaskParameters.Figures.ParameterGUI.Position;
 %BpodNotebook('init');
 
 %% Main loop

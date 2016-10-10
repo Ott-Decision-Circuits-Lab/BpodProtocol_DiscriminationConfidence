@@ -302,4 +302,8 @@ if ~BpodSystem.EmulatorMode
     end
 end
 
+%%update hidden TaskParameter fields
+TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
+TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
+
 end
