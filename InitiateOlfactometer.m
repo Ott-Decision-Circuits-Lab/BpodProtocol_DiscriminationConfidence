@@ -1,5 +1,6 @@
 function InitiateOlfactometer(iTrial)
 global BpodSystem
+global TaskParameters
 if ~BpodSystem.Data.Custom.AuditoryTrial(iTrial) && ~BpodSystem.Data.Custom.OlfactometerStartup
     if ~BpodSystem.EmulatorMode
         BpodSystem.Data.Custom.OlfIp = FindOlfactometer;
