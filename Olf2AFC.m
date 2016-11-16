@@ -19,8 +19,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
+    TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','PercentCatch','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -122,6 +123,7 @@ BpodSystem.Data.Custom.FixBroke = false(0);
 BpodSystem.Data.Custom.EarlyWithdrawal = false(0);
 BpodSystem.Data.Custom.FixDur = [];
 BpodSystem.Data.Custom.MT = [];
+BpodSystem.Data.Custom.CatchTrial = false;
 BpodSystem.Data.Custom.OdorFracA = randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';
 BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
 BpodSystem.Data.Custom.OdorPair = ones(1,2);

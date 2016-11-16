@@ -167,6 +167,10 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
 end
 
 %% Drawing future trials
+
+%determine if catch trial
+BpodSystem.Data.Custom.CatchTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+
 %set jackpot time
 if TaskParameters.GUI.JackpotAuditory
     if sum(~isnan(BpodSystem.Data.Custom.ST))>50
