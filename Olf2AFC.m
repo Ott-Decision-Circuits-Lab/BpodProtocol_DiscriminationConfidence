@@ -20,8 +20,10 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.PercentCatch = 0;
+    TaskParameters.GUI.CatchError = false;
+    TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','PercentCatch','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','PercentCatch','CatchError','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
