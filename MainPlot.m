@@ -26,6 +26,7 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.EarlyWithdrawal = line(-1,0, 'LineStyle','none','Marker','d','MarkerEdge','none','MarkerFace','b', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.NoFeedback = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','none','MarkerFace','w', 'MarkerSize',5);
         BpodSystem.GUIHandles.OutcomePlot.NoResponse = line(-1,[0 1], 'LineStyle','none','Marker','x','MarkerEdge','w','MarkerFace','none', 'MarkerSize',6);
+        BpodSystem.GUIHandles.OutcomePlot.Catch = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[0,0,0],'MarkerFace',[0,0,0], 'MarkerSize',4);
         set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-1.25, 1.25], 'YTick', [-1, 1],'YTickLabel', {'Right','Left'}, 'FontSize', 16);
         set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata',find(~BpodSystem.Data.Custom.AuditoryTrial),'ydata',BpodSystem.Data.Custom.DV(~BpodSystem.Data.Custom.AuditoryTrial));
         set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata',find(BpodSystem.Data.Custom.AuditoryTrial),'ydata',BpodSystem.Data.Custom.DV(BpodSystem.Data.Custom.AuditoryTrial));
@@ -68,6 +69,15 @@ switch Action
         AxesHandles.HandleFeedback.XLabel.String = 'Time (ms)';
         AxesHandles.HandleFeedback.YLabel.String = 'trial counts';
         AxesHandles.HandleFeedback.Title.String = 'Feedback delay';
+        %% Vevaiometric curve
+        hold(AxesHandles.HandleVevaiometric,'on')
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,0,-1, 'LineStyle','-','Color','g');
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,0,-1, 'LineStyle','-','Color','r');
+        AxesHandles.HandleVevaiometric.YLim = [0 10];
+        AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
+        AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
+        AxesHandles.HandleVevaiometric.YLabel.String = 'WT (s)';
+        AxesHandles.HandleVevaiometric.Title.String = 'Vevaiometric';
     case 'update'
         %% Outcome
         iTrial = varargin{1};
@@ -121,6 +131,11 @@ switch Action
         Xdata = indxToPlot(ndxNoFeedback&~ndxMiss);
         Ydata = BpodSystem.Data.Custom.DV(indxToPlot); Ydata = Ydata(ndxNoFeedback&~ndxMiss);
         set(BpodSystem.GUIHandles.OutcomePlot.NoFeedback, 'xdata', Xdata, 'ydata', Ydata);
+        %Plot catch trials
+        ndxCatch = BpodSystem.Data.Custom.CatchTrial(indxToPlot);
+        Xdata = indxToPlot(ndxCatch&~ndxMiss);
+        Ydata = BpodSystem.Data.Custom.DV(indxToPlot); Ydata = Ydata(ndxCatch&~ndxMiss);
+        set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', Xdata, 'ydata', Ydata);
         %% Psyc Olf
         OdorFracA = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
         ndxOlf = ~BpodSystem.Data.Custom.AuditoryTrial(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
@@ -211,18 +226,32 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.HistST.BinWidth = 50;
         BpodSystem.GUIHandles.OutcomePlot.HistST.FaceColor = 'b';
         BpodSystem.GUIHandles.OutcomePlot.HistST.EdgeColor = 'none';
-        %% Feedback delay
+        %% Feedback delay (exclude catch trials)
         cla(AxesHandles.HandleFeedback)
-        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial))*1000);
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.BinWidth = 100;
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeColor = 'none';
         BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = 'r';
         %BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
-        BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(BpodSystem.Data.Custom.Feedback)*1000);
+        BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial))*1000);
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.BinWidth = 50;
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = 'none';
         BpodSystem.GUIHandles.OutcomePlot.HistFeed.FaceColor = 'b';
 %         BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
+        %% Vevaiometric
+        ndxError = BpodSystem.Data.Custom.Feedback(1:iTrial) & BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 0 ; %only completed error trials (with feedback). thereby also excludes catch trials.
+        ndxCorrectCatch = BpodSystem.Data.Custom.CatchTrial(1:iTrial) & BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 1; %only correct catch trials
+        DV = BpodSystem.Data.Custom.DV;
+        DVBin = 8;
+        BinIdx = discretize(DV,linspace(-1,1,DVBin+1));
+        WTerr = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxError),BinIdx(ndxError),'mean');
+        WTcatch = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxCorrectCatch),BinIdx(ndxCorrectCatch),'mean');
+        Xerr = unique(BinIdx(ndxError))/AudBin*2-1-1/AudBin;
+        Xcatch = unique(BinIdx(ndxCorrectCatch))/AudBin*2-1-1/AudBin;
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr.YData = WTerr;
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr.XData = Xerr;
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch.YData = WTcatch;
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch.XData = Xcatch;
 end
 
 end

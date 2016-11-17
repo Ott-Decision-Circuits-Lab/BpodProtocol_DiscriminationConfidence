@@ -196,14 +196,15 @@ if ~BpodSystem.EmulatorMode
 end
 
 %% Initialize plots
-BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
-BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .06          .15 .91 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.06          .6  .1  .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.06 + 1*.1   .6  .1  .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',  [3*.06 + 2*.1   .6  .1  .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position',        [4*.06 + 3*.1   .6  .1  .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position',         [5*.06 + 4*.1   .6  .1  .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position',   [6*.06 + 5*.1   .6  .1  .3]);
+BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'on');
+BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .05          .15 .91 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.05          .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.05 + 1*.08   .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',  [3*.05 + 2*.08   .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position',        [4*.05 + 3*.08   .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position',         [5*.05 + 4*.08   .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleFeedback = axes('Position',   [6*.05 + 5*.08   .5  .1  .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric = axes('Position',   [7*.05 + 6*.08   .5  .1  .3]);
 MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 BpodSystem.ProtocolFigures.ParameterGUI.Position = TaskParameters.Figures.ParameterGUI.Position;
 %BpodNotebook('init');
