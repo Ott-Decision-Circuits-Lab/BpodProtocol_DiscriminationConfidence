@@ -35,16 +35,16 @@ switch Action
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', 18);
         hold(AxesHandles.HandleOutcome, 'on');
         %% Psyc Olfactory
-        BpodSystem.GUIHandles.OutcomePlot.PsycOlf = line(AxesHandles.HandlePsycOlf,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6);
-        BpodSystem.GUIHandles.OutcomePlot.PsycOlfFit = line(AxesHandles.HandlePsycOlf,[0 100],[.5 .5],'color','k');
+        BpodSystem.GUIHandles.OutcomePlot.PsycOlf = line(AxesHandles.HandlePsycOlf,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
+        BpodSystem.GUIHandles.OutcomePlot.PsycOlfFit = line(AxesHandles.HandlePsycOlf,[0 100],[.5 .5],'color','k','Visible','off');
         AxesHandles.HandlePsycOlf.YLim = [-.05 1.05];
         AxesHandles.HandlePsycOlf.XLim = 100*[-.05 1.05];
         AxesHandles.HandlePsycOlf.XLabel.String = '% odor A'; % FIGURE OUT UNIT
         AxesHandles.HandlePsycOlf.YLabel.String = '% left';
         AxesHandles.HandlePsycOlf.Title.String = 'Psychometric Olf';
         %% Psyc Auditory
-        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6);
-        BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k');
+        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
+        BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k','Visible','off');
         AxesHandles.HandlePsycAud.YLim = [-.05 1.05];
         AxesHandles.HandlePsycAud.XLim = [-1.05, 1.05];
         AxesHandles.HandlePsycAud.XLabel.String = 'beta'; % FIGURE OUT UNIT
@@ -52,7 +52,7 @@ switch Action
         AxesHandles.HandlePsycAud.Title.String = 'Psychometric Aud';
         %% Trial rate
         hold(AxesHandles.HandleTrialRate,'on')
-        BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k'); %#ok<NBRAK>
+        BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k','Visible','off'); %#ok<NBRAK>
         AxesHandles.HandleTrialRate.XLabel.String = 'Time (min)'; % FIGURE OUT UNIT
         AxesHandles.HandleTrialRate.YLabel.String = 'nTrials';
         AxesHandles.HandleTrialRate.Title.String = 'Trial rate';
@@ -73,8 +73,8 @@ switch Action
         AxesHandles.HandleFeedback.Title.String = 'Feedback delay';
         %% Vevaiometric curve
         hold(AxesHandles.HandleVevaiometric,'on')
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','g');
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','r');
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','g','Visible','off');
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','r','Visible','off');
         AxesHandles.HandleVevaiometric.YLim = [0 10];
         AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
         AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
@@ -87,7 +87,7 @@ switch Action
         NoPlots = sum(ShowPlots);
         NPlot = cumsum(ShowPlots);
         if ShowPlots(1)
-            BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf.Position =      [NPlot(1)*.05                                 .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf.Position =      [NPlot(1)*.05                                    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf,'Children'),'Visible','on');
         else
@@ -95,7 +95,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf,'Children'),'Visible','off');
         end
         if ShowPlots(2)
-            BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud.Position =      [NPlot(2)*.05 + (NPlot(2)-1)*1/(1.65*NoPlots)    .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud.Position =      [NPlot(2)*.05 + (NPlot(2)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud,'Children'),'Visible','on');
         else
@@ -103,7 +103,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud,'Children'),'Visible','off');
         end
         if ShowPlots(3)
-            BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Position =    [NPlot(3)*.05 + (NPlot(3)-1)*1/(1.65*NoPlots)    .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Position =    [NPlot(3)*.05 + (NPlot(3)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate,'Children'),'Visible','on');
         else
@@ -111,7 +111,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate,'Children'),'Visible','off');
         end
         if ShowPlots(4)
-            BpodSystem.GUIHandles.OutcomePlot.HandleFix.Position =          [NPlot(4)*.05 + (NPlot(4)-1)*1/(1.65*NoPlots)    .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleFix.Position =          [NPlot(4)*.05 + (NPlot(4)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleFix.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFix,'Children'),'Visible','on');
         else
@@ -119,7 +119,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFix,'Children'),'Visible','off');
         end
         if ShowPlots(5)
-            BpodSystem.GUIHandles.OutcomePlot.HandleST.Position =           [NPlot(5)*.05 + (NPlot(5)-1)*1/(1.65*NoPlots)    .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleST.Position =           [NPlot(5)*.05 + (NPlot(5)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleST.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleST,'Children'),'Visible','on');
         else
@@ -127,7 +127,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleST,'Children'),'Visible','off');
         end
         if ShowPlots(6)
-            BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Position =     [NPlot(6)*.05 + (NPlot(6)-1)*1/(1.65*NoPlots)    .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Position =     [NPlot(6)*.05 + (NPlot(6)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFeedback,'Children'),'Visible','on');
         else
@@ -135,7 +135,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFeedback,'Children'),'Visible','off');
         end
         if ShowPlots(7)
-            BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Position = [NPlot(7)*.05 + (NPlot(7)-1)*1/(1.65*NoPlots)   .5   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Position = [NPlot(7)*.05 + (NPlot(7)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric,'Children'),'Visible','on');
         else
