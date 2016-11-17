@@ -104,6 +104,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.ShowPsycOlf.Style = 'checkbox';
     TaskParameters.GUI.ShowPsycAud = 1;
     TaskParameters.GUIMeta.ShowPsycAud.Style = 'checkbox';
+    TaskParameters.GUI.ShowVevaiometric = 1;
+    TaskParameters.GUIMeta.ShowVevaiometric.Style = 'checkbox';
     TaskParameters.GUI.ShowTrialRate = 1;
     TaskParameters.GUIMeta.ShowTrialRate.Style = 'checkbox';
     TaskParameters.GUI.ShowFix = 1;
@@ -112,9 +114,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.ShowST.Style = 'checkbox';
     TaskParameters.GUI.ShowFeedback = 1;
     TaskParameters.GUIMeta.ShowFeedback.Style = 'checkbox';
-    TaskParameters.GUI.ShowVevaiometric = 1;
-    TaskParameters.GUIMeta.ShowVevaiometric.Style = 'checkbox';
-    TaskParameters.GUIPanels.Plots = {'ShowPsycOlf','ShowPsycAud','ShowTrialRate','ShowFix','ShowST','ShowFeedback','ShowVevaiometric'};
+    TaskParameters.GUIPanels.Plots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -214,7 +214,7 @@ end
 
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
-BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .05          .15 .91 .3]);
+BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .055          .15 .91 .3]);
 BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.05          .6  .1  .3], 'Visible', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.05 + 1*.08   .6  .1  .3], 'Visible', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',  [3*.05 + 2*.08   .6  .1  .3], 'Visible', 'off');
