@@ -169,7 +169,11 @@ end
 %% Drawing future trials
 
 %determine if catch trial
-BpodSystem.Data.Custom.CatchTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+if iTrial > TaskParameters.GUI.StartEasyTrials
+    BpodSystem.Data.Custom.CatchTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+else
+    BpodSystem.Data.Custom.CatchTrial(iTrial+1) = false;
+end
 
 %set jackpot time
 if TaskParameters.GUI.JackpotAuditory
@@ -232,7 +236,13 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     TaskParameters.GUI.OdorTable.OdorProb = TaskParameters.GUI.OdorTable.OdorProb/sum(TaskParameters.GUI.OdorTable.OdorProb);
     
     % make future olfactory trials
-    newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
+    if iTrial > TaskParameters.GUI.StartEasyTrials
+        newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
+    else
+        EasyProb = zeros(numel(TaskParameters.GUI.OdorTable.OdorProb),1);
+        EasyProb(1) = 0.5; EasyProb(end)=0.5;
+        newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,EasyProb);
+    end
     newOdorID =  2 - double(newFracA > 50);
     if any(abs(newFracA-50)<(10*eps))
         ndxZeroInf = abs(newFracA-50)<(10*eps);
@@ -248,10 +258,15 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     
     % make future auditory trials
     %bias correcting
+    if iTrial > TaskParameters.GUI.StartEasyTrials
+        AuditoryAlpha = TaskParameters.GUI.AuditoryAlpha;
+    else
+        AuditoryAlpha = TaskParameters.GUI.AuditoryAlpha/4;
+    end
     BetaRatio = (1 - min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud))) / min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud)); %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
                                                                                           %cut off between 0.1-0.9 to prevent extreme values (only one side) and div by zero
-    BetaA =  (2*TaskParameters.GUI.AuditoryAlpha*BetaRatio) / (1+BetaRatio); %make a,b symmetric around AuditoryAlpha to make B symmetric
-    BetaB = (TaskParameters.GUI.AuditoryAlpha-BetaA) + TaskParameters.GUI.AuditoryAlpha;
+    BetaA =  (2*AuditoryAlpha*BetaRatio) / (1+BetaRatio); %make a,b symmetric around AuditoryAlpha to make B symmetric
+    BetaB = (AuditoryAlpha-BetaA) + AuditoryAlpha;
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
             BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1);
