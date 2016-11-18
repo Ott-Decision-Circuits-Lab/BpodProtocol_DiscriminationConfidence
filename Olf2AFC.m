@@ -102,6 +102,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.BlockTable.ColumnLabel = {'Block#','Block Length','Rew L', 'Rew R'};
     TaskParameters.GUIPanels.BlockStructure = {'BlockTable'};
     %% Plots
+    %Show Plots
     TaskParameters.GUI.ShowPsycOlf = 1;
     TaskParameters.GUIMeta.ShowPsycOlf.Style = 'checkbox';
     TaskParameters.GUI.ShowPsycAud = 1;
@@ -116,14 +117,20 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.ShowST.Style = 'checkbox';
     TaskParameters.GUI.ShowFeedback = 1;
     TaskParameters.GUIMeta.ShowFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.Plots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
+    TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
+    %Vevaiometric
+    TaskParameters.GUI.VevaiometricMinWT = 2;
+    TaskParameters.GUI.VevaiometricNBin = 8;
+    TaskParameters.GUI.VevaiometricShowPoints = 1;
+    TaskParameters.GUIMeta.VevaiometricShowPoints.Style = 'checkbox';
+    TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
     TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudJackpot'};
-    TaskParameters.GUITabs.Plots = {'Plots'};
+    TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];

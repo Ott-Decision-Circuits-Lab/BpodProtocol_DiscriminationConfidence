@@ -54,6 +54,8 @@ switch Action
         hold(AxesHandles.HandleVevaiometric,'on')
         BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','g','Visible','off','LineWidth',2);
         BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','r','Visible','off','LineWidth',2);
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color','r','Marker','o','MarkerFaceColor','r', 'MarkerSize',2,'Visible','off','MarkerEdgeColor','r');
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color','g','Marker','o','MarkerFaceColor','g', 'MarkerSize',2,'Visible','off','MarkerEdgeColor','r');
         AxesHandles.HandleVevaiometric.YLim = [0 10];
         AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
         AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
@@ -275,17 +277,29 @@ switch Action
         if TaskParameters.GUI.ShowVevaiometric
             ndxError = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 0 ; %all (completed) error trials (including catch errors)
             ndxCorrectCatch = BpodSystem.Data.Custom.CatchTrial(1:iTrial) & BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 1; %only correct catch trials
-            DV = BpodSystem.Data.Custom.DV;
-            DVBin = 8;
-            BinIdx = discretize(DV,linspace(-1,1,DVBin+1));
-            WTerr = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxError),BinIdx(ndxError),'mean');
-            WTcatch = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxCorrectCatch),BinIdx(ndxCorrectCatch),'mean');
-            Xerr = unique(BinIdx(ndxError))/DVBin*2-1-1/DVBin;
-            Xcatch = unique(BinIdx(ndxCorrectCatch))/DVBin*2-1-1/DVBin;
+            ndxMinWT = BpodSystem.Data.Custom.FeedbackTime > TaskParameters.GUI.VevaiometricMinWT;
+            DV = BpodSystem.Data.Custom.DV(1:iTrial);
+            DVNBin = TaskParameters.GUI.VevaiometricNBin;
+            BinIdx = discretize(DV,linspace(-1,1,DVNBin+1));
+            WTerr = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxError&ndxMinWT),BinIdx(ndxError&ndxMinWT),'mean')';
+            WTcatch = grpstats(BpodSystem.Data.Custom.FeedbackTime(ndxCorrectCatch&ndxMinWT),BinIdx(ndxCorrectCatch&ndxMinWT),'mean')';
+            Xerr = unique(BinIdx(ndxError&ndxMinWT))/DVNBin*2-1-1/DVNBin;
+            Xcatch = unique(BinIdx(ndxCorrectCatch&ndxMinWT))/DVNBin*2-1-1/DVNBin;
             BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr.YData = WTerr;
             BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr.XData = Xerr;
             BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch.YData = WTcatch;
             BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch.XData = Xcatch;
+            if TaskParameters.GUI.VevaiometricShowPoints
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr.YData = BpodSystem.Data.Custom.FeedbackTime(ndxError&ndxMinWT);
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr.XData = DV(ndxError&ndxMinWT);
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch.YData = BpodSystem.Data.Custom.FeedbackTime(ndxCorrectCatch&ndxMinWT);
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch.XData = DV(ndxCorrectCatch&ndxMinWT);
+            else
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr.YData = -1;
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr.XData = 0;
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch.YData = -1;
+                BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch.XData = 0;
+            end
         end
         %% Trial rate
         if TaskParameters.GUI.ShowTrialRate
