@@ -105,7 +105,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud,'Children'),'Visible','off');
         end
         if ShowPlots(3)
-            BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Position = [NPlot(7)*.05+0.005 + (NPlot(7)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Position = [NPlot(3)*.05+0.005 + (NPlot(3)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric,'Children'),'Visible','on');
         else
@@ -113,7 +113,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleVevaiometric,'Children'),'Visible','off');
         end
         if ShowPlots(4)
-            BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Position =    [NPlot(3)*.05+0.005 + (NPlot(3)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Position =    [NPlot(4)*.05+0.005 + (NPlot(4)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate,'Children'),'Visible','on');
         else
@@ -121,7 +121,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate,'Children'),'Visible','off');
         end
         if ShowPlots(5)
-            BpodSystem.GUIHandles.OutcomePlot.HandleFix.Position =          [NPlot(4)*.05+0.005 + (NPlot(4)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleFix.Position =          [NPlot(5)*.05+0.005 + (NPlot(5)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleFix.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFix,'Children'),'Visible','on');
         else
@@ -129,7 +129,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFix,'Children'),'Visible','off');
         end
         if ShowPlots(6)
-            BpodSystem.GUIHandles.OutcomePlot.HandleST.Position =           [NPlot(5)*.05+0.005 + (NPlot(5)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleST.Position =           [NPlot(6)*.05+0.005 + (NPlot(6)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleST.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleST,'Children'),'Visible','on');
         else
@@ -137,7 +137,7 @@ switch Action
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleST,'Children'),'Visible','off');
         end
         if ShowPlots(7)
-            BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Position =     [NPlot(6)*.05+0.005 + (NPlot(6)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
+            BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Position =     [NPlot(7)*.05+0.005 + (NPlot(7)-1)*1/(1.65*NoPlots)    .6   1/(1.65*NoPlots) 0.3];
             BpodSystem.GUIHandles.OutcomePlot.HandleFeedback.Visible = 'on';
             set(get(BpodSystem.GUIHandles.OutcomePlot.HandleFeedback,'Children'),'Visible','on');
         else
