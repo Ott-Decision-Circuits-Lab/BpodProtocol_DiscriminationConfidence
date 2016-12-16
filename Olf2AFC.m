@@ -9,8 +9,9 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.SendFigure = 0;
-    TaskParameters.GUIMeta.SendFigure.Style = 'checkbox';
+    TaskParameters.GUI.UserKillScript = 1;
+    TaskParameters.GUIMeta.UserKillScript.Style = 'popupmenu';
+    TaskParameters.GUIMeta.UserKillScript.String = {'None','Thiago','Torben'};
     TaskParameters.GUI.ITI = 0; % (s)
     TaskParameters.GUI.RewardAmount = 25;    
     TaskParameters.GUI.ChoiceDeadLine = 5;
@@ -24,7 +25,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'SendFigure','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','PercentCatch','CatchError','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'UserKillScript','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','PercentCatch','CatchError','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
