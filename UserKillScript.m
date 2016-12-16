@@ -20,6 +20,17 @@ end
 FigurePath = fullfile(FigureFolder,[FigureName,'.png']);
 saveas(FigureHandle,FigurePath,'png');
 
+%Analysis
+try
+    FigAnalysis = User();
+    FigurePathAnalysis = fullfile(FigureFolder,[FigureName,'Analysis.png']);
+    saveas(FigAnalysis,FigurePathAnalysis,'png');
+    s=close(FigAnalysis);
+    DidAnalysis = true;
+catch
+    DidAnalysis = false;
+end
+
 %send email if wished
 if TaskParameters.GUI.SendFigure
     [x,sessionfile] = fileparts(BpodSystem.DataPath);
@@ -28,7 +39,13 @@ if TaskParameters.GUI.SendFigure
     Subject = strcat(sessionfile,'@',animal);
     Body = sessionfile;
     
-    sent = SendMyMail(MailAddress,Subject,Body,{FigurePath});
+    if DidAnalysis
+        Attachment = {FigurePath,FigurePathAnalysis};
+    else
+        Attachment = {FigurePath};
+    end
+    
+    sent = SendMyMail(MailAddress,Subject,Body,Attachment);
     
     if sent
         fprintf('Figure "%s" sent to %s.\n',FigureString,MailAddress);
