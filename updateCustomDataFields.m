@@ -238,11 +238,15 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     % make future olfactory trials
     if iTrial > TaskParameters.GUI.StartEasyTrials
         newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,TaskParameters.GUI.OdorTable.OdorProb);
+        %include Fifty50 Trials
+        NewFifty50 = rand(5,1) < TaskParameters.GUI.Percent50Fifty;
+        newFracA(NewFifty50) = 50;
     else
         EasyProb = zeros(numel(TaskParameters.GUI.OdorTable.OdorProb),1);
         EasyProb(1) = 0.5; EasyProb(end)=0.5;
         newFracA = randsample(TaskParameters.GUI.OdorTable.OdorFracA,5,1,EasyProb);
     end
+    
     newOdorID =  2 - double(newFracA > 50);
     if any(abs(newFracA-50)<(10*eps))
         ndxZeroInf = abs(newFracA-50)<(10*eps);
@@ -269,8 +273,12 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     BetaB = (AuditoryAlpha-BetaA) + AuditoryAlpha;
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
-            BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1);
-            BpodSystem.Data.Custom.LeftClickRate(lastidx+a) = round(BpodSystem.Data.Custom.AuditoryOmega(lastidx+a).*TaskParameters.GUI.SumRates); %prevent negative parameters
+            if rand(1,1) < TaskParameters.GUI.Percent50Fifty && iTrial > TaskParameters.GUI.StartEasyTrials
+                BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = 0.5;
+            else
+                BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1); %prevent negative parameters
+            end
+            BpodSystem.Data.Custom.LeftClickRate(lastidx+a) = round(BpodSystem.Data.Custom.AuditoryOmega(lastidx+a).*TaskParameters.GUI.SumRates); 
             BpodSystem.Data.Custom.RightClickRate(lastidx+a) = round((1-BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)).*TaskParameters.GUI.SumRates);
             BpodSystem.Data.Custom.LeftClickTrain{lastidx+a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(lastidx+a), TaskParameters.GUI.AuditoryStimulusTime);
             BpodSystem.Data.Custom.RightClickTrain{lastidx+a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.RightClickRate(lastidx+a), TaskParameters.GUI.AuditoryStimulusTime);
