@@ -333,4 +333,15 @@ end
 TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
 TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
 
+%send bpod status to server
+try
+script = 'receivebpodstatus.php';
+%create a common "outcome" vector
+outcome = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial); %1=correct, 0=wrong
+outcome(BpodSystem.Data.Custom.EarlyWithdrawal(1:iTrial))=2; %early withdrawal=2
+outcome(BpodSystem.Data.Custom.FixBroke(1:iTrial))=3;%jackpot=3
+SendTrialStatusToServer(script,BpodSystem.Data.Custom.Rig,outcome,BpodSystem.Data.Custom.Subject,BpodSystem.CurrentProtocolName);
+catch
+end
+
 end

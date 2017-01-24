@@ -207,6 +207,10 @@ end%for a+1:2
 
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
+%server data
+BpodSystem.Data.Custom.Rig = getenv('computername');
+[~,BpodSystem.Data.Custom.Subject] = fileparts(fileparts(fileparts(fileparts(BpodSystem.DataPath))));
+
 %% Configuring PulsePal
 load PulsePalParamStimulus.mat
 load PulsePalParamFeedback.mat
