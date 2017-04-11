@@ -252,7 +252,7 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
         ndxZeroInf = abs(newFracA-50)<(10*eps);
         newOdorID(ndxZeroInf) = randsample(2,sum(ndxZeroInf),1);
     end
-    newOdorPair = ones(1,5);
+    newOdorPair = ones(1,5)*2;
     newFracA(newAuditoryTrial) = nan(sum(newAuditoryTrial),1);
     newOdorID(newAuditoryTrial) = nan(sum(newAuditoryTrial),1);
     newOdorPair(newAuditoryTrial) = nan(1,sum(newAuditoryTrial));
