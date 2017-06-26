@@ -376,7 +376,7 @@ if ~iscell(str)
 end
 for i = 1:length(str)
     x = pos(1)+1;y = pos(2)+pos(4)-i;
-    uicontrol(h.Parent,'Units','char','Position',[x,y,length(str{i}),1],'string',str{i},'style','text','background',[1,1,1],'FontSize',8);
+    uicontrol(h.Parent,'Units','char','Position',[x,y,length(str{i})+1,1],'string',str{i},'style','text','background',[1,1,1],'FontSize',8);
 end
 set(h,'Units',unit);
 end
