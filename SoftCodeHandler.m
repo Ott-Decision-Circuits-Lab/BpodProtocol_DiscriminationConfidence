@@ -29,7 +29,7 @@ if softCode < 11 %for olfactory
     end %if olfactometer initialized
 end %if olfactory soft codes
 
-if softCode > 10 && softCode < 21 %for auditory
+if softCode > 10 && softCode < 21 %for auditory clicks
     if ~BpodSystem.EmulatorMode
         if softCode == 11 %noise on chan 1
             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);
@@ -46,6 +46,15 @@ if softCode > 10 && softCode < 21 %for auditory
         end
     end
 end
+
+if softCode > 20 && softCode < 31 %for auditory freq
+    if softCode == 21 
+        if BpodSystem.Data.Custom.PsychtoolboxStartup
+            PsychToolboxSoundServer('Play', 1);
+        end
+    end
+end
+
 % switch odorID
 %     case 0
 %         CommandValveMinOil = Valves2EthernetString(firstbank, 2, secbank, 2);
