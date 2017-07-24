@@ -53,6 +53,11 @@ if softCode > 20 && softCode < 31 %for auditory freq
             PsychToolboxSoundServer('Play', 1);
         end
     end
+    if softCode == 22
+        if BpodSystem.Data.Custom.PsychtoolboxStartup
+            PsychToolboxSoundServer('Stop', 1);
+        end
+    end    
 end
 
 % switch odorID
