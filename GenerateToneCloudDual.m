@@ -11,7 +11,7 @@ Not all features have been imported to this version.
 %r is as defined by PZ (0 to 1), 0 meaning that the probability of target and non target freq is the same
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% global BpodSystem
+global BpodSystem
 
 nTones = StimSettings.nTones;
 ToneOverlap = StimSettings.ToneOverlap;
@@ -24,12 +24,12 @@ Volume = StimSettings.Volume;
  
 nFreq = StimSettings.nFreq; % Number of different frequencies to sample from
 toneFreq = logspace(log10(minFreq),log10(maxFreq),nFreq); % Nfreq logly distributed
-% SoundCal = BpodSystem.CalibrationTables.SoundCal;
-% 
-% if(isempty(SoundCal))
-%     disp('Error: no sound calibration file specified');
-%     return
-% end
+SoundCal = BpodSystem.CalibrationTables.SoundCal;
+
+if(isempty(SoundCal))
+    disp('Error: no sound calibration file specified');
+    return
+end
 
 %My sound file is for single speaker.
 %I need a double speaker program.
@@ -44,12 +44,10 @@ toneFreq = logspace(log10(minFreq),log10(maxFreq),nFreq); % Nfreq logly distribu
 % SoundCal(1,2).MaxBandLimit = SoundCal(1,1).MaxBandLimit;
 % SoundCal(1,2).FsOut = SoundCal(1,1).FsOut;
 % 
-% toneAtt = [polyval(SoundCal(1,1).Coefficient,toneFreq)' polyval(SoundCal(1,2).Coefficient,toneFreq)'];
-% diffSPL = Volume - [SoundCal(1,1).TargetSPL SoundCal(1,2).TargetSPL];
-% attFactor = sqrt(10.^(diffSPL./10));
-% 
-% att = toneAtt.*repmat(attFactor,nFreq,1);
-diffSPL = Volume;attFactor = sqrt(10.^(diffSPL./10));att = repmat(attFactor,nFreq,1);
+toneAtt = [polyval(SoundCal(1,1).Coefficient,toneFreq)' polyval(SoundCal(1,2).Coefficient,toneFreq)'];
+diffSPL = Volume - [SoundCal(1,1).TargetSPL SoundCal(1,2).TargetSPL];
+attFactor = sqrt(10.^(diffSPL./10));
+att = toneAtt.*repmat(attFactor,nFreq,1);
 
 
 nTones_Evidence = nTones - nTones_noEvidence; % Number of tones with controlled evidence
