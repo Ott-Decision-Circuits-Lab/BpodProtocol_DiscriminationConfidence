@@ -44,10 +44,14 @@ end
 % SoundCal(1,2).MaxBandLimit = SoundCal(1,1).MaxBandLimit;
 % SoundCal(1,2).FsOut = SoundCal(1,1).FsOut;
 % 
-toneAtt = [polyval(SoundCal(1,1).Coefficient,toneFreq)' polyval(SoundCal(1,2).Coefficient,toneFreq)'];
-diffSPL = Volume - [SoundCal(1,1).TargetSPL SoundCal(1,2).TargetSPL];
-attFactor = sqrt(10.^(diffSPL./10));
-att = toneAtt.*repmat(attFactor,nFreq,1);
+if ~BpodSystem.EmulatorMode
+    toneAtt = [polyval(SoundCal(1,1).Coefficient,toneFreq)' polyval(SoundCal(1,2).Coefficient,toneFreq)'];
+    diffSPL = Volume - [SoundCal(1,1).TargetSPL SoundCal(1,2).TargetSPL];
+    attFactor = sqrt(10.^(diffSPL./10));
+    att = toneAtt.*repmat(attFactor,nFreq,1);
+else
+    att = ones(nFreq,1);
+end
 
 
 nTones_Evidence = nTones - nTones_noEvidence; % Number of tones with controlled evidence

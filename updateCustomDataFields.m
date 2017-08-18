@@ -228,6 +228,10 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
             else
                 TaskParameters.GUI.LeftBiasAud = 0.5;
             end
+            if sum(ndxRewd)>10
+                TaskParameters.GUI.Aud_Levels.AudPFrac(TaskParameters.GUI.Aud_Levels.AudFracHigh<50) = TaskParameters.GUI.LeftBiasAud;
+                TaskParameters.GUI.Aud_Levels.AudPFrac(TaskParameters.GUI.Aud_Levels.AudFracHigh>50) = 1 - TaskParameters.GUI.LeftBiasAud;
+            end
     end
     if sum(TaskParameters.GUI.OdorTable.OdorProb) == 0
         TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorProb));
