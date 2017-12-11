@@ -269,7 +269,9 @@ BpodSystem.Data.Custom.PulsePalParamStimulus=PulsePalParamStimulus;
 BpodSystem.Data.Custom.PulsePalParamFeedback=PulsePalParamFeedback;
 clear PulsePalParamFeedback PulsePalParamStimulus
 if BpodSystem.Data.Custom.AuditoryTrial(1)
-    if BpodSystem.Data.Custom.ClickTask(1) && ~BpodSystem.EmulatorMode
+   if ~BpodSystem.EmulatorMode
+    
+    if BpodSystem.Data.Custom.ClickTask(1) 
         ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
         SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{1}))*5);
         SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{1}))*5);
@@ -277,6 +279,7 @@ if BpodSystem.Data.Custom.AuditoryTrial(1)
         InitiatePsychtoolbox(1);
         PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{1});
         BpodSystem.Data.Custom.AudSound{1} = {};
+    end
     end
 end
 
