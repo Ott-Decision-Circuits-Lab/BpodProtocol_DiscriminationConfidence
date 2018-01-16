@@ -52,7 +52,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelayTau = 0.05;
     TaskParameters.GUI.FeedbackDelayGrace = 0;
-    TaskParameters.GUI.NegativeFeedbackType = 1;
+    TaskParameters.GUI.NegativeFeedbackType = 2;
     TaskParameters.GUIMeta.NegativeFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.NegativeFeedbackType.String = {'None','Tone','PortLED'};
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
