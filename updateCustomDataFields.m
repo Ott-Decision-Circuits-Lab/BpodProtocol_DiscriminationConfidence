@@ -175,6 +175,12 @@ else
     BpodSystem.Data.Custom.CatchTrial(iTrial+1) = false;
 end
 
+%determine if laser trial
+if iTrial > TaskParameters.GUI.StartEasyTrials
+    BpodSystem.Data.Custom.LaserTrial(iTrial+1) = rand(1,1) < TaskParameters.GUI.LaserTrials;
+else
+    BpodSystem.Data.Custom.LaserTrial(iTrial+1) = false;
+end
 
 %create future trials
 if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
@@ -379,12 +385,14 @@ end%if trial > - 5
 % send auditory stimuli to PulsePal for next trial
 
 if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
-    if BpodSystem.Data.Custom.ClickTask(iTrial+1) &&  ~BpodSystem.EmulatorMode
-        SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
-        SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
-    else
-        PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+1});
-        BpodSystem.Data.Custom.AudSound{iTrial+1} = {};
+    if ~BpodSystem.EmulatorMode
+        if BpodSystem.Data.Custom.ClickTask(iTrial+1)
+            SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
+            SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+        else
+            PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+1});
+            BpodSystem.Data.Custom.AudSound{iTrial+1} = {};
+        end
     end
 end
 

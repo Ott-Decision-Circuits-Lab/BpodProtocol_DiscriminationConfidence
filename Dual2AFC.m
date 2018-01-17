@@ -150,6 +150,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.VevaiometricShowPoints = 1;
     TaskParameters.GUIMeta.VevaiometricShowPoints.Style = 'checkbox';
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
+    %% Laser
+    TaskParameters.GUI.LaserTrials = 0;
+    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -157,6 +160,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
+    TaskParameters.GUITabs.Laser = {'LaserGeneral'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
@@ -183,6 +187,7 @@ BpodSystem.Data.Custom.ST = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
+BpodSystem.Data.Custom.LaserTrial = false;
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.ClickTask = true(1,2) & TaskParameters.GUI.AuditoryStimulusType == 1;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
