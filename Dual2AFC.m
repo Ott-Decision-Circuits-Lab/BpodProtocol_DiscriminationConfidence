@@ -52,12 +52,15 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelayTau = 0.05;
     TaskParameters.GUI.FeedbackDelayGrace = 0;
-    TaskParameters.GUI.NegativeFeedbackType = 2;
-    TaskParameters.GUIMeta.NegativeFeedbackType.Style = 'popupmenu';
-    TaskParameters.GUIMeta.NegativeFeedbackType.String = {'None','Tone','PortLED'};
+    TaskParameters.GUI.IncorrectChoiceFeedbackType = 2;
+    TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
+    TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.String = {'None','Tone','PortLED'};
+    TaskParameters.GUI.SkippedFeedbackFeedbackType = 2;
+    TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.Style = 'popupmenu';
+    TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.String = {'None','Tone','PortLED'};
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
-    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelayGrace','FeedbackDelay','NegativeFeedbackType'};
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelayGrace','FeedbackDelay','IncorrectChoiceFeedbackType','SkippedFeedbackFeedbackType'};
     %% OdorParams
     TaskParameters.GUI.OdorA_bank = 3;
     TaskParameters.GUI.OdorB_bank = 4;
