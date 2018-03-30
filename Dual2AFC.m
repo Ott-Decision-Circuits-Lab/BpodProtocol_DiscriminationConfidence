@@ -25,7 +25,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.Wire1VideoTrigger = false;
     TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','Wire1VideoTrigger'};
+    TaskParameters.GUI.MaxSessionTime = 180;
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','Wire1VideoTrigger'};
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -326,13 +327,25 @@ while RunSession
         BpodSystem.Data.TrialSettings(iTrial) = TaskParameters;
         SaveBpodSessionData;
     end
+    
+    updateCustomDataFields(iTrial);
+    MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
+    
+    %pause protocol if MaxSessionTime elapsed
+    if (BpodSystem.Data.TrialStartTimestamp(iTrial) - BpodSystem.Data.TrialStartTimestamp(1))/60 > TaskParameters.GUI.MaxSessionTime
+        TaskParameters.GUI.MaxSessionTime = 1000;
+        try
+            Notify() % optional notify sript in your MATLAB path (not part of protocol)
+        catch
+        end
+        RunProtocol('StartPause')
+    end
+    
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
     if BpodSystem.BeingUsed == 0
         return
     end
     
-    updateCustomDataFields(iTrial);
-    MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     iTrial = iTrial + 1;
     
 end
