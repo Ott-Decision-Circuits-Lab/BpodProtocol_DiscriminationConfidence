@@ -37,7 +37,7 @@ switch Action
         %% Psyc Olfactory
         BpodSystem.GUIHandles.OutcomePlot.PsycOlf = line(AxesHandles.HandlePsycOlf,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
         BpodSystem.GUIHandles.OutcomePlot.PsycOlfFit = line(AxesHandles.HandlePsycOlf,[0 100],[.5 .5],'color','k','Visible','off');
-        AxesHandles.HandlePsycOlf.YLim = [-.05 1.05];
+        AxesHandles.HandlePsycOlf.YLim = [0 1];
         AxesHandles.HandlePsycOlf.XLim = 100*[-.05 1.05];
         AxesHandles.HandlePsycOlf.XLabel.String = '% odor A'; % FIGURE OUT UNIT
         AxesHandles.HandlePsycOlf.YLabel.String = '% left';
@@ -45,7 +45,7 @@ switch Action
         %% Psyc Auditory
         BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
         BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k','Visible','off');
-        AxesHandles.HandlePsycAud.YLim = [-.05 1.05];
+        AxesHandles.HandlePsycAud.YLim = [0 1];
         AxesHandles.HandlePsycAud.XLim = [-1.05, 1.05];
         AxesHandles.HandlePsycAud.XLabel.String = 'beta'; % FIGURE OUT UNIT
         AxesHandles.HandlePsycAud.YLabel.String = '% left';
