@@ -411,6 +411,10 @@ end
 TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
 TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
 
+%update laser params
+BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
+ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+
 %send bpod status to server
 try
     script = 'receivebpodstatus.php';

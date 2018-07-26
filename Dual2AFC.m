@@ -153,7 +153,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
     %% Laser
     TaskParameters.GUI.LaserTrials = 0;
-    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials'};
+    TaskParameters.GUI.LaserStimFreq = 0;
+    TaskParameters.GUI.LaserPulseDuration_ms = 1;
+    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -277,7 +279,7 @@ BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 %% Configuring PulsePal
 load PulsePalParamStimulus.mat
 load PulsePalParamFeedback.mat
-BpodSystem.Data.Custom.PulsePalParamStimulus=PulsePalParamStimulus;
+BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(PulsePalParamStimulus);
 BpodSystem.Data.Custom.PulsePalParamFeedback=PulsePalParamFeedback;
 clear PulsePalParamFeedback PulsePalParamStimulus
 if BpodSystem.Data.Custom.AuditoryTrial(1)
@@ -328,10 +330,13 @@ while RunSession
         SaveBpodSessionData;
     end
     
-    updateCustomDataFields(iTrial);
-    MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
-    
     %pause protocol if MaxSessionTime elapsed
+    
+    HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
+    if BpodSystem.BeingUsed == 0
+        return
+    end
+    
     if (BpodSystem.Data.TrialStartTimestamp(iTrial) - BpodSystem.Data.TrialStartTimestamp(1))/60 > TaskParameters.GUI.MaxSessionTime
         TaskParameters.GUI.MaxSessionTime = 1000;
         try
@@ -341,10 +346,8 @@ while RunSession
         RunProtocol('StartPause')
     end
     
-    HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
-    if BpodSystem.BeingUsed == 0
-        return
-    end
+    updateCustomDataFields(iTrial);
+    MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     
     iTrial = iTrial + 1;
     
