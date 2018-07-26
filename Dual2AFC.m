@@ -155,7 +155,15 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTrials = 0;
     TaskParameters.GUI.LaserStimFreq = 0;
     TaskParameters.GUI.LaserPulseDuration_ms = 1;
+    TaskParameters.GUI.LaserITI = 0; TaskParameters.GUIMeta.LaserITI.Style = 'checkbox';
+    TaskParameters.GUI.LaserPreStim = 0; TaskParameters.GUIMeta.LaserPreStim.Style = 'checkbox';
+    TaskParameters.GUI.LaserStim = 0; TaskParameters.GUIMeta.LaserStim.Style = 'checkbox';
+    TaskParameters.GUI.LaserMov = 0; TaskParameters.GUIMeta.LaserMov.Style = 'checkbox';
+    TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
+    TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
+    TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
     TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -163,7 +171,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
-    TaskParameters.GUITabs.Laser = {'LaserGeneral'};
+    TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTaskEpochs'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
