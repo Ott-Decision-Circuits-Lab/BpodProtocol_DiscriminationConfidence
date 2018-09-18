@@ -27,7 +27,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
-    TaskParameters.GUI.PortLEDs.Style = 'checkbox';
+    TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
     TaskParameters.GUIPanels.General = {'MaxSessionTime','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','Wire1VideoTrigger','PortLEDs'};
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
