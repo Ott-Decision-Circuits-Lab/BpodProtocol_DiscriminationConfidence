@@ -29,6 +29,8 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.NoFeedback = line(-1,0, 'LineStyle','none','Marker','o','MarkerEdge','none','MarkerFace','w', 'MarkerSize',5);
         BpodSystem.GUIHandles.OutcomePlot.NoResponse = line(-1,[0 1], 'LineStyle','none','Marker','x','MarkerEdge','w','MarkerFace','none', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.Catch = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[0,0,0],'MarkerFace',[0,0,0], 'MarkerSize',4);
+        BpodSystem.GUIHandles.OutcomePlot.InterruptRewarded = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[0,150,0]/255,'MarkerFace',[0,150,0]/255, 'MarkerSize',4);
+        BpodSystem.GUIHandles.OutcomePlot.InterruptSkipped = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[255,70,184]/255,'MarkerFace',[255,70,184]/255, 'MarkerSize',4);
         set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-1.25, 1.25], 'YTick', [-1, 1],'YTickLabel', {'Right','Left'}, 'FontSize', 13);
         set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata',find(~BpodSystem.Data.Custom.AuditoryTrial),'ydata',BpodSystem.Data.Custom.DV(~BpodSystem.Data.Custom.AuditoryTrial));
         set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata',find(BpodSystem.Data.Custom.AuditoryTrial),'ydata',BpodSystem.Data.Custom.DV(BpodSystem.Data.Custom.AuditoryTrial));
@@ -202,6 +204,16 @@ switch Action
         Xdata = indxToPlot(ndxCatch&~ndxMiss);
         Ydata = BpodSystem.Data.Custom.DV(indxToPlot); Ydata = Ydata(ndxCatch&~ndxMiss);
         set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', Xdata, 'ydata', Ydata);
+        %plot interrupt trials
+        ndxInterruptRewarded = BpodSystem.Data.Custom.InterruptDelayRewarded;
+        Xdata = indxToPlot(ndxInterruptRewarded);
+        Ydata = BpodSystem.Data.Custom.DV(indxToPlot);Ydata = Ydata(ndxInterruptRewarded);
+        set(BpodSystem.GUIHandles.OutcomePlot.InterruptRewarded, 'xdata', Xdata, 'ydata', Ydata);
+        ndxInterruptSkip = BpodSystem.Data.Custom.InterruptDelaySkipped;
+        Xdata = indxToPlot(ndxInterruptSkip);
+        Ydata = BpodSystem.Data.Custom.DV(indxToPlot);Ydata = Ydata(ndxInterruptSkip);
+        set(BpodSystem.GUIHandles.OutcomePlot.InterruptSkipped, 'xdata', Xdata, 'ydata', Ydata);
+        
         %% Psyc Olf
         if TaskParameters.GUI.ShowPsycOlf
             OdorFracA = BpodSystem.Data.Custom.OdorFracA(1:numel(BpodSystem.Data.Custom.ChoiceLeft));

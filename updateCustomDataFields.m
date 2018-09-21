@@ -14,6 +14,9 @@ BpodSystem.Data.Custom.MT(iTrial) = NaN;
 BpodSystem.Data.Custom.ST(iTrial) = NaN;
 BpodSystem.Data.Custom.Rewarded(iTrial) = false;
 BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;
+BpodSystem.Data.Custom.InterruptDelayRewarded(iTrial) = false;
+BpodSystem.Data.Custom.InterruptDelaySkipped(iTrial) = false;
+BpodSystem.Data.Custom.InterruptDelayExperienced(iTrial) = NaN;
 
 %% Checking states and rewriting standard
 statesThisTrial = BpodSystem.Data.RawData.OriginalStateNamesByNumber{iTrial}(BpodSystem.Data.RawData.OriginalStateData{iTrial});
@@ -64,6 +67,27 @@ end
 if any(strncmp('water_',statesThisTrial,6))
     BpodSystem.Data.Custom.Rewarded(iTrial) = true;
 end
+if any(strncmp('water_Interrupt',statesThisTrial,15))
+    BpodSystem.Data.Custom.InterruptDelayRewarded(iTrial) = true;
+    if any(strcmp('Interrupt_L_start',statesThisTrial))
+        BpodSystem.Data.Custom.InterruptDelayExperienced(iTrial) = ...
+           BpodSystem.Data.RawEvents.Trial{end}.States.water_Interrupt_L(1,1) - BpodSystem.Data.RawEvents.Trial{end}.States.Interrupt_L_start(1,1);
+    else%right
+        BpodSystem.Data.Custom.InterruptDelayExperienced(iTrial) = ...
+            BpodSystem.Data.RawEvents.Trial{end}.States.water_Interrupt_R(1,1) - BpodSystem.Data.RawEvents.Trial{end}.States.Interrupt_R_start(1,1);
+    end
+end
+if any(strcmp('skipped_feedback_Interrupt',statesThisTrial))
+    BpodSystem.Data.Custom.InterruptDelaySkipped(iTrial) = true;
+    if any(strcmp('Interrupt_L_start',statesThisTrial))
+        BpodSystem.Data.Custom.InterruptDelayExperienced(iTrial) = ...
+           BpodSystem.Data.RawEvents.Trial{end}.States.skipped_feedback_Interrupt(1,1) - BpodSystem.Data.RawEvents.Trial{end}.States.Interrupt_L_start(1,1);
+    else%right
+        BpodSystem.Data.Custom.InterruptDelayExperienced(iTrial) = ...
+            BpodSystem.Data.RawEvents.Trial{end}.States.skipped_feedback_Interrupt(1,1) - BpodSystem.Data.RawEvents.Trial{end}.States.Interrupt_R_start(1,1);
+    end
+end
+
 
 %% State-independent fields
 BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
@@ -181,6 +205,23 @@ if iTrial > TaskParameters.GUI.StartEasyTrials
 else
     BpodSystem.Data.Custom.LaserTrial(iTrial+1) = false;
 end
+
+%determine if interrupt trial
+if iTrial > TaskParameters.GUI.StartEasyTrials
+    BpodSystem.Data.Custom.InterruptDelay(iTrial+1) = rand(1,1) < TaskParameters.GUI.InterruptPercentage;
+else
+    BpodSystem.Data.Custom.InterruptDelay(iTrial+1) = false;
+end
+BpodSystem.Data.Custom.InterruptDelayStartTime(iTrial+1) = NaN;
+BpodSystem.Data.Custom.InterruptDelayTime(iTrial+1)=0;
+if  BpodSystem.Data.Custom.InterruptDelay(iTrial+1)
+    BpodSystem.Data.Custom.InterruptDelayStartTime(iTrial+1) = TaskParameters.GUI.InterruptStartMin +  rand(1,1)*(TaskParameters.GUI.InterruptStartMax-TaskParameters.GUI.InterruptStartMin);
+    while BpodSystem.Data.Custom.InterruptDelayTime(iTrial+1)<=0 || BpodSystem.Data.Custom.InterruptDelayTime(iTrial+1)>3*TaskParameters.GUI.InterruptSigmaDelay
+        BpodSystem.Data.Custom.InterruptDelayTime(iTrial+1) =TaskParameters.GUI.InterruptMeanDelay + TaskParameters.GUI.InterruptSigmaDelay*randn(1,1);
+    end
+end
+TaskParameters.GUI.InterruptDelayTime = BpodSystem.Data.Custom.InterruptDelayTime(iTrial+1);
+TaskParameters.GUI.InterruptDelayStartTime = BpodSystem.Data.Custom.InterruptDelayStartTime(iTrial+1);
 
 %create future trials
 if iTrial > numel(BpodSystem.Data.Custom.DV) - 5

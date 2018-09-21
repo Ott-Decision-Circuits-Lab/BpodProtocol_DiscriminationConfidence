@@ -164,8 +164,22 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
+    TaskParameters.GUI.LaserInterrupt = 0; TaskParameters.GUIMeta.LaserInterrupt.Style = 'checkbox';
     TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
-    TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
+    TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback','LaserInterrupt'};
+    %% Interrupt random delay
+    TaskParameters.GUI.InterruptPercentage = 0;
+    TaskParameters.GUI.InterruptRewPer = 1;%percentage of normal left/right reward
+    TaskParameters.GUI.InterruptStartMin = 0;%of unif
+    TaskParameters.GUI.InterruptStartMax = 8;%of unif
+    TaskParameters.GUI.InterruptDelayStartTime = 0; %only for for visual 
+    TaskParameters.GUIMeta.InterruptDelayStartTime.Style = 'text';
+    TaskParameters.GUI.InterruptMeanDelay = 0;%of Gaussian
+    TaskParameters.GUI.InterruptSigmaDelay = 0;%of Gaussian
+    TaskParameters.GUI.InterruptDelayTime = 0; %only for for visual
+    TaskParameters.GUIMeta.InterruptDelayTime.Style = 'text';
+    TaskParameters.GUIPanels.InterruptGeneral = {'InterruptPercentage','InterruptRewPer','InterruptStartMin','InterruptStartMax','InterruptDelayStartTime'};
+    TaskParameters.GUIPanels.InterruptDelay = {'InterruptMeanDelay','InterruptSigmaDelay','InterruptDelayTime'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -174,6 +188,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
     TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTaskEpochs'};
+    TaskParameters.GUITabs.Interrupt = {'InterruptGeneral','InterruptDelay'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
@@ -205,6 +220,12 @@ BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAud
 BpodSystem.Data.Custom.ClickTask = true(1,2) & TaskParameters.GUI.AuditoryStimulusType == 1;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
 BpodSystem.Data.Custom.PsychtoolboxStartup = false;
+BpodSystem.Data.Custom.InterruptDelay = false;
+BpodSystem.Data.Custom.InterruptDelayStartTime = 0;
+BpodSystem.Data.Custom.InterruptDelayTime = 0;
+BpodSystem.Data.Custom.InterruptDelayRewarded = false;
+BpodSystem.Data.Custom.InterruptDelaySkipped = false;
+BpodSystem.Data.Custom.InterruptDelayExperienced = NaN;
 
 % make auditory stimuli for first trials
 for a = 1:2
