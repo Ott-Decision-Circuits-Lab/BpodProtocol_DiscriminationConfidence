@@ -187,6 +187,7 @@ BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = NaN;
 if BpodSystem.Data.Custom.LaserTrial(iTrial+1)
     if TaskParameters.GUI.LaserTrainRandStart
         BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
+        BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1)=round(BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1)*10000)/10000;
     else
         BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = 0;
     end
