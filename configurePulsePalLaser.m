@@ -22,12 +22,17 @@ else
     ParameterMatrix(5,OutputChannels+1)={TaskParameters.GUI.LaserPulseDuration_ms/1000};
 end
 
-%stimulus train duration
+%stimulus burst and train duration
 if TaskParameters.GUI.LaserTrainDuration_ms>0
-    ParameterMatrix(11,OutputChannels+1)={TaskParameters.GUI.LaserTrainDuration_ms/1000};
+    ParameterMatrix(9,OutputChannels+1)={TaskParameters.GUI.LaserTrainDuration_ms/1000};%burst duration
+    ParameterMatrix(11,OutputChannels+1)={TaskParameters.GUI.LaserTrainDuration_ms/1000};%train duration
+    if StimFreq == 0
+        ParameterMatrix(5,OutputChannels+1)={TaskParameters.GUI.LaserTrainDuration_ms/1000};
+    end
 else
     %if==0 --> ongoing (long)
-    ParameterMatrix(11,OutputChannels+1)={10};
+    ParameterMatrix(9,OutputChannels+1)={10};%burst duration
+    ParameterMatrix(11,OutputChannels+1)={10};%train duration
 end
 
 %stimulus train delay
@@ -37,6 +42,5 @@ else
     ParameterMatrix(12,OutputChannels+1)={0};
 end
 
-%Burst Duration (one burst only)
-ParameterMatrix(9,OutputChannels+1)={10};
-ParameterMatrix(11,OutputChannels+1)={10};
+%Burst interval
+ParameterMatrix(10,OutputChannels+1)={0};%burst interval
