@@ -157,6 +157,11 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTrials = 0;
     TaskParameters.GUI.LaserStimFreq = 0;
     TaskParameters.GUI.LaserPulseDuration_ms = 1;
+    TaskParameters.GUI.LaserTrainDuration_ms = 0;
+    TaskParameters.GUI.LaserTrainRandStart = 0;
+    TaskParameters.GUIMeta.LaserTrainRandStart.Style='checkbox';
+    TaskParameters.GUI.LaserTrainStartMin_s = 0;
+    TaskParameters.GUI.LaserTrainStartMax_s = 5;
     TaskParameters.GUI.LaserITI = 0; TaskParameters.GUIMeta.LaserITI.Style = 'checkbox';
     TaskParameters.GUI.LaserPreStim = 0; TaskParameters.GUIMeta.LaserPreStim.Style = 'checkbox';
     TaskParameters.GUI.LaserStim = 0; TaskParameters.GUIMeta.LaserStim.Style = 'checkbox';
@@ -165,6 +170,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
     TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserTrainStartMin_s','LaserTrainStartMax_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
@@ -173,7 +179,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
-    TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTaskEpochs'};
+    TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTrain','LaserTaskEpochs'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
@@ -201,6 +207,7 @@ BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.LaserTrial = false;
+BpodSystem.Data.Custom.LaserTrialTrainStart = NaN;
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.ClickTask = true(1,2) & TaskParameters.GUI.AuditoryStimulusType == 1;
 BpodSystem.Data.Custom.OlfactometerStartup = false;

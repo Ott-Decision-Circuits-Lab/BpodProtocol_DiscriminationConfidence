@@ -182,6 +182,16 @@ else
     BpodSystem.Data.Custom.LaserTrial(iTrial+1) = false;
 end
 
+%determine laser stimulus delay
+BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = NaN;
+if BpodSystem.Data.Custom.LaserTrial(iTrial+1)
+    if TaskParameters.GUI.LaserTrainRandStart
+        BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
+    else
+        BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = 0;
+    end
+end
+
 %create future trials
 if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     

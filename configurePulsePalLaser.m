@@ -3,6 +3,7 @@ function ParameterMatrix = configurePulsePalLaser(PulsePalMatrix)
 %stimulus according to settings
 
 global TaskParameters
+global BpodSystem
 
 OutputChannels = [3,4];
 
@@ -21,7 +22,21 @@ else
     ParameterMatrix(5,OutputChannels+1)={TaskParameters.GUI.LaserPulseDuration_ms/1000};
 end
 
-%Burst Duration
-ParameterMatrix(9,OutputChannels+1)={10};
 %stimulus train duration
+if TaskParameters.GUI.LaserTrainDuration_ms>0
+    ParameterMatrix(11,OutputChannels+1)={TaskParameters.GUI.LaserTrainDuration_ms/1000};
+else
+    %if==0 --> ongoing (long)
+    ParameterMatrix(11,OutputChannels+1)={10};
+end
+
+%stimulus train delay
+if TaskParameters.GUI.LaserTrainRandStart
+    ParameterMatrix(12,OutputChannels+1)={BpodSystem.Data.Custom.LaserTrialTrainStart(end)};
+else
+    ParameterMatrix(12,OutputChannels+1)={0};
+end
+
+%Burst Duration (one burst only)
+ParameterMatrix(9,OutputChannels+1)={10};
 ParameterMatrix(11,OutputChannels+1)={10};
