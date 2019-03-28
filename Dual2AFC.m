@@ -9,7 +9,8 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.ITI = 0; % (s)CenterWaitMax
+     TaskParameters.GUI.CenterWaitMax = 10; 
     TaskParameters.GUI.RewardAmount = 25;
     TaskParameters.GUI.ChoiceDeadLine = 5;
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
@@ -23,12 +24,10 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUI.Wire1VideoTrigger = false;
-    TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','Wire1VideoTrigger','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -172,6 +171,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserTrainStartMin_s','LaserTrainStartMax_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
+    %% Video
+    TaskParameters.GUI.Wire1VideoTrigger = false;
+    TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
+    TaskParameters.GUI.VideoTrials = 1;
+    TaskParameters.GUIMeta.VideoTrials.Style = 'dropbox';
+    TaskParameters.GUIMeta.VideoTrials.String = {'Investment','All'};
+    TaskParameters.GUIPanels.VideoGeneral = {'Wire1VideoTrigger','VideoTrials'};
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -180,6 +186,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
     TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTrain','LaserTaskEpochs'};
+    TaskParameters.GUITabs.Video = {'VideoGeneral'};
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];

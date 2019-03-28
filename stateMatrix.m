@@ -55,16 +55,22 @@ else
 end
 
 %Wire1 settings
-if TaskParameters.GUI.Wire1VideoTrigger
+%no video default
+Wire1OutError = {};
+Wire1OutCorrect =	{};
+Wire1Out = {};
+if TaskParameters.GUI.Wire1VideoTrigger % video
     Wire1OutError =	{'WireState', 1};
-    if BpodSystem.Data.Custom.CatchTrial(iTrial)
-    	Wire1OutCorrect =	{'WireState', 1};
-    else
-        Wire1OutCorrect =	{};
+    switch TaskParameters.GUI.VideoTrials
+        case 1 %only catch & error
+            if BpodSystem.Data.Custom.CatchTrial(iTrial)
+                Wire1OutCorrect =	{'WireState', 1};
+            else
+                Wire1OutCorrect =	{};
+            end
+        case 2 %all trials
+            Wire1Out =	{'WireState', 1};
     end
-else
-    Wire1OutError = {};
-    Wire1OutCorrect =	{};
 end
 
 %BNC2 settings -- assumes connection from Bpod BNC2 out to Trigger 2 of
@@ -114,8 +120,12 @@ end
 sma = NewStateMatrix();
 sma = SetGlobalTimer(sma,1,FeedbackDelayCorrect);
 sma = SetGlobalTimer(sma,2,FeedbackDelayError);
+sma = AddState(sma, 'Name', 'wait_Cin_start',...
+    'Timer', 0.05,...
+    'StateChangeConditions', {'Tup','wat_Cin'},...
+    'OutputActions', Wire1Out);
 sma = AddState(sma, 'Name', 'wait_Cin',...
-    'Timer', 0,...
+    'Timer', TaskParameters.GUI.CenterWaitMax,...
     'StateChangeConditions', {CenterPortIn, 'stay_Cin'},...
     'OutputActions', {'SoftCode',1,strcat('PWM',num2str(CenterPort)),PortLEDs,'BNCState',BNC2OutWaitC});
 sma = AddState(sma, 'Name', 'broke_fixation',...
