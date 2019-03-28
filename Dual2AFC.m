@@ -178,6 +178,65 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.VideoTrials.Style = 'dropbox';
     TaskParameters.GUIMeta.VideoTrials.String = {'Investment','All'};
     TaskParameters.GUIPanels.VideoGeneral = {'Wire1VideoTrigger','VideoTrials'};
+    
+        %% Photometry
+    %photometry general
+    TaskParameters.GUI.Photometry=0;
+    TaskParameters.GUIMeta.Photometry.Style='checkbox';
+    TaskParameters.GUI.DbleFibers=0;
+    TaskParameters.GUIMeta.DbleFibers.Style='checkbox';
+    TaskParameters.GUIMeta.DbleFibers.String='Auto';
+    TaskParameters.GUI.Isobestic405=0;
+    TaskParameters.GUIMeta.Isobestic405.Style='checkbox';
+    TaskParameters.GUIMeta.Isobestic405.String='Auto';
+    TaskParameters.GUI.RedChannel=1;
+    TaskParameters.GUIMeta.RedChannel.Style='checkbox';
+    TaskParameters.GUIMeta.RedChannel.String='Auto';    
+    TaskParameters.GUIPanels.PhotometryRecording={'Photometry','DbleFibers','Isobestic405','RedChannel'};
+    
+    %plot photometry
+    TaskParameters.GUI.TimeMin=-4;
+    TaskParameters.GUI.TimeMax=4;
+    TaskParameters.GUI.NidaqMin=-5;
+    TaskParameters.GUI.NidaqMax=10;
+    TaskParameters.GUI.SidePokeIn=1;
+	TaskParameters.GUIMeta.SidePokeIn.Style='checkbox';
+    TaskParameters.GUI.SidePokeLeave=1;
+	TaskParameters.GUIMeta.SidePokeLeave.Style='checkbox';
+    TaskParameters.GUI.Reward=1;
+	TaskParameters.GUIMeta.Reward.Style='checkbox';    
+     TaskParameters.GUI.BaselineBegin=0.1;
+    TaskParameters.GUI.BaselineEnd=1.1;
+    TaskParameters.GUIPanels.PhotometryPlot={'TimeMin','TimeMax','NidaqMin','NidaqMax','StateToZero','BaselineBegin','BaselineEnd'};
+    
+    %% Nidaq and Photometry
+    TaskParameters.GUI.PhotometryVersion=1;
+    TaskParameters.GUI.Modulation=1;
+    TaskParameters.GUIMeta.Modulation.Style='checkbox';
+    TaskParameters.GUIMeta.Modulation.String='Auto';
+	TaskParameters.GUI.NidaqDuration=4;
+    TaskParameters.GUI.NidaqSamplingRate=6100;
+    TaskParameters.GUI.DecimateFactor=610;
+    TaskParameters.GUI.LED1_Name='Fiber1 470-A1';
+    TaskParameters.GUIMeta.LED1_Name.Style='edittext';
+    TaskParameters.GUI.LED1_Amp=2;
+    TaskParameters.GUI.LED1_Freq=211;
+    TaskParameters.GUI.LED2_Name='Fiber1 405 / 565';
+    TaskParameters.GUIMeta.LED2_Name.Style='edittext';
+    TaskParameters.GUI.LED2_Amp=2;
+    TaskParameters.GUI.LED2_Freq=531;
+    TaskParameters.GUI.LED1b_Name='Fiber2 470-mPFC';
+    TaskParameters.GUIMeta.LED1b_Name.Style='edittext';
+    TaskParameters.GUI.LED1b_Amp=2;
+    TaskParameters.GUI.LED1b_Freq=531;
+
+    TaskParameters.GUIPanels.PhotometryNidaq={'PhotometryVersion','Modulation','NidaqDuration',...
+                            'NidaqSamplingRate','DecimateFactor',...
+                            'LED1_Name','LED1_Amp','LED1_Freq',...
+                            'LED2_Name','LED2_Amp','LED2_Freq',...
+                            'LED1b_Name','LED1b_Amp','LED1b_Freq'};
+                        
+                        
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
@@ -187,6 +246,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
     TaskParameters.GUITabs.Laser = {'LaserGeneral','LaserTrain','LaserTaskEpochs'};
     TaskParameters.GUITabs.Video = {'VideoGeneral'};
+    TaskParameters.GUITabs.Photometry = {'PhotometryRecording','PhotometryNidaq','PhotometryPlot','PhotometryRig'};
+    
     %%Non-GUI Parameters (but saved)
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
     TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
@@ -210,6 +271,7 @@ BpodSystem.Data.Custom.OdorFracA = randsample([min(TaskParameters.GUI.OdorTable.
 BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50);
 BpodSystem.Data.Custom.OdorPair = ones(1,2)*2;
 BpodSystem.Data.Custom.ST = [];
+BpodSystem.Data.Custom.ResolutionTime = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
@@ -335,6 +397,21 @@ MainPlot(BpodSystem.GUIHandles.OutcomePlot,'init');
 BpodSystem.ProtocolFigures.ParameterGUI.Position = TaskParameters.Figures.ParameterGUI.Position;
 %BpodNotebook('init');
 
+%% NIDAQ Initialization and Plots
+if TaskParameters.GUI.Photometry
+if (TaskParameters.GUI.DbleFibers+TaskParameters.GUI.Isobestic405+TaskParameters.GUI.RedChannel)*TaskParameters.GUI.Photometry >1
+    disp('Error - Incorrect photometry recording parameters')
+    return
+end
+
+Nidaq_photometry('ini');
+
+FigNidaq1=Online_NidaqPlot('ini','470');
+if TaskParameters.GUI.DbleFibers || TaskParameters.GUI.Isobestic405 || TaskParameters.GUI.RedChannel
+    FigNidaq2=Online_NidaqPlot('ini','channel2');
+end
+end
+
 %% Main loop
 RunSession = true;
 iTrial = 1;
@@ -345,17 +422,36 @@ while RunSession
     InitiateOlfactometer(iTrial);
     InitiatePsychtoolbox(iTrial);
     
+    %% send state matrix to Bpod
     sma = stateMatrix(iTrial);
     SendStateMatrix(sma);
+    
+    %% NIDAQ Get nidaq ready to start
+    if TaskParameters.GUI.Photometry
+        Nidaq_photometry('WaitToStart');
+    end
+    
+    %% Run Trial
     RawEvents = RunStateMatrix;
+    
+    %% NIDAQ Stop acquisition and save data in bpod structure
+    if TaskParameters.GUI.Photometry
+    Nidaq_photometry('Stop');
+    [PhotoData,Photo2Data]=Nidaq_photometry('Save');
+    BpodSystem.Data.NidaqData{iTrial}=PhotoData;
+    if TaskParameters.GUI.DbleFibers || TaskParameters.GUI.RedChannel
+        BpodSystem.Data.Nidaq2Data{iTrial}=Photo2Data;
+    end
+    end
+    
+    %% Bpod save
     if ~isempty(fieldnames(RawEvents))
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         BpodSystem.Data.TrialSettings(iTrial) = TaskParameters;
         SaveBpodSessionData;
     end
     
-    %pause protocol if MaxSessionTime elapsed
-    
+    %% pause conditions    
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
     if BpodSystem.BeingUsed == 0
         return
@@ -370,10 +466,69 @@ while RunSession
         RunProtocol('StartPause')
     end
     
+    %% update custom data fields for this trial and draw future trials
     updateCustomDataFields(iTrial);
+    
+    %% update behavior plots
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
+    
+    %% update photometry plots
+    if TaskParameters.GUI.Photometry
+            
+        Alignments = {[],[],[]};
+        %Choice
+        if ~isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial)) %Choice
+            Alignments{1} = 'start_'; %a little dangerous since generic state name start_ but so far (3/2019) only used for choice
+        end
+        %Leave
+        if ~isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial)) && (BpodSystem.Data.Custom.ChoiceCorrect(iTrial) == 0 || BpodSystem.Data.Custom.CatchTrial(iTrial) == 1)
+            Alignments{2} = BpodSystem.Data.Custom.ResolutionTime(iTrial);
+        end
+        %Reward
+        if TaskParameters.GUI.Reward && BpodSystem.Data.Custom.Rewarded(iTrial)==1
+            Alignments{3} = 'water_';
+        end
+        
+        for k =1:length(Alignments)
+             align = Alignments{k};
+             if ~isempty(align)
+            [currentNidaq1, rawNidaq1]=Online_NidaqDemod(PhotoData(:,1),nidaq.LED1,TaskParameters.GUI.LED1_Freq,TaskParameters.GUI.LED1_Amp,align);
+            FigNidaq1=Online_NidaqPlot('update',[],FigNidaq1,currentNidaq1,rawNidaq1,k);
+            
+            if TaskParameters.GUI.Isobestic405 || TaskParameters.GUI.DbleFibers || TaskParameters.GUI.RedChannel
+                if TaskParameters.GUI.Isobestic405
+                    [currentNidaq2, rawNidaq2]=Online_NidaqDemod(PhotoData(:,1),nidaq.LED2,TaskParameters.GUI.LED2_Freq,TaskParameters.GUI.LED2_Amp,align);
+                elseif TaskParameters.GUI.RedChannel
+                    [currentNidaq2, rawNidaq2]=Online_NidaqDemod(Photo2Data(:,1),nidaq.LED2,TaskParameters.GUI.LED2_Freq,TaskParameters.GUI.LED2_Amp,align);
+                elseif TaskParameters.GUI.DbleFibers
+                    [currentNidaq2, rawNidaq2]=Online_NidaqDemod(Photo2Data(:,1),nidaq.LED2,TaskParameters.GUI.LED1b_Freq,TaskParameters.GUI.LED1b_Amp,align);
+                end
+                FigNidaq2=Online_NidaqPlot('update',[],FigNidaq2,currentNidaq2,rawNidaq2,k);
+            end
+             end%if non-empty align
+        end%alignment loop
+    end%if photometry
     
     iTrial = iTrial + 1;
     
 end
+
+%% photometry check
+if TaskParameters.GUI.Photometry
+    thismax=max(PhotoData(TaskParameters.GUI.NidaqSamplingRate:TaskParameters.GUI.NidaqSamplingRate*2,1))
+    if thismax>4 || thismax<0.3
+        disp('WARNING - Something is wrong with fiber #1 - run check-up! - unpause to ignore')
+        BpodSystem.Pause=1;
+        HandlePauseCondition;
+    end
+    if TaskParameters.GUI.DbleFibers
+    thismax=max(Photo2Data(TaskParameters.GUI.NidaqSamplingRate:TaskParameters.GUI.NidaqSamplingRate*2,1))
+    if thismax>4 || thismax<0.3
+        disp('WARNING - Something is wrong with fiber #2 - run check-up! - unpause to ignore')
+        BpodSystem.Pause=1;
+        HandlePauseCondition;
+    end
+    end
+end
+
 end

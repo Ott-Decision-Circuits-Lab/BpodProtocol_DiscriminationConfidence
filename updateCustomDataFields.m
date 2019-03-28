@@ -12,6 +12,7 @@ BpodSystem.Data.Custom.EarlyWithdrawal(iTrial) = false;
 BpodSystem.Data.Custom.FixDur(iTrial) = NaN;
 BpodSystem.Data.Custom.MT(iTrial) = NaN;
 BpodSystem.Data.Custom.ST(iTrial) = NaN;
+BpodSystem.Data.Custom.ResolutionTime(iTrial) = NaN;
 BpodSystem.Data.Custom.Rewarded(iTrial) = false;
 BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;
 
@@ -35,21 +36,25 @@ if any(strcmp('rewarded_Lin',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 1;
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.rewarded_Lin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 elseif any(strcmp('rewarded_Rin',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 1;
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.rewarded_Rin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 elseif any(strcmp('unrewarded_Lin',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 1;
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Lin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 elseif any(strcmp('unrewarded_Rin',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Rin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 elseif any(strcmp('broke_fixation',statesThisTrial))
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
 elseif any(strcmp('early_withdrawal',statesThisTrial))
