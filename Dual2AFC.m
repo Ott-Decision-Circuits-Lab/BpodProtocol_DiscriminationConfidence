@@ -3,6 +3,7 @@ function Dual2AFC
 % This project is available on https://github.com/KepecsLab/BpodProtocols_Olf2AFC/
 
 global BpodSystem
+global nidaq
 
 %% Task parameters
 global TaskParameters
@@ -175,7 +176,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.Wire1VideoTrigger = false;
     TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
     TaskParameters.GUI.VideoTrials = 1;
-    TaskParameters.GUIMeta.VideoTrials.Style = 'dropbox';
+    TaskParameters.GUIMeta.VideoTrials.Style = 'popupmenu';
     TaskParameters.GUIMeta.VideoTrials.String = {'Investment','All'};
     TaskParameters.GUIPanels.VideoGeneral = {'Wire1VideoTrigger','VideoTrials'};
     
@@ -199,15 +200,15 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.TimeMax=4;
     TaskParameters.GUI.NidaqMin=-5;
     TaskParameters.GUI.NidaqMax=10;
-    TaskParameters.GUI.SidePokeIn=1;
-	TaskParameters.GUIMeta.SidePokeIn.Style='checkbox';
-    TaskParameters.GUI.SidePokeLeave=1;
-	TaskParameters.GUIMeta.SidePokeLeave.Style='checkbox';
-    TaskParameters.GUI.Reward=1;
-	TaskParameters.GUIMeta.Reward.Style='checkbox';    
+    TaskParameters.GUI.PhotoPlotSidePokeIn=1;
+	TaskParameters.GUIMeta.PhotoPlotSidePokeIn.Style='checkbox';
+    TaskParameters.GUI.PhotoPlotSidePokeLeave=1;
+	TaskParameters.GUIMeta.PhotoPlotSidePokeLeave.Style='checkbox';
+    TaskParameters.GUI.PhotoPlotReward=1;
+	TaskParameters.GUIMeta.PhotoPlotReward.Style='checkbox';    
      TaskParameters.GUI.BaselineBegin=0.1;
     TaskParameters.GUI.BaselineEnd=1.1;
-    TaskParameters.GUIPanels.PhotometryPlot={'TimeMin','TimeMax','NidaqMin','NidaqMax','StateToZero','BaselineBegin','BaselineEnd'};
+    TaskParameters.GUIPanels.PhotometryPlot={'TimeMin','TimeMax','NidaqMin','NidaqMax','PhotoPlotSidePokeIn','PhotoPlotSidePokeLeave','PhotoPlotReward','BaselineBegin','BaselineEnd'};
     
     %% Nidaq and Photometry
     TaskParameters.GUI.PhotometryVersion=1;
@@ -236,6 +237,11 @@ if isempty(fieldnames(TaskParameters))
                             'LED2_Name','LED2_Amp','LED2_Freq',...
                             'LED1b_Name','LED1b_Amp','LED1b_Freq'};
                         
+                     % rig-specific
+        TaskParameters.GUI.nidaqDev='Dev2';
+        TaskParameters.GUIMeta.nidaqDev.Style='edittext';
+        
+        TaskParameters.GUIPanels.PhotometryRig={'nidaqDev'};      
                         
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
@@ -485,7 +491,7 @@ while RunSession
             Alignments{2} = BpodSystem.Data.Custom.ResolutionTime(iTrial);
         end
         %Reward
-        if TaskParameters.GUI.Reward && BpodSystem.Data.Custom.Rewarded(iTrial)==1
+        if  BpodSystem.Data.Custom.Rewarded(iTrial)==1
             Alignments{3} = 'water_';
         end
         
