@@ -1,6 +1,8 @@
 function SoftCodeHandler(softCode)
 %soft codes 1-10 reserved for odor delivery
 %soft code 11-20 reserved for PulsePal sound delivery
+%soft code 21-30 reserved for PulsePal frequency delivery
+%soft code 31-40 reserved for laser stimulation protocols
 
 global BpodSystem
 global TaskParameters
@@ -58,6 +60,32 @@ if softCode > 20 && softCode < 31 %for auditory freq
             PsychToolboxSoundServer('Stop', 1);
         end
     end    
+end
+
+%laser stimulation protocols
+if softCode > 30 && softCode < 41 %for laser stuff
+    if softCode==31
+        if  BpodSystem.Data.Custom.LaserTrial(end) && TaskParameters.GUI.LaserSoftCode %laser trial and laser via softcode setting
+            if TaskParameters.GUI.LaserTimeInvestment
+                %this soft code 'solution' only works for time investment
+                %inhibition with a significant delay to allow for loading
+                %the soft code. stupid hack bc PulsePal only supports 2
+                %custom pulse trains and you can only have 1 pulsepal.
+                %soft code is called at beginning of time investment to
+                %load pulsepal matrix for laser stimulation
+                Params=struct();
+                Params.Length=TaskParameters.GUI.LaserTrainDuration_ms/1000; %in sec. train INCLUDES RAMP
+                Params.Ramp = TaskParameters.GUI.LaserRampDuration_ms/1000;
+                Params.Amp = TaskParameters.GUI.LaserAmp;
+                Params.TriggerOutChan=3;
+                Params.LaserOutChan=4;
+                Params.TriggerInChan=2;
+                Params.CustomPulseTrainID=1;
+                P=configurePulsePalLaser_CustomTrain(Params);
+            end
+        end
+         SendSoftCode(1); %send back to Bpod that we're done here, only then state matrix continues
+    end
 end
 
 % switch odorID

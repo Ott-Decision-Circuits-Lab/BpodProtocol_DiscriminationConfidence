@@ -408,8 +408,20 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     
 end%if trial > - 5
 
-% send auditory stimuli to PulsePal for next trial
 
+%%update hidden TaskParameter fields
+TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
+TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
+
+%update laser params
+if TaskParameters.LaserSoftCode
+    %laser via programm pulsepal (without custom train via softvode)
+    BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
+end
+
+% send auditory stimuli to PulsePal for next trial
+% to be safe: after updating PulsePal Matrix for laser
+ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
 if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
     if ~BpodSystem.EmulatorMode
         if BpodSystem.Data.Custom.ClickTask(iTrial+1)
@@ -421,15 +433,6 @@ if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
         end
     end
 end
-
-
-%%update hidden TaskParameter fields
-TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
-TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
-
-%update laser params
-BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
-ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
 
 %send bpod status to server
 try

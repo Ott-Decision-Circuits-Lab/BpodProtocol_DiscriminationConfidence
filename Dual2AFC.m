@@ -155,9 +155,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
     %% Laser
     TaskParameters.GUI.LaserTrials = 0;
+    TaskParameters.GUI.LaserSoftCode = 0;
+    TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
+    TaskParameters.GUI.LaserAmp = 5;
     TaskParameters.GUI.LaserStimFreq = 0;
     TaskParameters.GUI.LaserPulseDuration_ms = 1;
     TaskParameters.GUI.LaserTrainDuration_ms = 0;
+    TaskParameters.GUI.LaserRampDuration_ms = 0;
     TaskParameters.GUI.LaserTrainRandStart = 0;
     TaskParameters.GUIMeta.LaserTrainRandStart.Style='checkbox';
     TaskParameters.GUI.LaserTrainStartMin_s = 0;
@@ -169,8 +173,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserStimFreq','LaserPulseDuration_ms'};
-    TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserTrainStartMin_s','LaserTrainStartMax_s'};
+    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserSoftCode','LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserRampDuration_ms','LaserTrainStartMin_s','LaserTrainStartMax_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     %% Video
     TaskParameters.GUI.Wire1VideoTrigger = false;
