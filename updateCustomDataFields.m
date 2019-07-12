@@ -414,7 +414,7 @@ TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOut
 TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
 
 %update laser params
-if TaskParameters.LaserSoftCode
+if TaskParameters.GUI.LaserSoftCode
     %laser via programm pulsepal (without custom train via softvode)
     BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
 end
