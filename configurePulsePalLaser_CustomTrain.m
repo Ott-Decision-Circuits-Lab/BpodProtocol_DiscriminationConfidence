@@ -7,6 +7,8 @@ function ParameterMatrix=configurePulsePalLaser_CustomTrain(Params)
 
 %
 
+global BpodSystem
+
 if ~isfield(Params,'Length'), Params.Length=2; end
 if ~isfield(Params,'Ramp'), Params.Ramp=1; end
 if ~isfield(Params,'Amp'), Params.Amp=5; end
