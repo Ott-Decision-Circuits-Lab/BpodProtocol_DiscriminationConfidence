@@ -9,21 +9,27 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 25;    
+    TaskParameters.GUI.ITI = 1; % (s)
+    TaskParameters.GUI.RewardAmount = 25;
+    
+    TaskParameters.GUI.RewardNoise = 0; %reward noise
+    TaskParameters.GUI.TrialsPerBlock = 80; %average trial length of each bout
+    TaskParameters.GUI.TrialStD = 15;
+    
     TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
-    TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
-    TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
-    TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
+    TaskParameters.GUI.TimeOutIncorrectChoice = 3; % (s)
+    TaskParameters.GUI.TimeOutBrokeFixation = 3; % (s)
+    TaskParameters.GUI.TimeOutEarlyWithdrawal = 3; % (s)
+    TaskParameters.GUI.TimeOutSkippedFeedback = 3; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.StartEasyTrials = 0;
     TaskParameters.GUI.Percent50Fifty = 0;
     TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
-    TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
+    TaskParameters.GUI.Ports_LMR = 234;
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','RewardNoise', 'TrialsPerBlock','TrialStD'...
+        'ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -137,6 +143,16 @@ if isempty(fieldnames(TaskParameters))
     
 end
 BpodParameterGUI('init', TaskParameters);
+%% Initialize left and right reward sizes
+
+left_rewardTrain=generate_rewardTrain();
+right_rewardTrain=generate_rewardTrain();
+
+BpodSystem.Data.Custom.totalTrials=min(numel(left_rewardTrain),numel(right_rewardTrain)); 
+BpodSystem.Data.Custom.RewardMagnitude=horzcat(left_rewardTrain(1:BpodSystem.Data.Custom.totalTrials),right_rewardTrain(1:BpodSystem.Data.Custom.totalTrials)); %
+
+%plot Left and Right port
+plotReward_port();
 
 %% Initializing data (trial type) vectors
 BpodSystem.Data.Custom.BlockNumber = 1;
@@ -155,7 +171,7 @@ BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50
 BpodSystem.Data.Custom.OdorPair = ones(1,2)*2;
 BpodSystem.Data.Custom.ST = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
-BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
+%BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
@@ -266,4 +282,62 @@ while RunSession
     iTrial = iTrial + 1;
 
 end
+end
+
+function plotReward_port()
+
+global BpodSystem
+
+%% general ploting parameters
+ScrSze=get(0,'ScreenSize');
+FigSze=[ScrSze(3)*1/3 ScrSze(2)+40 ScrSze(3)*1/3 ScrSze(4)-120];
+figure('Name', 'RewardStruct','Position',FigSze, 'numbertitle','off');
+
+xlabel('Trial'); ylabel('RewardAmount');
+minx=1; maxx=size(BpodSystem.Data.Custom.RewardMagnitude,1);  xstep=1; 
+
+
+plot(minx:xstep:maxx, BpodSystem.Data.Custom.RewardMagnitude(:,1),... %leftport
+    'LineStyle','--', 'color', [0, 0.4470, 0.7410])
+
+hold on
+plot(minx:xstep:maxx, BpodSystem.Data.Custom.RewardMagnitude(:,2),...%rightport
+    'LineStyle','--', 'color', [0.8500, 0.3250, 0.0980])
+
+legend('left','right')
+
+end
+
+function trialReward=generate_rewardTrain()
+    global TaskParameters
+ 
+    waterReward=TaskParameters.GUI.rewardAmount;
+    
+    %generate n bouts per session of trial len 80 ~gaussian distrib with
+    %std dev defined by TaskParameters.GUI.TrialStD
+    %
+    boutLen=num2cell(round(normrnd(TaskParameters.GUI.TrialsPerBlock, TaskParameters.GUI.TrialStD,25,1))); 
+    
+    trialSplit=cellfun(@(x)  ones(x,1), boutLen, 'UniformOutput', false); %generate separate trials
+
+    idx = rand(length(boutLen),1); %randomly assign splits to low, med, high reward
+
+       for i = 1:length(idx)
+            if idx(i)<=0.3
+                rewardSize=waterReward*0.50;
+                trialSplit(i)=cellfun(@(x) x*rewardSize,trialSplit(i),'un',0);
+            elseif idx(i)<=0.6
+                rewardSize=waterReward*0.75;
+                trialSplit(i)=cellfun(@(x) x*rewardSize,trialSplit(i),'un',0);
+            else
+                rewardSize=waterReward;
+                trialSplit(i)=cellfun(@(x) x*rewardSize,trialSplit(i),'un',0);
+            end
+       end
+
+    trialSplit=vertcat(trialSplit{:});
+
+    decay=0.9836; %add noise centered around the average reward
+    noise=normrnd(0,TaskParameters.GUI.RewardNoise,[length(trialSplit),1]);
+    trialReward=trialSplit*decay+(1-decay)*mean(trialSplit)+noise;
 end
