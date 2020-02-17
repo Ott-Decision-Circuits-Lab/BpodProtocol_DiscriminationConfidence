@@ -194,7 +194,7 @@ if BpodSystem.Data.Custom.LaserTrial(iTrial+1)
         BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
         BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1)=round(BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1)*10000)/10000;
     else
-        BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = 0;
+        BpodSystem.Data.Custom.LaserTrialTrainStart(iTrial+1) = TaskParameters.GUI.LaserTrainStartMin_s;
     end
 end
 
@@ -414,14 +414,13 @@ TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOut
 TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
 
 %update laser params
-if TaskParameters.GUI.LaserSoftCode
+if ~TaskParameters.GUI.LaserSoftCode
     %laser via programm pulsepal (without custom train via softvode)
     BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
+    ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
 end
 
 % send auditory stimuli to PulsePal for next trial
-% to be safe: after updating PulsePal Matrix for laser
-ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
 if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
     if ~BpodSystem.EmulatorMode
         if BpodSystem.Data.Custom.ClickTask(iTrial+1)
@@ -436,12 +435,12 @@ end
 
 %send bpod status to server
 try
-    script = 'receivebpodstatus.php';
-    %create a common "outcome" vector
-    outcome = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial); %1=correct, 0=wrong
-    outcome(BpodSystem.Data.Custom.EarlyWithdrawal(1:iTrial))=2; %early withdrawal=2
-    outcome(BpodSystem.Data.Custom.FixBroke(1:iTrial))=3;%jackpot=3
-    SendTrialStatusToServer(script,BpodSystem.Data.Custom.Rig,outcome,BpodSystem.Data.Custom.Subject,BpodSystem.CurrentProtocolName);
+%     script = 'receivebpodstatus.php';
+%     %create a common "outcome" vector
+%     outcome = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial); %1=correct, 0=wrong
+%     outcome(BpodSystem.Data.Custom.EarlyWithdrawal(1:iTrial))=2; %early withdrawal=2
+%     outcome(BpodSystem.Data.Custom.FixBroke(1:iTrial))=3;%jackpot=3
+%     SendTrialStatusToServer(script,BpodSystem.Data.Custom.Rig,outcome,BpodSystem.Data.Custom.Subject,BpodSystem.CurrentProtocolName);
 catch
 end
 

@@ -44,3 +44,6 @@ end
 
 %Burst interval
 ParameterMatrix(10,OutputChannels+1)={0};%burst interval
+
+%amplitude
+ParameterMatrix(3,OutputChannels+1) = {TaskParameters.GUI.Amp};
