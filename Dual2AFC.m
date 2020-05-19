@@ -9,27 +9,28 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.ITI = 0; % (s)
+    TaskParameters.GUI.ITI = 1; % (s)
     TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.RewardBiasTrials=125;
     TaskParameters.GUI.BlockMean=250;
     TaskParameters.GUI.BlockNoise=50; %noise re: block length
     
     TaskParameters.GUI.ChoiceDeadLine = 5;
-    TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
-    TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
-    TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
-    TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
+    TaskParameters.GUI.TimeOutIncorrectChoice = 3; % (s)
+    TaskParameters.GUI.TimeOutBrokeFixation = 3; % (s)
+    TaskParameters.GUI.TimeOutEarlyWithdrawal = 3; % (s)
+    TaskParameters.GUI.TimeOutSkippedFeedback = 3; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
     TaskParameters.GUI.AuditoryDiscretize=true;
     TaskParameters.GUIMeta.AuditoryDiscretize.Style = 'checkbox';
     
     TaskParameters.GUI.StartEasyTrials = 0;
-    TaskParameters.GUI.Percent50Fifty = 0;
+    TaskParameters.GUI.Percent50Fifty = 0.15;
     TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','BlockMean','BlockNoise','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'ITI','RewardBiasTrials', 'RewardAmount','BlockMean','BlockNoise','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -39,8 +40,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.StimDelayAutoincrement = 1;
     TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
     TaskParameters.GUIMeta.StimDelayAutoincrement.String = 'Auto';
-    TaskParameters.GUI.StimDelayMin = 0;
-    TaskParameters.GUI.StimDelayMax = 0.6;
+    TaskParameters.GUI.StimDelayMin = 0.01;
+    TaskParameters.GUI.StimDelayMax = 0.2;
     TaskParameters.GUI.StimDelayIncr = 0.01;
     TaskParameters.GUI.StimDelayDecr = 0.01;
     TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
@@ -50,11 +51,11 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelaySelection = 2;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp'};
-    TaskParameters.GUI.FeedbackDelayMin = 0;
-    TaskParameters.GUI.FeedbackDelayMax = 1;
+    TaskParameters.GUI.FeedbackDelayMin = 0.05;
+    TaskParameters.GUI.FeedbackDelayMax = 2.5;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
-    TaskParameters.GUI.FeedbackDelayTau = 0.05;
+    TaskParameters.GUI.FeedbackDelayTau = 0.1;
     TaskParameters.GUI.FeedbackDelayGrace = 0;
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
@@ -99,11 +100,12 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.AudMinSample = {'MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
     TaskParameters.GUIPanels.AudJackpot = {'JackpotAuditory','JackpotAuditoryTime'};
     %% Block structure
+    % left and right block structure are independent
     TaskParameters.GUI.BlockTable.BlockNumberL = 1:10;
     TaskParameters.GUI.BlockTable.BlockNumberR = 1:10;
     
-    TaskParameters.GUI.BlockTable.BlockLenL = vertcat(125, 125,125, 125, round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
-    TaskParameters.GUI.BlockTable.BlockLenR = vertcat(125, 125,125, 125, round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    TaskParameters.GUI.BlockTable.BlockLenL = vertcat(repmat(TaskParameters.GUI.RewardBiasTrials,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    TaskParameters.GUI.BlockTable.BlockLenR = vertcat(repmat(TaskParameters.GUI.RewardBiasTrials,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
 
     
     if rand(1)>0.5 %randomly assign to left/right ports
@@ -190,14 +192,16 @@ BpodSystem.Data.Custom.Rewarded = false(0);
 BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
+%housekeeping
+BpodSystem.Data.Custom.RewardBase=round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)]);
 
 if TaskParameters.GUI.RewardDrift == false
-    BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
+    BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)]);
 
 elseif TaskParameters.GUI.RewardDrift == true
     BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
     
-    while sum(BpodSystem.Data.Custom.RewardMagnitude < 5) > 0
+    while sum(BpodSystem.Data.Custom.RewardMagnitude < 5) > 0 || sum(BpodSystem.Data.Custom.RewardMagnitude >38 ) > 0
         BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
     end
     
@@ -208,7 +212,7 @@ for a = 1:2
     if BpodSystem.Data.Custom.AuditoryTrial(a)
         
         if TaskParameters.GUI.AuditoryDiscretize == true
-           BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.05 0.25 0.5 0.75 0.95],1); 
+           BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.01 0.25 0.75 0.99],1); 
         else
            BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha/4,TaskParameters.GUI.AuditoryAlpha/4,1,1);
         end
@@ -276,8 +280,9 @@ end
 
 %% Initialize plots
 BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
-BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .055          .15 .91 .3]);
-BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.05          .6  .1  .3], 'Visible', 'off');
+BpodSystem.GUIHandles.OutcomePlot.HandleRewOutcome = axes('Position',    [  .055          .38 .91 .1]);
+BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .055          .1 .91 .2]);
+BpodSystem.GUIHandles.OutcomePlot.HandlePsycOlf = axes('Position',    [1*.05          .6  .1  .3], 'Visible', 'on');
 BpodSystem.GUIHandles.OutcomePlot.HandlePsycAud = axes('Position',    [2*.05 + 1*.08   .6  .1  .3], 'Visible', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',  [3*.05 + 2*.08   .6  .1  .3], 'Visible', 'off');
 BpodSystem.GUIHandles.OutcomePlot.HandleFix = axes('Position',        [4*.05 + 3*.08   .6  .1  .3], 'Visible', 'off');
@@ -293,9 +298,10 @@ RunSession = true;
 iTrial = 1;
 
 while RunSession
-    TaskParameters = BpodParameterGUI('sync', TaskParameters);
+ %comment off when in emulator mode
+ %   TaskParameters = BpodParameterGUI('sync', TaskParameters);
     
-    InitiateOlfactometer(iTrial);
+    %InitiateOlfactometer(iTrial);
     
     sma = stateMatrix(iTrial);
     SendStateMatrix(sma);
