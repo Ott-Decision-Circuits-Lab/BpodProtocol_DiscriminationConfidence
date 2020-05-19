@@ -10,20 +10,26 @@ TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
     TaskParameters.GUI.ITI = 0; % (s)
-    TaskParameters.GUI.RewardAmount = 25;    
+    TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.BlockMean=250;
+    TaskParameters.GUI.BlockNoise=50; %noise re: block length
+    
     TaskParameters.GUI.ChoiceDeadLine = 5;
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 0; % (s)
     TaskParameters.GUI.TimeOutEarlyWithdrawal = 0; % (s)
     TaskParameters.GUI.TimeOutSkippedFeedback = 0; % (s)
     TaskParameters.GUI.PercentAuditory = 1;
+    TaskParameters.GUI.AuditoryDiscretize=true;
+    TaskParameters.GUIMeta.AuditoryDiscretize.Style = 'checkbox';
+    
     TaskParameters.GUI.StartEasyTrials = 0;
     TaskParameters.GUI.Percent50Fifty = 0;
     TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
+    TaskParameters.GUIPanels.General = {'ITI','RewardAmount','BlockMean','BlockNoise','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR'};    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -93,14 +99,37 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.AudMinSample = {'MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
     TaskParameters.GUIPanels.AudJackpot = {'JackpotAuditory','JackpotAuditoryTime'};
     %% Block structure
-    TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
-    TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*150;
-    TaskParameters.GUI.BlockTable.RewL = [1 randsample([1 .6],2) 1]';
-    TaskParameters.GUI.BlockTable.RewR = flipud(TaskParameters.GUI.BlockTable.RewL);
+    TaskParameters.GUI.BlockTable.BlockNumberL = 1:10;
+    TaskParameters.GUI.BlockTable.BlockNumberR = 1:10;
+    
+    TaskParameters.GUI.BlockTable.BlockLenL = vertcat(125, 125,125, 125, round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    TaskParameters.GUI.BlockTable.BlockLenR = vertcat(125, 125,125, 125, round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+
+    
+    if rand(1)>0.5 %randomly assign to left/right ports
+        TaskParameters.GUI.BlockTable.RewL = horzcat([1, 1, 1.66,1], repmat([1,1.66],[1,3]));
+        TaskParameters.GUI.BlockTable.RewR = horzcat([1, 1.66, 1,1], repmat([1.66,1],[1,3])); 
+        
+        TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0, 0,0], repmat([10,2],[1,3]));
+        TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0, 0,0], repmat([2,10],[1,3]));
+
+    else
+        TaskParameters.GUI.BlockTable.RewL = horzcat([1, 1.66, 1,1], repmat([1.66,1],[1,3]));
+        TaskParameters.GUI.BlockTable.RewR = horzcat([1, 1, 1.66,1], repmat([1,1.66],[1,3])); 
+        
+        TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0, 0,0], repmat([2,10],[1,3]));
+        TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0, 0,0], repmat([10,2],[1,3]));
+    end
+    
     TaskParameters.GUIMeta.BlockTable.Style = 'table';
     TaskParameters.GUIMeta.BlockTable.String = 'Block structure';
-    TaskParameters.GUIMeta.BlockTable.ColumnLabel = {'Block#','Block Length','Rew L', 'Rew R'};
-    TaskParameters.GUIPanels.BlockStructure = {'BlockTable'};
+    TaskParameters.GUIMeta.BlockTable.ColumnLabel = {'BlockL #', 'BlockR #', 'Block Length L', 'Block Length R','Rew L', 'Rew R', 'Noise L','Noise R'};
+    
+    TaskParameters.GUI.RewardDrift = true;
+    TaskParameters.GUIMeta.RewardDrift.Style = 'checkbox';
+   
+
+    TaskParameters.GUIPanels.BlockStructure = {'BlockTable', 'RewardDrift'};
     %% Plots
     %Show Plots
     TaskParameters.GUI.ShowPsycOlf = 1;
@@ -139,8 +168,11 @@ end
 BpodParameterGUI('init', TaskParameters);
 
 %% Initializing data (trial type) vectors
-BpodSystem.Data.Custom.BlockNumber = 1;
-BpodSystem.Data.Custom.BlockTrial = 1;
+BpodSystem.Data.Custom.BlockNumberL(1) = 1;
+BpodSystem.Data.Custom.BlockNumberR(1) = 1;
+BpodSystem.Data.Custom.BlockTrialL(1) = 1;
+BpodSystem.Data.Custom.BlockTrialR(1) = 1;
+
 BpodSystem.Data.Custom.ChoiceLeft = [];
 BpodSystem.Data.Custom.ChoiceCorrect = [];
 BpodSystem.Data.Custom.Feedback = false(0);
@@ -155,15 +187,32 @@ BpodSystem.Data.Custom.OdorID = 2 - double(BpodSystem.Data.Custom.OdorFracA > 50
 BpodSystem.Data.Custom.OdorPair = ones(1,2)*2;
 BpodSystem.Data.Custom.ST = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
-BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
 BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAuditory;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
 
+if TaskParameters.GUI.RewardDrift == false
+    BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
+
+elseif TaskParameters.GUI.RewardDrift == true
+    BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
+    
+    while sum(BpodSystem.Data.Custom.RewardMagnitude < 5) > 0
+        BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
+    end
+    
+end
+
 % make auditory stimuli for first trials
 for a = 1:2
     if BpodSystem.Data.Custom.AuditoryTrial(a)
-        BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha/4,TaskParameters.GUI.AuditoryAlpha/4,1,1);
+        
+        if TaskParameters.GUI.AuditoryDiscretize == true
+           BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.05 0.25 0.5 0.75 0.95],1); 
+        else
+           BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha/4,TaskParameters.GUI.AuditoryAlpha/4,1,1);
+        end
+        
         BpodSystem.Data.Custom.LeftClickRate(a) = round(BpodSystem.Data.Custom.AuditoryOmega(a)*TaskParameters.GUI.SumRates);
         BpodSystem.Data.Custom.RightClickRate(a) = round((1-BpodSystem.Data.Custom.AuditoryOmega(a))*TaskParameters.GUI.SumRates);
         BpodSystem.Data.Custom.LeftClickTrain{a} = GeneratePoissonClickTrain(BpodSystem.Data.Custom.LeftClickRate(a), TaskParameters.GUI.AuditoryStimulusTime);

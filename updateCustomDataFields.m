@@ -70,23 +70,57 @@ BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 BpodSystem.Data.Custom.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
 BpodSystem.Data.Custom.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
-if BpodSystem.Data.Custom.BlockNumber(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumber) % Not final block
-    if BpodSystem.Data.Custom.BlockTrial(iTrial) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
-            ==BpodSystem.Data.Custom.BlockNumber(iTrial)) % Block transition
-        BpodSystem.Data.Custom.BlockNumber(iTrial+1) = BpodSystem.Data.Custom.BlockNumber(iTrial) + 1;
-        BpodSystem.Data.Custom.BlockTrial(iTrial+1) = 1;
+%left block tracking
+if BpodSystem.Data.Custom.BlockNumberL(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumberL) % Not final block
+    if BpodSystem.Data.Custom.BlockTrialL(iTrial) >= TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) % Block transition
+        BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial) + 1; %update block number
+        BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = 1; %reset block trial
     else
-        BpodSystem.Data.Custom.BlockNumber(iTrial+1) = BpodSystem.Data.Custom.BlockNumber(iTrial);
-        BpodSystem.Data.Custom.BlockTrial(iTrial+1) = BpodSystem.Data.Custom.BlockTrial(iTrial) + 1;
+        BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial);
+        BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = BpodSystem.Data.Custom.BlockTrialL(iTrial) + 1;
     end
 else % Final block
-    BpodSystem.Data.Custom.BlockTrial(iTrial+1) = BpodSystem.Data.Custom.BlockTrial(iTrial) + 1;
-    BpodSystem.Data.Custom.BlockNumber(iTrial+1) = BpodSystem.Data.Custom.BlockNumber(iTrial);
+    BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = BpodSystem.Data.Custom.BlockTrialL(iTrial) + 1;
+    BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial);
 end
 
-BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAmount*...
-    [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(iTrial+1)),...
-    TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==BpodSystem.Data.Custom.BlockNumber(iTrial+1))];
+% right block tracking
+if BpodSystem.Data.Custom.BlockNumberR(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumberR) % Not final block
+    if BpodSystem.Data.Custom.BlockTrialR(iTrial) >= TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) % Block transition
+        BpodSystem.Data.Custom.BlockNumberR(iTrial+1) = BpodSystem.Data.Custom.BlockNumberR(iTrial) + 1;
+        BpodSystem.Data.Custom.BlockTrialR(iTrial+1) = 1;
+    else
+        BpodSystem.Data.Custom.BlockNumberR(iTrial+1) = BpodSystem.Data.Custom.BlockNumberR(iTrial);
+        BpodSystem.Data.Custom.BlockTrialR(iTrial+1) = BpodSystem.Data.Custom.BlockTrialR(iTrial) + 1;
+    end
+else % Final block
+    BpodSystem.Data.Custom.BlockTrialR(iTrial+1) = BpodSystem.Data.Custom.BlockTrialR(iTrial) + 1;
+    BpodSystem.Data.Custom.BlockNumberR(iTrial+1) = BpodSystem.Data.Custom.BlockNumberR(iTrial);
+end
+
+
+if TaskParameters.GUI.RewardDrift == false
+    BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAmount*...
+        [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)),...
+        TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumberR==BpodSystem.Data.Custom.BlockNumberR(iTrial+1))];
+    
+elseif TaskParameters.GUI.RewardDrift == true
+    RewardMagnitude=round(TaskParameters.GUI.RewardAmount*...
+        [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)),...
+        TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumberR==BpodSystem.Data.Custom.BlockNumberR(iTrial+1))]);
+    
+    BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:)=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
+    
+    while sum(BpodSystem.Data.Custom.RewardMagnitude < 5) > 0
+         BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:)=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
+    end
+    
+    clearvars RewardMagnitude
+end
+   
+    
 
 %% Updating Delays
 %stimulus delay
@@ -267,14 +301,17 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
     else
         AuditoryAlpha = TaskParameters.GUI.AuditoryAlpha/4;
     end
-    BetaRatio = (1 - min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud))) / min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud)); %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
-                                                                                          %cut off between 0.1-0.9 to prevent extreme values (only one side) and div by zero
+    BetaRatio = (1 - min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud))) / min(0.9,max(0.1,TaskParameters.GUI.LeftBiasAud)); 
+    %use a = ratio*b to yield E[X] = LeftBiasAud using Beta(a,b) pdf
+    %cut off between 0.1-0.9 to prevent extreme values (only one side) and div by zero
     BetaA =  (2*AuditoryAlpha*BetaRatio) / (1+BetaRatio); %make a,b symmetric around AuditoryAlpha to make B symmetric
     BetaB = (AuditoryAlpha-BetaA) + AuditoryAlpha;
     for a = 1:5
         if BpodSystem.Data.Custom.AuditoryTrial(lastidx+a)
             if rand(1,1) < TaskParameters.GUI.Percent50Fifty && iTrial > TaskParameters.GUI.StartEasyTrials
                 BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = 0.5;
+            elseif TaskParameters.GUI.AuditoryDiscretize == true
+                BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)=randsample([0.1 0.25 0.5 0.75 0.9],1); 
             else
                 BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1); %prevent negative parameters
             end
