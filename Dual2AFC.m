@@ -299,7 +299,7 @@ iTrial = 1;
 
 while RunSession
  %comment off when in emulator mode
- %   TaskParameters = BpodParameterGUI('sync', TaskParameters);
+    TaskParameters = BpodParameterGUI('sync', TaskParameters);
     
     %InitiateOlfactometer(iTrial);
     
