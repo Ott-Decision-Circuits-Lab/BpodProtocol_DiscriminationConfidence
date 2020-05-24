@@ -121,13 +121,19 @@ elseif TaskParameters.GUI.RewardDrift == true
         [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)),...
         TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumberR==BpodSystem.Data.Custom.BlockNumberR(iTrial+1))]);
     
-    BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:)=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
+    RewardMag=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
     
-    while sum(BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) < 5) > 0 || sum(BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) >38 ) > 0
-         BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:)=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
+    while (sum (RewardMag < TaskParameters.GUI.RewardMin) > 0) || (sum(RewardMag > TaskParameters.GUI.RewardMax ) > 0)
+         RewardMag=round(RewardMagnitude+ [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1))), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)))]);
     end
     
-    clearvars RewardMagnitude
+    BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = RewardMag;
+    
+%     if sum(RewardMag < TaskParameters.GUI.RewardMin)>0 || sum(RewardMag > TaskParameters.GUI.RewardMax)>0
+%         RewardMag(RewardMag<TaskParameters.GUI.RewardMin) = TaskParameters.GUI.RewardMin;
+%         RewardMag(RewardMag>TaskParameters.GUI.RewardMax) = TaskParameters.GUI.RewardMax;
+%     end
+    clearvars RewardMagnitude RewardMag
 end
 
 %% Updating Delays

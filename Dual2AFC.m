@@ -15,7 +15,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.CenterWaitMax = 20; 
     
     TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
-    TaskParameters.GUI.RewardBiasTrials=125;
+    TaskParameters.GUI.RewardMin=6;
+    TaskParameters.GUI.RewardMax=38;
+    
     TaskParameters.GUI.BlockMean=250;
     TaskParameters.GUI.BlockNoise=50; %noise re: block length
     
@@ -40,7 +42,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','RewardBiasTrials', 'RewardAmount','BlockMean','BlockNoise','DrinkingTime','DrinkingGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI', 'RewardAmount','RewardMin', 'RewardMax','BlockMean','BlockNoise','DrinkingTime','DrinkingGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -133,13 +135,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.AudFreq = {'Aud_nFreq','Aud_NoEvidence','Aud_minFreq','Aud_maxFreq','Aud_Volume','Aud_ToneDuration','Aud_ToneOverlap','Aud_Ramp','Aud_SamplingRate','Aud_UseMiddleOctave'};
     TaskParameters.GUIPanels.AudFreqLevels = {'Aud_Levels'};
     TaskParameters.GUIPanels.AudMinSample= {'MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
-       %% Block structure
+ %% Block structure
     % left and right block structure are independent
     TaskParameters.GUI.BlockTable.BlockNumberL = (1:10)';
     TaskParameters.GUI.BlockTable.BlockNumberR = (1:10)';
     
-    TaskParameters.GUI.BlockTable.BlockLenL = vertcat(repmat(TaskParameters.GUI.RewardBiasTrials,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
-    TaskParameters.GUI.BlockTable.BlockLenR = vertcat(repmat(TaskParameters.GUI.RewardBiasTrials,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    TaskParameters.GUI.BlockTable.BlockLenL = vertcat(repmat(125,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    TaskParameters.GUI.BlockTable.BlockLenR = vertcat(repmat(125,[4,1]), round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
 
     
     if rand(1)>0.5 %randomly assign to left/right ports
@@ -342,7 +344,7 @@ if TaskParameters.GUI.RewardDrift == false
 elseif TaskParameters.GUI.RewardDrift == true
     BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
     
-    while sum(BpodSystem.Data.Custom.RewardMagnitude < 5) > 0 || sum(BpodSystem.Data.Custom.RewardMagnitude >38 ) > 0
+    while sum(BpodSystem.Data.Custom.RewardMagnitude < TaskParameters.GUI.RewardMin) > 0 || sum(BpodSystem.Data.Custom.RewardMagnitude >TaskParameters.GUI.RewardMax ) > 0
         BpodSystem.Data.Custom.RewardMagnitude = round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)] + [normrnd(0, TaskParameters.GUI.BlockTable.NoiseL(1)), normrnd(0,TaskParameters.GUI.BlockTable.NoiseR(1))]) ;
     end
     

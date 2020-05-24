@@ -181,9 +181,9 @@ switch Action
         R = BpodSystem.Data.Custom.RewardMagnitude;
         ndxRwd = BpodSystem.Data.Custom.Rewarded;
         C = zeros(size(R)); C(BpodSystem.Data.Custom.ChoiceLeft==1&ndxRwd,1) = 1; C(BpodSystem.Data.Custom.ChoiceLeft==0&ndxRwd,2) = 1;
-        R = R.*C;
+        R = sum(R.*C);
         set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [iTrial+1 1], 'string', ...
-            [num2str(sum(R(:))/1000) ' mL']);
+            (['    L:' num2str(R(1)) '    R:' num2str(R(2)) '   T:' num2str(sum(R)/1000)]));
         clear R C
         %Plot Rewarded
         ndxCor = BpodSystem.Data.Custom.ChoiceCorrect(indxToPlot)==1;
@@ -260,20 +260,22 @@ switch Action
         end
             
         %% Psych Aud
+        %Blocks are complicated to define for variance task, but to
+        %assess learning during training, plots psychometric tracking left block only
         if TaskParameters.GUI.ShowPsycAud
             AudDV = BpodSystem.Data.Custom.DV(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
             ndxAud = BpodSystem.Data.Custom.AuditoryTrial(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
-            if isfield(BpodSystem.Data.Custom,'BlockNumber')
-                BlockNumber = BpodSystem.Data.Custom.BlockNumber;
+            if isfield(BpodSystem.Data.Custom,'BlockNumberL')
+                BlockNumber = BpodSystem.Data.Custom.BlockNumberL;
             else
                 BlockNumber = ones(size(BpodSystem.Data.Custom.ChoiceLeft));
             end
             setBlocks = reshape(unique(BlockNumber),1,[]);
             ndxNan = isnan(BpodSystem.Data.Custom.ChoiceLeft);
             for iBlock = setBlocks(end)
-                ndxBlock = BpodSystem.Data.Custom.BlockNumber(1:numel(BpodSystem.Data.Custom.ChoiceLeft)) == iBlock;
+                ndxBlock = BpodSystem.Data.Custom.BlockNumberL(1:numel(BpodSystem.Data.Custom.ChoiceLeft)) == iBlock;
                 if any(ndxBlock)
-                    AudBin = 8;
+                    AudBin = 5;
                     BinIdx = discretize(AudDV,linspace(-1,1,AudBin+1));
                     PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock),BinIdx(ndxAud&~ndxNan&ndxBlock),'mean');
                     PsycX = unique(BinIdx(ndxAud&~ndxNan&ndxBlock))/AudBin*2-1-1/AudBin;
@@ -286,13 +288,14 @@ switch Action
                                 BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
                         end
                     else
+                        
                         lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
                         bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
                         lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
                         %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
-                        BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','none','Marker','o',...
+                        BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
                             'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
-                        BpodSystem.GUIHandles.OutcomePlot.PsycOlfAud(iBlock) = line(AxesHandles.HandlePsycAud,[0 100],[.5 .5],'color',lineColor);
+                        %BpodSystem.GUIHandles.OutcomePlot.PsycOlfAud(iBlock) = line(AxesHandles.HandlePsycAud,[0 100],[.5 .5],'color',lineColor(iBlock, :));
                         
                     end
                 end
