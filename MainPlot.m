@@ -221,6 +221,8 @@ switch Action
         set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', Xdata, 'ydata', Ydata);
         %% Reward Trace
         iTrial = varargin{1};
+        [mn, ~] = rescaleX(AxesHandles.HandleRewOutcome,iTrial,nTrialsToShow); % recompute xlimiTrial = varargin{1};
+        indxToPlot = mn:iTrial;
         
         %Plot left trace
         Xdata=indxToPlot;
