@@ -10,17 +10,11 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
+    TaskParameters.GUI.MaxSessionTime = 180;
+    TaskParameters.GUI.CenterWaitMax = 20; 
     TaskParameters.GUI.ITI = 1; 
     TaskParameters.GUI.PreITI = 0; 
-    TaskParameters.GUI.CenterWaitMax = 20; 
-    
-    TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
-    TaskParameters.GUI.RewardMin=6;
-    TaskParameters.GUI.RewardMax=38;
-    
-    TaskParameters.GUI.BlockMean=250;
-    TaskParameters.GUI.BlockNoise=50; %noise re: block length
-    
+
     TaskParameters.GUI.DrinkingTime = 5;
     TaskParameters.GUI.DrinkingGrace = 0.1;
     TaskParameters.GUI.ChoiceDeadLine = 3;
@@ -39,10 +33,17 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
-    TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI', 'RewardAmount','RewardMin', 'RewardMax','BlockMean','BlockNoise','DrinkingTime','DrinkingGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
+    %% Reward&BlockGeneral
+    TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.RewardMin=6;
+    TaskParameters.GUI.RewardMax=38;
+    TaskParameters.GUI.BlockMean=250;
+    TaskParameters.GUI.BlockNoise=50; %noise re: block length
+    TaskParameters.GUIPanels.Reward = {'RewardAmount','RewardMin', 'RewardMax', 'BlockMean','BlockNoise'};
+    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
@@ -288,7 +289,7 @@ if isempty(fieldnames(TaskParameters))
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
-    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay'};
+    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','Reward','General','FeedbackDelay'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
@@ -493,6 +494,11 @@ RunSession = true;
 iTrial = 1;
 
 while RunSession
+    if iTrial==1 %randomly determines block lengths at the start of each session instead of saving values for last saved session.
+        TaskParameters.GUI.BlockTable.BlockLenL(5:end) = vertcat( round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+        TaskParameters.GUI.BlockTable.BlockLenR(5:end) = vertcat(round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+    end
+    
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
     
     InitiateOlfactometer(iTrial);
