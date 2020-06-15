@@ -281,25 +281,40 @@ switch Action
                     BinIdx = discretize(AudDV,linspace(-1,1,AudBin+1));
                     PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock),BinIdx(ndxAud&~ndxNan&ndxBlock),'mean');
                     PsycX = unique(BinIdx(ndxAud&~ndxNan&ndxBlock))/AudBin*2-1-1/AudBin;
-                    if iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
-                        BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
-                        BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
-                        if sum(ndxAud&~ndxNan&ndxBlock) > 1
-                            BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
-                            BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
-                                BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
+                    try
+                        if iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
+                            if sum(ndxAud&~ndxNan&ndxBlock) > 1
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
+                                    BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
+                            end
+                        else
+
+                            lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
+                            bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
+                            lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
+                            %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
+                                'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
+                            %BpodSystem.GUIHandles.OutcomePlot.PsycOlfAud(iBlock) = line(AxesHandles.HandlePsycAud,[0 100],[.5 .5],'color',lineColor(iBlock, :));
+
                         end
-                    else
+                    catch
+                        AudBin = 5;
+                        BinIdx = discretize(AudDV,linspace(-1,1,AudBin+1));
+                        PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan),BinIdx(ndxAud&~ndxNan),'mean');
+                        PsycX = unique(BinIdx(ndxAud&~ndxNan))/AudBin*2-1-1/AudBin;
                         
                         lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
-                        bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
+                        bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(end,:) * [1 -1]');
                         lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
-                        %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
-                        BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
-                            'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
-                        %BpodSystem.GUIHandles.OutcomePlot.PsycOlfAud(iBlock) = line(AxesHandles.HandlePsycAud,[0 100],[.5 .5],'color',lineColor(iBlock, :));
-                        
+                            %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
+                        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
+                                'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
                     end
+                        
                 end
             end
         end

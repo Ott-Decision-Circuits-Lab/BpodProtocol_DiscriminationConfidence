@@ -147,14 +147,14 @@ if isempty(fieldnames(TaskParameters))
     
     if rand(1)>0.5 %randomly assign to left/right ports
         TaskParameters.GUI.BlockTable.RewL = horzcat([1, 1, 1.66,1], repmat([1,1.66],[1,3]))';
-        TaskParameters.GUI.BlockTable.RewR = horzcat([1, 1.66, 1,1], repmat([1.66,1],[1,3]))'; 
+        TaskParameters.GUI.BlockTable.RewR = horzcat([2, 1.66, 1,1], repmat([1.66,1],[1,3]))'; 
         
         TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0, 0,0], repmat([10,2],[1,3]))';
         TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0, 0,0], repmat([2,10],[1,3]))';
 
     else
         TaskParameters.GUI.BlockTable.RewL = horzcat([1, 1.66, 1,1], repmat([1.66,1],[1,3]))';
-        TaskParameters.GUI.BlockTable.RewR = horzcat([1, 1, 1.66,1], repmat([1,1.66],[1,3]))'; 
+        TaskParameters.GUI.BlockTable.RewR = horzcat([2, 1, 1.66,1], repmat([1,1.66],[1,3]))'; 
         
         TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0, 0,0], repmat([2,10],[1,3]))';
         TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0, 0,0], repmat([10,2],[1,3]))';
@@ -358,7 +358,7 @@ for a = 1:2
             if BpodSystem.Data.Custom.AuditoryTrial(a)
                 
                 if TaskParameters.GUI.AuditoryDiscretize == true
-                   BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.01 0.25 0.75 0.99],1); 
+                   BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.01 0.15 0.85 0.99],1); 
                 else
                    BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha/4,TaskParameters.GUI.AuditoryAlpha/4,1,1);
                 end
