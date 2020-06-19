@@ -156,8 +156,8 @@ if isempty(fieldnames(TaskParameters))
         TaskParameters.GUI.BlockTable.RewL = horzcat([1, 1.66], repmat([1.66,1],[1,3]))';
         TaskParameters.GUI.BlockTable.RewR = horzcat([1, 1], repmat([1,1.66],[1,3]))'; 
         
-        TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0, 0,0], repmat([2,10],[1,3]))';
-        TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0, 0,0], repmat([10,2],[1,3]))';
+        TaskParameters.GUI.BlockTable.NoiseL = horzcat([0, 0], repmat([2,10],[1,3]))';
+        TaskParameters.GUI.BlockTable.NoiseR = horzcat([0, 0], repmat([10,2],[1,3]))';
     end
     
     TaskParameters.GUIMeta.BlockTable.Style = 'table';
@@ -497,8 +497,8 @@ iTrial = 1;
 
 while RunSession
     if iTrial==1 %randomly determines block lengths at the start of each session instead of saving values for last saved session.
-        TaskParameters.GUI.BlockTable.BlockLenL(5:end) = vertcat( round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
-        TaskParameters.GUI.BlockTable.BlockLenR(5:end) = vertcat(round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[6,1])));
+        TaskParameters.GUI.BlockTable.BlockLenL = round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[8,1]));
+        TaskParameters.GUI.BlockTable.BlockLenR = round(normrnd(TaskParameters.GUI.BlockMean,TaskParameters.GUI.BlockNoise,[8,1]));
     end
     
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
