@@ -110,6 +110,8 @@ BpodSystem.Data.Custom.RewardBase(iTrial+1,:)=round(TaskParameters.GUI.RewardAmo
         [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1)),...
         TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumberR==BpodSystem.Data.Custom.BlockNumberR(iTrial+1))]);
 
+BpodSystem.Data.Custom.NoiseHiLeft(iTrial+1,:)= max(TaskParameters.GUI.BlockTable.NoiseL) == TaskParameters.GUI.BlockTable.NoiseL(TaskParameters.GUI.BlockTable.BlockNumberL==BpodSystem.Data.Custom.BlockNumberL(iTrial+1));
+
 
 if TaskParameters.GUI.RewardDrift == false
     BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = TaskParameters.GUI.RewardAmount*...
@@ -133,7 +135,7 @@ elseif TaskParameters.GUI.RewardDrift == true
     end
     
     BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = RewardMag;
-    
+    BpodSystem.Data.Custom.RichLeft(iTrial+1)=RewardMag(1) > RewardMag(2);
 %     if sum(RewardMag < TaskParameters.GUI.RewardMin)>0 || sum(RewardMag > TaskParameters.GUI.RewardMax)>0
 %         RewardMag(RewardMag<TaskParameters.GUI.RewardMin) = TaskParameters.GUI.RewardMin;
 %         RewardMag(RewardMag>TaskParameters.GUI.RewardMax) = TaskParameters.GUI.RewardMax;
