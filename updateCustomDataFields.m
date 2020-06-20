@@ -55,13 +55,34 @@ elseif any(strcmp('unrewarded_Rin',statesThisTrial))
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Rin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
     BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
-elseif any(strcmp('broke_fixation',statesThisTrial))
+elseif any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
-elseif any(strcmp('early_withdrawal',statesThisTrial))
+    
+    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
+    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+elseif any(strcmp('early_withdrawal',statesThisTrial)) %if early withdawal, add a trial to the block
     BpodSystem.Data.Custom.EarlyWithdrawal(iTrial) = true;
+    
+    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
 end
-if any(strcmp('missed_choice',statesThisTrial))
+if any(strcmp('missed_choice',statesThisTrial)) % if missed choice, add a trial to the block
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
+    
+     TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
 end
 if any(strcmp('skipped_feedback',statesThisTrial))
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
@@ -136,6 +157,9 @@ elseif TaskParameters.GUI.RewardDrift == true
     
     BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = RewardMag;
     BpodSystem.Data.Custom.RichLeft(iTrial+1)=RewardMag(1) > RewardMag(2);
+    BpodSystem.Data.Custom.RichRight(iTrial+1) = RewardMag(2) > RewardMag(1);
+    BpodSystem.Data.Custom.RichEqual(iTrial+1)= RewardMag(1) == RewardMag(2); 
+    
 %     if sum(RewardMag < TaskParameters.GUI.RewardMin)>0 || sum(RewardMag > TaskParameters.GUI.RewardMax)>0
 %         RewardMag(RewardMag<TaskParameters.GUI.RewardMin) = TaskParameters.GUI.RewardMin;
 %         RewardMag(RewardMag>TaskParameters.GUI.RewardMax) = TaskParameters.GUI.RewardMax;

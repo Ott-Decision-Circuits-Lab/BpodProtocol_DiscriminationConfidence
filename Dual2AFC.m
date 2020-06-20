@@ -338,7 +338,10 @@ BpodSystem.Data.Custom.PsychtoolboxStartup = false;
 %housekeeping
 BpodSystem.Data.Custom.RewardBase=round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)]);
 BpodSystem.Data.Custom.RichLeft = TaskParameters.GUI.BlockTable.RewL(1) > TaskParameters.GUI.BlockTable.RewR(1);
-BpodSystem.Data.Custom.NoiseHiLeft = TaskParameters.GUI.BlockTable.NoiseL(1)==max(TaskParameters.GUI.BlockTable.NoiseL);
+BpodSystem.Data.Custom.RichRight = TaskParameters.GUI.BlockTable.RewL(1) < TaskParameters.GUI.BlockTable.RewR(1);
+BpodSystem.Data.Custom.RichEqual = TaskParameters.GUI.BlockTable.RewL(1) == TaskParameters.GUI.BlockTable.RewR(1);
+
+BpodSystem.Data.Custom.NoiseHiLeft(1) = TaskParameters.GUI.BlockTable.NoiseL(1)==max(TaskParameters.GUI.BlockTable.NoiseL);
 
 %Reward Magnitude
 if TaskParameters.GUI.RewardDrift == false
