@@ -363,7 +363,7 @@ for a = 1:2
             if BpodSystem.Data.Custom.AuditoryTrial(a)
                 
                 if TaskParameters.GUI.AuditoryDiscretize == true
-                   BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.01 0.15 0.85 0.99],1); 
+                   BpodSystem.Data.Custom.AuditoryOmega(a)=randsample([0.05 0.3 0.45 0.55 0.7 0.95],1); 
                 else
                    BpodSystem.Data.Custom.AuditoryOmega(a) = betarnd(TaskParameters.GUI.AuditoryAlpha/4,TaskParameters.GUI.AuditoryAlpha/4,1,1);
                 end
