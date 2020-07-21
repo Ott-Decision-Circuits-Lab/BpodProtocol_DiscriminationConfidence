@@ -378,8 +378,8 @@ if iTrial > numel(BpodSystem.Data.Custom.DV) - 5
                     if rand(1,1) < TaskParameters.GUI.Percent50Fifty && iTrial > TaskParameters.GUI.StartEasyTrials
                         BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = 0.5;
                         
-                    elseif TaskParameters.GUI.AuditoryDiscretize == true
-                        BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)=randsample([0.01 0.15 0.85 0.99],1); 
+                    elseif TaskParameters.GUI.AuditoryDiscretize == true && iTrial > TaskParameters.GUI.StartEasyTrials
+                        BpodSystem.Data.Custom.AuditoryOmega(lastidx+a)=randsample([0.05 0.3 0.45 0.55 0.7 0.95],1); 
                         
                     else
                         BpodSystem.Data.Custom.AuditoryOmega(lastidx+a) = betarnd(max(0,BetaA),max(0,BetaB),1,1); %prevent negative parameters
