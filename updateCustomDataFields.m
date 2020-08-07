@@ -58,31 +58,31 @@ elseif any(strcmp('unrewarded_Rin',statesThisTrial))
 elseif any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
     
-    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
-    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+%     TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
+%     TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
 elseif any(strcmp('early_withdrawal',statesThisTrial)) %if early withdawal, add a trial to the block
     BpodSystem.Data.Custom.EarlyWithdrawal(iTrial) = true;
     
-    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
-    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
+%     TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+%     TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
 end
 if any(strcmp('missed_choice',statesThisTrial)) % if missed choice, add a trial to the block
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
     
-     TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
-    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
-            ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
+%      TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+%             ==BpodSystem.Data.Custom.BlockNumberL(iTrial))+ 1;
+%     TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+%             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) + 1;
 end
 if any(strcmp('skipped_feedback',statesThisTrial))
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
@@ -91,6 +91,32 @@ if any(strncmp('water_',statesThisTrial,6))
     BpodSystem.Data.Custom.Rewarded(iTrial) = true;
 end
 
+%debug --> GUI only updates every other isnan(ChoiceLeft)? Checks for nans
+%every other trial and adds to block
+if rem(iTrial,2)==0 &&  iTrial< TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+                        ==BpodSystem.Data.Custom.BlockNumberR(iTrial))
+    addTrials=sum(isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial-1:iTrial)));
+    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+                        ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  (TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+                        ==BpodSystem.Data.Custom.BlockNumberR(iTrial))) + addTrials;
+    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+                        ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  (TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+                        ==BpodSystem.Data.Custom.BlockNumberL(iTrial)))+ addTrials;
+elseif isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
+    TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+                        ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) =  (TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
+                        ==BpodSystem.Data.Custom.BlockNumberR(iTrial))) + 1;
+    TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+                        ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) =  (TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
+                        ==BpodSystem.Data.Custom.BlockNumberL(iTrial)))+ 1;
+           
+end
+
+ 
+    
+
+
+
 %% State-independent fields
 BpodSystem.Data.Custom.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 BpodSystem.Data.Custom.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
@@ -98,21 +124,28 @@ BpodSystem.Data.Custom.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
 %left block tracking
 if BpodSystem.Data.Custom.BlockNumberL(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumberL) % If not final block
+
+    %if it is the last trial in a block 
     if BpodSystem.Data.Custom.BlockTrialL(iTrial) >= TaskParameters.GUI.BlockTable.BlockLenL(TaskParameters.GUI.BlockTable.BlockNumberL...
-            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) % Block transition
+            ==BpodSystem.Data.Custom.BlockNumberL(iTrial)) 
+       
         BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial) + 1; %update block number
         BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = 1; %reset block trial
+
     else
         BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial); %update what block
         BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = BpodSystem.Data.Custom.BlockTrialL(iTrial) + 1; %update trial within block
     end
 else % Final block
+    
     BpodSystem.Data.Custom.BlockTrialL(iTrial+1) = BpodSystem.Data.Custom.BlockTrialL(iTrial) + 1;
     BpodSystem.Data.Custom.BlockNumberL(iTrial+1) = BpodSystem.Data.Custom.BlockNumberL(iTrial);
 end
 
 % right block tracking
 if BpodSystem.Data.Custom.BlockNumberR(iTrial) < max(TaskParameters.GUI.BlockTable.BlockNumberR) % Not final block
+    
+
     if BpodSystem.Data.Custom.BlockTrialR(iTrial) >= TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
             ==BpodSystem.Data.Custom.BlockNumberR(iTrial)) % Block transition
         BpodSystem.Data.Custom.BlockNumberR(iTrial+1) = BpodSystem.Data.Custom.BlockNumberR(iTrial) + 1;
@@ -122,6 +155,7 @@ if BpodSystem.Data.Custom.BlockNumberR(iTrial) < max(TaskParameters.GUI.BlockTab
         BpodSystem.Data.Custom.BlockTrialR(iTrial+1) = BpodSystem.Data.Custom.BlockTrialR(iTrial) + 1;
     end
 else % Final block
+    
     BpodSystem.Data.Custom.BlockTrialR(iTrial+1) = BpodSystem.Data.Custom.BlockTrialR(iTrial) + 1;
     BpodSystem.Data.Custom.BlockNumberR(iTrial+1) = BpodSystem.Data.Custom.BlockNumberR(iTrial);
 end

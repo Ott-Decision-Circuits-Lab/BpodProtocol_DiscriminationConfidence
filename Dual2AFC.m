@@ -553,8 +553,11 @@ while RunSession
         RunProtocol('StartPause')
     end
     
+
     %% update custom data fields for this trial and draw future trials
     updateCustomDataFields(iTrial);
+    
+
     
     %% update behavior plots
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
