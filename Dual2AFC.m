@@ -32,10 +32,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.CatchError = false;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
+    
+    TaskParameters.GUI.ErrorLoop = true;
+    TaskParameters.GUIMeta.ErrorLoop.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop', 'Ports_LMR','PortLEDs'};
     %% Reward&BlockGeneral
     TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
     TaskParameters.GUI.RewardMin=6;
@@ -556,6 +559,20 @@ while RunSession
 
     %% update custom data fields for this trial and draw future trials
     updateCustomDataFields(iTrial);
+   %error loop: repeat last trial
+   if TaskParameters.GUI.ErrorLoop && iTrial>1
+    if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 || isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
+        disp('error loop')
+        BpodSystem.Data.Custom.AuditoryOmega(iTrial+1)=BpodSystem.Data.Custom.AuditoryOmega(iTrial);
+        BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
+        BpodSystem.Data.Custom.RightClickRate(iTrial+1) = BpodSystem.Data.Custom.RightClickRate(iTrial);
+        BpodSystem.Data.Custom.DV(iTrial+1) = BpodSystem.Data.Custom.DV(iTrial);
+        BpodSystem.Data.Custom.LeftClickTrain(iTrial+1)=BpodSystem.Data.Custom.LeftClickTrain(iTrial);
+        BpodSystem.Data.Custom.RightClickTrain(iTrial+1)= BpodSystem.Data.Custom.RightClickTrain(iTrial);
+        BpodSystem.Data.Custom.LeftRewarded(iTrial+1)=BpodSystem.Data.Custom.LeftRewarded(iTrial);
+        
+    end
+   end
     
 
     
