@@ -572,10 +572,24 @@ while RunSession
                 BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
                 BpodSystem.Data.Custom.RightClickRate(iTrial+1) = BpodSystem.Data.Custom.RightClickRate(iTrial);
                 BpodSystem.Data.Custom.DV(iTrial+1) = BpodSystem.Data.Custom.DV(iTrial);
-                BpodSystem.Data.Custom.LeftClickTrain(iTrial+1)=BpodSystem.Data.Custom.LeftClickTrain(iTrial);
-                BpodSystem.Data.Custom.RightClickTrain(iTrial+1)= BpodSystem.Data.Custom.RightClickTrain(iTrial);
+                BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}=BpodSystem.Data.Custom.LeftClickTrain{iTrial};
+                BpodSystem.Data.Custom.RightClickTrain{iTrial+1}= BpodSystem.Data.Custom.RightClickTrain{iTrial};
                 BpodSystem.Data.Custom.LeftRewarded(iTrial+1)=BpodSystem.Data.Custom.LeftRewarded(iTrial);
                 BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+1) = 1;
+                BpodSystem.Data.Custom.LeftRewarded(iTrial+1) = BpodSystem.Data.Custom.LeftRewarded(iTrial);
+                
+                if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
+                    if ~BpodSystem.EmulatorMode
+                        if BpodSystem.Data.Custom.ClickTask(iTrial+1)
+                            SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
+                            SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
+                        else
+                            PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+1});
+                            BpodSystem.Data.Custom.AudSound{iTrial+1} = {};
+                        end
+                    end
+                end
+
             else
                 BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+1) = 0; 
             end
