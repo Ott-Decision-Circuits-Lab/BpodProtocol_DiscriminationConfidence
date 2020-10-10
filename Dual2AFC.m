@@ -37,10 +37,12 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ErrorLoop = true;
     TaskParameters.GUIMeta.ErrorLoop.Style = 'checkbox';
     TaskParameters.GUI.ErrorLoopRate = 0.5;
+    TaskParameters.GUI.ErrorLoopDiffBoundary = 0.15;  %boundary for omega difficulty that repeats
+    TaskParameters.GUI.ErrorLoopReplace = 5; %preallocated trials
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'CenterGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'CenterGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'ErrorLoopDiffBoundary', 'ErrorLoopReplace','Ports_LMR','PortLEDs'};
     %% Reward&BlockGeneral
     TaskParameters.GUI.RewardAmount = 25; %low reward amount, high reward amount hardcoded as x1.66
     TaskParameters.GUI.RewardMin=6;
@@ -566,11 +568,11 @@ while RunSession
    %error loop: repeat last trial
    
    if TaskParameters.GUI.ErrorLoop 
-       if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>0.8 || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<0.15) 
+       if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>(1-TaskParameters.GUI.ErrorLoopDiffBoundary) || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<TaskParameters.GUI.ErrorLoopDiffBoundary) 
                 if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 || isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
                                %randomly adds incorrect
                     preAllocatedTrials=1:5;
-                    replaceTrials=preAllocatedTrials(preAllocatedTrials(length(preAllocatedTrials),2));
+                    replaceTrials=randsample(preAllocatedTrials,TaskParameters.GUI.ErrorLoopReplace);
                     
                     for i=1:length(replaceTrials)
                         replaceThisTrial=replaceTrials(i);
