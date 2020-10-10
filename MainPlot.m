@@ -277,7 +277,7 @@ switch Action
             for iBlock = setBlocks(end)
                 ndxBlock = BpodSystem.Data.Custom.BlockNumberL(1:numel(BpodSystem.Data.Custom.ChoiceLeft)) == iBlock;
                 if any(ndxBlock)
-                    AudBin = 5;
+                    AudBin = 8;
                     BinIdx = discretize(AudDV,linspace(-1,1,AudBin+1));
                     PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock),BinIdx(ndxAud&~ndxNan&ndxBlock),'mean');
                     PsycX = unique(BinIdx(ndxAud&~ndxNan&ndxBlock))/AudBin*2-1-1/AudBin;

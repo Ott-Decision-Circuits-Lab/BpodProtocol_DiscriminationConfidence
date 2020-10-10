@@ -10,13 +10,14 @@ global TaskParameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
-    TaskParameters.GUI.MaxSessionTime = 180;
-    TaskParameters.GUI.CenterWaitMax = 20; 
+    TaskParameters.GUI.MaxSessionTime = 200;
+    TaskParameters.GUI.CenterWaitMax = 200000; 
     TaskParameters.GUI.ITI = 1; 
     TaskParameters.GUI.PreITI = 0.3; 
 
-    TaskParameters.GUI.DrinkingTime = .3;
-    TaskParameters.GUI.DrinkingGrace = 0.1;
+    TaskParameters.GUI.DrinkingTime = .5;
+    TaskParameters.GUI.DrinkingGrace = 0.3;
+    TaskParameters.GUI.CenterGrace = 0.1;
     TaskParameters.GUI.ChoiceDeadLine = 3;
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 3; % (s)
@@ -39,13 +40,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'CenterGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'Ports_LMR','PortLEDs'};
     %% Reward&BlockGeneral
-    TaskParameters.GUI.RewardAmount = 15; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.RewardAmount = 25; %low reward amount, high reward amount hardcoded as x1.66
     TaskParameters.GUI.RewardMin=6;
     TaskParameters.GUI.RewardMax=38;
-    TaskParameters.GUI.BlockMean=250;
-    TaskParameters.GUI.BlockNoise=5; %noise re: block length
+    TaskParameters.GUI.BlockMean=2000;
+    TaskParameters.GUI.BlockNoise=0; %noise re: block length
     TaskParameters.GUIPanels.Reward = {'RewardAmount','RewardMin', 'RewardMax', 'BlockMean','BlockNoise'};
     
     %% BiasControl
@@ -102,7 +103,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.OlfStimuli = {'OdorTable','OdorStimulusTimeMin'};
     %% Auditory Params
     %clicks
-    TaskParameters.GUI.AuditoryAlpha = 1;
+    TaskParameters.GUI.AuditoryAlpha = 0.5;
     TaskParameters.GUI.LeftBiasAud = 0.5;
     TaskParameters.GUIMeta.LeftBiasAud.Style = 'text';
     TaskParameters.GUI.SumRates = 100;
@@ -565,34 +566,41 @@ while RunSession
    %error loop: repeat last trial
    
    if TaskParameters.GUI.ErrorLoop 
-       if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate
-            if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 || isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
-                disp('error loop')
-                BpodSystem.Data.Custom.AuditoryOmega(iTrial+1)=BpodSystem.Data.Custom.AuditoryOmega(iTrial);
-                BpodSystem.Data.Custom.LeftClickRate(iTrial+1) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
-                BpodSystem.Data.Custom.RightClickRate(iTrial+1) = BpodSystem.Data.Custom.RightClickRate(iTrial);
-                BpodSystem.Data.Custom.DV(iTrial+1) = BpodSystem.Data.Custom.DV(iTrial);
-                BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}=BpodSystem.Data.Custom.LeftClickTrain{iTrial};
-                BpodSystem.Data.Custom.RightClickTrain{iTrial+1}= BpodSystem.Data.Custom.RightClickTrain{iTrial};
-                BpodSystem.Data.Custom.LeftRewarded(iTrial+1)=BpodSystem.Data.Custom.LeftRewarded(iTrial);
-                BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+1) = 1;
-                BpodSystem.Data.Custom.LeftRewarded(iTrial+1) = BpodSystem.Data.Custom.LeftRewarded(iTrial);
-                
-                if BpodSystem.Data.Custom.AuditoryTrial(iTrial+1)
-                    if ~BpodSystem.EmulatorMode
-                        if BpodSystem.Data.Custom.ClickTask(iTrial+1)
-                            SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+1}))*5);
-                            SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+1}))*5);
-                        else
-                            PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+1});
-                            BpodSystem.Data.Custom.AudSound{iTrial+1} = {};
+       if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>0.8 || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<0.15) 
+                if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 || isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
+                               %randomly adds incorrect
+                    preAllocatedTrials=1:5;
+                    replaceTrials=preAllocatedTrials(preAllocatedTrials(length(preAllocatedTrials),2));
+                    
+                    for i=1:length(replaceTrials)
+                        replaceThisTrial=replaceTrials(i);
+                        disp('error loop')
+                        BpodSystem.Data.Custom.AuditoryOmega(iTrial+replaceThisTrial)=BpodSystem.Data.Custom.AuditoryOmega(iTrial);
+                        BpodSystem.Data.Custom.LeftClickRate(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
+                        BpodSystem.Data.Custom.RightClickRate(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.RightClickRate(iTrial);
+                        BpodSystem.Data.Custom.DV(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.DV(iTrial);
+                        BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}=BpodSystem.Data.Custom.LeftClickTrain{iTrial};
+                        BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}= BpodSystem.Data.Custom.RightClickTrain{iTrial};
+                        BpodSystem.Data.Custom.LeftRewarded(iTrial+replaceThisTrial)=BpodSystem.Data.Custom.LeftRewarded(iTrial);
+                        BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+replaceThisTrial) = 1;
+                        BpodSystem.Data.Custom.LeftRewarded(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.LeftRewarded(iTrial);
+
+                        if BpodSystem.Data.Custom.AuditoryTrial(iTrial+replaceThisTrial)
+                            if ~BpodSystem.EmulatorMode
+                                if BpodSystem.Data.Custom.ClickTask(iTrial+replaceThisTrial)
+                                    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}))*5);
+                                    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}))*5);
+                                else
+                                    PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+replaceThisTrial});
+                                    BpodSystem.Data.Custom.AudSound{iTrial+replaceThisTrial} = {};
+                                end
+                            end
                         end
                     end
-                end
 
-            else
-                BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+1) = 0; 
-            end
+                end
+           
+       
        end
    else
        BpodSystem.Data.Custom.ErrorLoopTrial=NaN;
