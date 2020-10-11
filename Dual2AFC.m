@@ -28,7 +28,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.AuditoryDiscretize=false;
     TaskParameters.GUIMeta.AuditoryDiscretize.Style = 'checkbox';
     
-    TaskParameters.GUI.StartEasyTrials = 0;
+    TaskParameters.GUI.StartEasyTrials = 100;
     TaskParameters.GUI.Percent50Fifty = 0;
     TaskParameters.GUI.PercentCatch = 0;
     TaskParameters.GUI.CatchError = false;
@@ -36,9 +36,9 @@ if isempty(fieldnames(TaskParameters))
     
     TaskParameters.GUI.ErrorLoop = true;
     TaskParameters.GUIMeta.ErrorLoop.Style = 'checkbox';
-    TaskParameters.GUI.ErrorLoopRate = 0.5;
+    TaskParameters.GUI.ErrorLoopRate = 1;
     TaskParameters.GUI.ErrorLoopDiffBoundary = 0.15;  %boundary for omega difficulty that repeats
-    TaskParameters.GUI.ErrorLoopReplace = 5; %preallocated trials
+    TaskParameters.GUI.ErrorLoopReplace = 2; %preallocated trials
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
@@ -569,36 +569,35 @@ while RunSession
    
    if TaskParameters.GUI.ErrorLoop 
        if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>(1-TaskParameters.GUI.ErrorLoopDiffBoundary) || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<TaskParameters.GUI.ErrorLoopDiffBoundary) 
-                if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 || isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial))
+                if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 
                                %randomly adds incorrect
                     preAllocatedTrials=1:5;
                     replaceTrials=randsample(preAllocatedTrials,TaskParameters.GUI.ErrorLoopReplace);
                     
-                    for i=1:length(replaceTrials)
-                        replaceThisTrial=replaceTrials(i);
                         disp('error loop')
-                        BpodSystem.Data.Custom.AuditoryOmega(iTrial+replaceThisTrial)=BpodSystem.Data.Custom.AuditoryOmega(iTrial);
-                        BpodSystem.Data.Custom.LeftClickRate(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
-                        BpodSystem.Data.Custom.RightClickRate(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.RightClickRate(iTrial);
-                        BpodSystem.Data.Custom.DV(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.DV(iTrial);
-                        BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}=BpodSystem.Data.Custom.LeftClickTrain{iTrial};
-                        BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}= BpodSystem.Data.Custom.RightClickTrain{iTrial};
-                        BpodSystem.Data.Custom.LeftRewarded(iTrial+replaceThisTrial)=BpodSystem.Data.Custom.LeftRewarded(iTrial);
-                        BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+replaceThisTrial) = 1;
-                        BpodSystem.Data.Custom.LeftRewarded(iTrial+replaceThisTrial) = BpodSystem.Data.Custom.LeftRewarded(iTrial);
+                        BpodSystem.Data.Custom.AuditoryOmega(iTrial+[replaceTrials])=BpodSystem.Data.Custom.AuditoryOmega(iTrial);
+                        BpodSystem.Data.Custom.LeftClickRate(iTrial+[replaceTrials]) = BpodSystem.Data.Custom.LeftClickRate(iTrial);
+                        BpodSystem.Data.Custom.RightClickRate(iTrial+[replaceTrials]) = BpodSystem.Data.Custom.RightClickRate(iTrial);
+                        BpodSystem.Data.Custom.DV(iTrial+[replaceTrials]) = BpodSystem.Data.Custom.DV(iTrial);
+                        BpodSystem.Data.Custom.LeftClickTrain(replaceTrials+iTrial)=BpodSystem.Data.Custom.LeftClickTrain(iTrial);
+                        BpodSystem.Data.Custom.RightClickTrain(replaceTrials+iTrial)= BpodSystem.Data.Custom.RightClickTrain(iTrial);
+                        BpodSystem.Data.Custom.LeftRewarded(iTrial+[replaceTrials])=BpodSystem.Data.Custom.LeftRewarded(iTrial);
+                        BpodSystem.Data.Custom.ErrorLoopTrial(iTrial+[replaceTrials]) = 1;
+                        BpodSystem.Data.Custom.LeftRewarded(iTrial+[replaceTrials]) = BpodSystem.Data.Custom.LeftRewarded(iTrial);
 
-                        if BpodSystem.Data.Custom.AuditoryTrial(iTrial+replaceThisTrial)
-                            if ~BpodSystem.EmulatorMode
-                                if BpodSystem.Data.Custom.ClickTask(iTrial+replaceThisTrial)
-                                    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial+replaceThisTrial}))*5);
-                                    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial+replaceThisTrial}))*5);
+                       %if the next immediate trial needs to be replaced,
+                       %else replaced in updatecustomdatafields
+                        if ~BpodSystem.EmulatorMode && sum(replaceTrials==1)>0
+                                if BpodSystem.Data.Custom.ClickTask(iTrial)
+                                    SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{iTrial}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{iTrial}))*5);
+                                    SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{iTrial}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{iTrial}))*5);
                                 else
                                     PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{iTrial+replaceThisTrial});
                                     BpodSystem.Data.Custom.AudSound{iTrial+replaceThisTrial} = {};
                                 end
-                            end
                         end
-                    end
+                        
+                    
 
                 end
            
