@@ -568,7 +568,7 @@ while RunSession
    %error loop: repeat last trial
    
    if TaskParameters.GUI.ErrorLoop 
-       if iTrial>1 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>(1-TaskParameters.GUI.ErrorLoopDiffBoundary) || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<TaskParameters.GUI.ErrorLoopDiffBoundary) 
+       if iTrial>5 && rand(1)<=TaskParameters.GUI.ErrorLoopRate && (BpodSystem.Data.Custom.AuditoryOmega(iTrial)>(1-TaskParameters.GUI.ErrorLoopDiffBoundary) || BpodSystem.Data.Custom.AuditoryOmega(iTrial)<TaskParameters.GUI.ErrorLoopDiffBoundary) 
                 if BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0 
                                %randomly adds incorrect
                     preAllocatedTrials=1:5;
