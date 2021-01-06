@@ -47,11 +47,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.RewardAmount = 25; %low reward amount, high reward amount hardcoded as x1.66
     TaskParameters.GUI.RewardMin=6;
     TaskParameters.GUI.RewardMax=38;
-    TaskParameters.GUI.CenterRewardProb = 0;
-    TaskParameters.GUI.CenterPortRewAmount = 10;
     TaskParameters.GUI.BlockMean=2000;
     TaskParameters.GUI.BlockNoise=0; %noise re: block length
-    TaskParameters.GUIPanels.Reward = {'RewardAmount','RewardMin', 'RewardMax', 'CenterRewardProb', 'CenterPortRewAmount','BlockMean','BlockNoise'};
+    TaskParameters.GUIPanels.Reward = {'RewardAmount','RewardMin', 'RewardMax', 'BlockMean','BlockNoise'};
     
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
@@ -338,7 +336,6 @@ BpodSystem.Data.Custom.ST = [];
 BpodSystem.Data.Custom.ResolutionTime = [];
 BpodSystem.Data.Custom.Rewarded = false(0);
 %BpodSystem.Data.Custom.RewardMagnitude = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
-BpodSystem.Data.Custom.CenterPortRewAmount =TaskParameters.GUI.CenterPortRewAmount;
 BpodSystem.Data.Custom.TrialNumber = [];
 BpodSystem.Data.Custom.LaserTrial = false;
 BpodSystem.Data.Custom.LaserTrialTrainStart = NaN;
