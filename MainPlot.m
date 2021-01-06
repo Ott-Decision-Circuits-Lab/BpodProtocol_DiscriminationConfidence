@@ -60,8 +60,17 @@ switch Action
         AxesHandles.HandlePsycOlf.YLabel.String = 'trials in block';
         AxesHandles.HandlePsycOlf.Title.String = 'Reward';
         %% Psyc Auditory
-        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
-        BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k','Visible','off');
+        if isfield(BpodSystem.Data.Custom,'BlockNumberL')
+            numBlocks=8;
+            lineColor = parula(numBlocks);
+            for i=1:numBlocks
+                BpodSystem.GUIHandles.OutcomePlot.PsycAud(i) = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge',lineColor(i,:),'MarkerFace',lineColor(i,:), 'MarkerSize',1,'Visible','off');
+                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(i) = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color',lineColor(i,:),'Visible','off');
+            end
+        else
+            BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
+            BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k','Visible','off');
+        end
         AxesHandles.HandlePsycAud.YLim = [-.05 1.05];
         AxesHandles.HandlePsycAud.XLim = [-1.05, 1.05];
         AxesHandles.HandlePsycAud.XLabel.String = 'beta'; % FIGURE OUT UNIT
@@ -264,6 +273,8 @@ switch Action
         %% Psych Aud
         %Blocks are complicated to define for variance task, but to
         %assess learning during training, plots psychometric tracking left block only
+        
+    
         if TaskParameters.GUI.ShowPsycAud
             AudDV = BpodSystem.Data.Custom.DV(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
             ndxAud = BpodSystem.Data.Custom.AuditoryTrial(1:numel(BpodSystem.Data.Custom.ChoiceLeft));
@@ -272,9 +283,10 @@ switch Action
             else
                 BlockNumber = ones(size(BpodSystem.Data.Custom.ChoiceLeft));
             end
+            
             setBlocks = reshape(unique(BlockNumber),1,[]);
             ndxNan = isnan(BpodSystem.Data.Custom.ChoiceLeft);
-            for iBlock = setBlocks(end)
+            for iBlock = 1:setBlocks(end)
                 ndxBlock = BpodSystem.Data.Custom.BlockNumberL(1:numel(BpodSystem.Data.Custom.ChoiceLeft)) == iBlock;
                 if any(ndxBlock)
                     AudBin = 8;
@@ -282,37 +294,51 @@ switch Action
                     PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock),BinIdx(ndxAud&~ndxNan&ndxBlock),'mean');
                     PsycX = unique(BinIdx(ndxAud&~ndxNan&ndxBlock))/AudBin*2-1-1/AudBin;
                     try
-                        if iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
+                        if iBlock==setBlocks(end)
                             BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
                             BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
                             if sum(ndxAud&~ndxNan&ndxBlock) > 1
-                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
-                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).LineWidth=2;
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).MarkerSize=6;
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).XData = linspace(min(AudDV),max(AudDV),100);
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
+                                    BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
+                            end
+                            
+                        elseif iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
+                            if sum(ndxAud&~ndxNan&ndxBlock) > 1
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).LineStyle='--';
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).MarkerSize=3;
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).XData = linspace(min(AudDV),max(AudDV),100);
+                                BpodSystem.GUIHandles.OutcomePlot.PsycAudFit(iBlock).YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
                                     BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
                             end
                         else
-
-                            lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
+                        
+                            %lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
                             bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
-                            lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
+                            %lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
                             %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
                             BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
-                                'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
+                                'MarkerEdge',lineColor(iBlock, :),'MarkerFace',lineColor(iBlock, :), 'MarkerSize',6);
                             %BpodSystem.GUIHandles.OutcomePlot.PsycOlfAud(iBlock) = line(AxesHandles.HandlePsycAud,[0 100],[.5 .5],'color',lineColor(iBlock, :));
 
                         end
                     catch
-                        AudBin = 5;
+                        
+                        AudBin = 8;
                         BinIdx = discretize(AudDV,linspace(-1,1,AudBin+1));
                         PsycY = grpstats(BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan),BinIdx(ndxAud&~ndxNan),'mean');
                         PsycX = unique(BinIdx(ndxAud&~ndxNan))/AudBin*2-1-1/AudBin;
                         
-                        lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
+                        %lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
                         bias = tanh(.3 * BpodSystem.Data.Custom.RewardMagnitude(end,:) * [1 -1]');
-                        lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
+                        %lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
                             %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','None','Marker','o',...
-                                'MarkerEdge',lineColor,'MarkerFace',lineColor, 'MarkerSize',6);
+                                'MarkerEdge',lineColor(iBlock, :),'MarkerFace',lineColor(iBlock, :), 'MarkerSize',6);
                     end
                         
                 end
