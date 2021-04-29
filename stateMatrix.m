@@ -60,9 +60,9 @@ Wire1OutError = {};
 Wire1OutCorrect =	{};
 Wire1Out = {};
 if TaskParameters.GUI.Wire1VideoTrigger % video
-    Wire1OutError =	{'WireState', 1};
     switch TaskParameters.GUI.VideoTrials
         case 1 %only catch & error
+            Wire1OutError =	{'WireState', 1};
             if BpodSystem.Data.Custom.CatchTrial(iTrial)
                 Wire1OutCorrect =	{'WireState', 1};
             else
