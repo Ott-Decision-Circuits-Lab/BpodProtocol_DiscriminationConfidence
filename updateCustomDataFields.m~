@@ -15,7 +15,6 @@ BpodSystem.Data.Custom.ST(iTrial) = NaN;
 BpodSystem.Data.Custom.ResolutionTime(iTrial) = NaN;
 BpodSystem.Data.Custom.Rewarded(iTrial) = false;
 BpodSystem.Data.Custom.TrialNumber(iTrial) = iTrial;
-BpodSystem.Data.Custom.InvestmentRatio(iTrial)=NaN;
 
 %% Checking states and rewriting standard
 statesThisTrial = BpodSystem.Data.RawData.OriginalStateNamesByNumber{iTrial}(BpodSystem.Data.RawData.OriginalStateData{iTrial});
@@ -86,22 +85,15 @@ end
 
 
 if any(strcmp('water_L',statesThisTrial))
-    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 1;
-    BpodSystem.Data.Custom.Correct(iTrial) = 1;
-elseif any(strcmp('water_R',statesThisTrial))
-    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
-    BpodSystem.Data.Custom.Correct(iTrial) = 1;
-elseif any(strcmp('timeOut_IncorrectChoiceL',statesThisTrial))
-    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 1;
-    BpodSystem.Data.Custom.Correct(iTrial) = 0;
-elseif any(strcmp('timeOut_IncorrectChoiceR',statesThisTrial))
-    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
-    BpodSystem.Data.Custom.Correct(iTrial) = 0;
-end 
+elseif any(strcmp('water_L',statesThisTrial))
 
 BpodSystem.Data.Custom.FeedbackTimeR(iTrial)=FeedbackTimeL+FeedbackTimeL_unRe;
 BpodSystem.Data.Custom.FeedbackTimeL(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe;
 
+if BpodSystem.Data.Custom.ChoiceLeft(iTrial)==1 && BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==1
+elseif BpodSystem.Data.Custom.ChoiceLeft(iTrial)==0 && BpodSystem.Data.Custom.ChoiceCorrect(iTrial)==0
+end
+    
 
 if any(strcmp('missed_choice',statesThisTrial)) % if missed choice, add a trial to the block
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
@@ -118,12 +110,6 @@ if any(strcmp('skipped_feedback',statesThisTrial))
 end
 if any(strncmp('water_',statesThisTrial,6))
     BpodSystem.Data.Custom.Rewarded(iTrial) = true;
-    if BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 1
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = BpodSystem.Data.Custom.FeedbackTimeL(iTrial)/(BpodSystem.Data.Custom.FeedbackTimeL(iTrial)+BpodSystem.Data.Custom.FeedbackTimeR(iTrial));
-    elseif BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 0
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = BpodSystem.Data.Custom.FeedbackTimeR(iTrial)/(BpodSystem.Data.Custom.FeedbackTimeL(iTrial)+BpodSystem.Data.Custom.FeedbackTimeR(iTrial));
-    end
-        
 end
 
 %debug --> GUI only updates every other isnan(ChoiceLeft)? Checks for nans

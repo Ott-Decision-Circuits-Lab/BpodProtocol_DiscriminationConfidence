@@ -85,7 +85,7 @@ switch Action
         AxesHandles.HandleVevaiometric.YLim = [0 10];
         AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
         AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
-        AxesHandles.HandleVevaiometric.YLabel.String = 'IR%';
+        AxesHandles.HandleVevaiometric.YLabel.String = 'WT (s)';
         AxesHandles.HandleVevaiometric.Title.String = 'Vevaiometric';
         %% Trial rate
         hold(AxesHandles.HandleTrialRate,'on')

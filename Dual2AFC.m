@@ -323,7 +323,10 @@ BpodSystem.Data.Custom.ErrorLoopTrial(1) = 0;
 BpodSystem.Data.Custom.ChoiceLeft = [];
 BpodSystem.Data.Custom.ChoiceCorrect = [];
 BpodSystem.Data.Custom.Feedback = false(0);
-BpodSystem.Data.Custom.FeedbackTime = [];
+BpodSystem.Data.Custom.FeedbackTimeL = [];
+BpodSystem.Data.Custom.FeedbackTimeR = [];
+BpodSystem.Data.Custom.InvestmentRatio=[];
+
 BpodSystem.Data.Custom.FixBroke = false(0);
 BpodSystem.Data.Custom.EarlyWithdrawal = false(0);
 BpodSystem.Data.Custom.FixDur = [];
@@ -343,6 +346,11 @@ BpodSystem.Data.Custom.AuditoryTrial = rand(1,2) < TaskParameters.GUI.PercentAud
 BpodSystem.Data.Custom.ClickTask = true(1,2) & TaskParameters.GUI.AuditoryStimulusType == 1;
 BpodSystem.Data.Custom.OlfactometerStartup = false;
 BpodSystem.Data.Custom.PsychtoolboxStartup = false;
+
+%Feedback Data left vs right
+BpodSystem.Data.Custom.TimeInCorrect = [];
+BpodSystem.Data.Custom.TimeInIncorrect = [];
+
 
 %housekeeping
 BpodSystem.Data.Custom.RewardBase=round(TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)]);
