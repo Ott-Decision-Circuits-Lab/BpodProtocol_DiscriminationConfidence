@@ -50,32 +50,27 @@ if any(strcmp('rewarded_Lin',statesThisTrial))
     %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 1;
     FeedbackPortTimesL = BpodSystem.Data.RawEvents.Trial{end}.States.rewarded_Lin;
     FeedbackTimeL = sum(FeedbackPortTimesL(:,2)-FeedbackPortTimesL(:,1));
-    %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end)
-end
-if any(strcmp('rewarded_Rin',statesThisTrial))
+    %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+elseif any(strcmp('rewarded_Rin',statesThisTrial))
     %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
     %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 1;
     FeedbackPortTimesR = BpodSystem.Data.RawEvents.Trial{end}.States.rewarded_Rin;
     FeedbackTimeR = sum(FeedbackPortTimesR(:,2)-FeedbackPortTimesR(:,1));
     %BpodSystem.Data.Custom.FeedbackTimeR(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
     %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
-end
-if any(strcmp('unrewarded_Lin',statesThisTrial))
+elseif any(strcmp('unrewarded_Lin',statesThisTrial))
     %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 1;
     %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
     FeedbackPortTimesL = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Lin;
     FeedbackTimeL_unRe = sum(FeedbackPortTimesL(:,2)-FeedbackPortTimesL(:,1));
     %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
-end
-if any(strcmp('unrewarded_Rin',statesThisTrial))
+elseif any(strcmp('unrewarded_Rin',statesThisTrial))
     %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
     %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
     FeedbackPortTimesR = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Rin;
     FeedbackTimeR_unRe = sum(FeedbackPortTimesR(:,2)-FeedbackPortTimesR(:,1));
     %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
-end
-
-if any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
+elseif any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
     
 %     TaskParameters.GUI.BlockTable.BlockLenR(TaskParameters.GUI.BlockTable.BlockNumberR...
@@ -112,7 +107,7 @@ end
 
 BpodSystem.Data.Custom.FeedbackTimeR(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe;
 BpodSystem.Data.Custom.FeedbackTimeL(iTrial)=FeedbackTimeL+FeedbackTimeL_unRe;
-BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe;
+BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial)=BpodSystem.Data.Custom.FeedbackTimeL(iTrial)+BpodSystem.Data.Custom.FeedbackTimeR(iTrial);
 
 
 
@@ -132,9 +127,9 @@ end
 if any(strncmp('water_',statesThisTrial,6))
     BpodSystem.Data.Custom.Rewarded(iTrial) = true;
     if BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 1
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = (FeedbackTimeL+FeedbackTimeL_unRe)/(FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe);
+        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = 
     elseif BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 0
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = (FeedbackTimeR+FeedbackTimeR_unRe)/(FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe);
+        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = BpodSystem.Data.Custom.FeedbackTimeR(end)/(BpodSystem.Data.Custom.FeedbackTimeL(end)+BpodSystem.Data.Custom.FeedbackTimeR(end))
     end
         
 end

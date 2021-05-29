@@ -325,6 +325,7 @@ BpodSystem.Data.Custom.ChoiceCorrect = [];
 BpodSystem.Data.Custom.Feedback = false(0);
 BpodSystem.Data.Custom.FeedbackTimeL = [];
 BpodSystem.Data.Custom.FeedbackTimeR = [];
+BpodSystem.Data.Custom.FeedbackTimeTotal=[];
 BpodSystem.Data.Custom.InvestmentRatio=[];
 
 BpodSystem.Data.Custom.FixBroke = false(0);

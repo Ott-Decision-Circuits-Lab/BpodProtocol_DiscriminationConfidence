@@ -348,7 +348,7 @@ switch Action
         if TaskParameters.GUI.ShowVevaiometric
             ndxError = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 0 ; %all (completed) error trials (including catch errors)
             ndxCorrectCatch = BpodSystem.Data.Custom.CatchTrial(1:iTrial) & BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 1; %only correct catch trials
-            ndxMinWT = BpodSystem.Data.Custom.FeedbackTime > TaskParameters.GUI.VevaiometricMinWT;
+            ndxMinWT = (BpodSystem.Data.Custom.FeedbackTimeL > TaskParameters.GUI.VevaiometricMinWT) | (BpodSystem.Data.Custom.FeedbackTimeR > TaskParameters.GUI.VevaiometricMinWT);
             DV = BpodSystem.Data.Custom.DV(1:iTrial);
             DVNBin = TaskParameters.GUI.VevaiometricNBin;
             BinIdx = discretize(DV,linspace(-1,1,DVNBin+1));
@@ -413,18 +413,18 @@ switch Action
             else
                 ndxExclude = false(1,iTrial);
             end
-            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(~BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude)*1000);
+            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTimeTotal(~BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.BinWidth = 100;
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeColor = 'none';
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = 'r';
             %BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
-            BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTime(BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude)*1000);
+            BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,BpodSystem.Data.Custom.FeedbackTimeTotal(BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistFeed.BinWidth = 50;
             BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = 'none';
             BpodSystem.GUIHandles.OutcomePlot.HistFeed.FaceColor = 'b';
             %BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
-            LeftSkip = sum(~BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==1)/sum(~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==1);
-            RightSkip = sum(~BpodSystem.Data.Custom.Feedback(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==0)/sum(~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==0);
+            LeftSkip = sum(~BpodSystem.Data.Custom.FeedbackTimeTotal(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==1)/sum(~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==1);
+            RightSkip = sum(~BpodSystem.Data.Custom.FeedbackTimeTotal(1:iTrial)&~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==0)/sum(~BpodSystem.Data.Custom.CatchTrial(1:iTrial)&~ndxExclude&BpodSystem.Data.Custom.ChoiceLeft(1:iTrial)==0);
             cornertext(AxesHandles.HandleFeedback,{sprintf('L=%1.2f',LeftSkip),sprintf('R=%1.2f',RightSkip)})
         end
 end
