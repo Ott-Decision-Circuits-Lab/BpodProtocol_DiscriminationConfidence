@@ -348,7 +348,7 @@ switch Action
         if TaskParameters.GUI.ShowVevaiometric
             ndxError = BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 0 ; %all (completed) error trials (including catch errors)
             ndxCorrectCatch = BpodSystem.Data.Custom.CatchTrial(1:iTrial) & BpodSystem.Data.Custom.ChoiceCorrect(1:iTrial) == 1; %only correct catch trials
-            ndxMinWT = (BpodSystem.Data.Custom.FeedbackTimeL > TaskParameters.GUI.VevaiometricMinWT) | (BpodSystem.Data.Custom.FeedbackTimeR > TaskParameters.GUI.VevaiometricMinWT);
+            ndxMinWT = (BpodSystem.Data.Custom.FeedbackTimeL  > TaskParameters.GUI.VevaiometricMinWT) | (BpodSystem.Data.Custom.FeedbackTimeR > TaskParameters.GUI.VevaiometricMinWT);
             DV = BpodSystem.Data.Custom.DV(1:iTrial);
             DVNBin = TaskParameters.GUI.VevaiometricNBin;
             BinIdx = discretize(DV,linspace(-1,1,DVNBin+1));
