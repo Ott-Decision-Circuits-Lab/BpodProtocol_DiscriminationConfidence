@@ -13,7 +13,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MaxSessionTime = 200;
     TaskParameters.GUI.CenterWaitMax = 200000; 
     TaskParameters.GUI.ITI = 1; 
-    TaskParameters.GUI.PreITI = 0.3; 
+    TaskParameters.GUI.PreITI = 0.3;
 
     TaskParameters.GUI.DrinkingTime = .5;
     TaskParameters.GUI.DrinkingGrace = 0.3;
@@ -45,6 +45,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'CenterGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'ErrorLoopDiffBoundary', 'ErrorLoopReplace','Ports_LMR','PortLEDs'};
     %% Reward&BlockGeneral
     TaskParameters.GUI.RewardAmount = 25; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.BetReward=5;
     TaskParameters.GUI.RewardMin=6;
     TaskParameters.GUI.RewardMax=38;
     TaskParameters.GUI.BlockMean=2000;
@@ -77,6 +78,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelayTau = 0.05;
     TaskParameters.GUI.FeedbackDelayGrace = 0;
+    TaskParameters.GUI.SwitchDelayGrace = 0;
+
     TaskParameters.GUI.IncorrectChoiceFeedbackType = 1;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.String = {'None','Tone','PortLED'};
