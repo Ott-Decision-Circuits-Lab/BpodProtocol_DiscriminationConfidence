@@ -77,8 +77,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelayTau = 0.05;
-    TaskParameters.GUI.FeedbackDelayGrace = 0;
-    TaskParameters.GUI.SwitchDelayGrace = 0;
+    TaskParameters.GUI.FeedbackDelayGrace = 0.2;
+    TaskParameters.GUI.switchGrace = 3;
 
     TaskParameters.GUI.IncorrectChoiceFeedbackType = 1;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
