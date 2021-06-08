@@ -70,7 +70,7 @@ if isempty(fieldnames(TaskParameters))
     %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelaySelection = 1;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
-    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp','Uniform'};
+    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp'};
     TaskParameters.GUI.FeedbackDelayMin = 0.01;
     TaskParameters.GUI.FeedbackDelayMax = 0.1;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
