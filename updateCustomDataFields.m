@@ -316,6 +316,8 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
         %         TaskParameters.GUIMeta.FeedbackDelay.Style = 'edit';
         %     end
         TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMax;
+    case 'Uniform'
+        TaskParameters.GUI.FeedbackDelay = round(unifrnd(TaskParameters.GUI.FeedbackDelayMin,TaskParameters.GUI.FeedbackDelayMax),1);
 end
 
 %% Drawing future trials
