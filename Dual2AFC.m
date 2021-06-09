@@ -71,15 +71,16 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelaySelection = 1;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp','Uniform'};
-    TaskParameters.GUI.FeedbackDelayMin = 0.01;
-    TaskParameters.GUI.FeedbackDelayMax = 0.1;
+    TaskParameters.GUI.FeedbackDelayMin = 0.6;
+    TaskParameters.GUI.FeedbackDelayMax = 4;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
-    TaskParameters.GUI.FeedbackDelayTau = 0.05;
-    TaskParameters.GUI.FeedbackDelayGrace = 0;
-    TaskParameters.GUI.SwitchTimer = 5;
-    TaskParameters.GUI.SwitchImmediateReward.style='checkbox';
-    TaskParameters.GUI.SwitchImmediateReward = 1;
+    TaskParameters.GUI.FeedbackDelayTau = 1;
+    TaskParameters.GUI.FeedbackDelayGrace = 0.5;
+    TaskParameters.GUI.SwitchTimer = 10;
+    TaskParameters.GUI.SwitchImmediateReward = true;
+    TaskParameters.GUIMeta.SwitchImmediateReward.Style='checkbox';
+
     TaskParameters.GUI.IncorrectChoiceFeedbackType = 1;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.String = {'None','Tone','PortLED'};
