@@ -70,7 +70,7 @@ if isempty(fieldnames(TaskParameters))
     %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelaySelection = 1;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
-    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp','Uniform'};
+    TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'TruncExp','Fix','AutoIncr','Uniform'};
     TaskParameters.GUI.FeedbackDelayMin = 0.6;
     TaskParameters.GUI.FeedbackDelayMax = 4;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
@@ -80,7 +80,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.SwitchTimer = 10;
     TaskParameters.GUI.SwitchImmediateReward = true;
     TaskParameters.GUIMeta.SwitchImmediateReward.Style='checkbox';
-
+    
+    TaskParameters.GUI.HoldForError = true;
+    TaskParameters.GUIMeta.HoldForError.Style='checkbox';
     TaskParameters.GUI.IncorrectChoiceFeedbackType = 1;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.String = {'None','Tone','PortLED'};
@@ -89,7 +91,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.String = {'None','Tone','PortLED'};
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
-    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelayGrace','FeedbackDelay', 'SwitchTimer','SwitchImmediateReward','IncorrectChoiceFeedbackType','SkippedFeedbackFeedbackType'};
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelayGrace','FeedbackDelay', 'SwitchTimer','SwitchImmediateReward','HoldForError','IncorrectChoiceFeedbackType','SkippedFeedbackFeedbackType'};
     %% OdorParams
     TaskParameters.GUI.OdorA_bank = 3;
     TaskParameters.GUI.OdorB_bank = 4;
