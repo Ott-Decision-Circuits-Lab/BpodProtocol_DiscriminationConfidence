@@ -4,6 +4,7 @@ global TaskParameters
 
 %% Standard values
 BpodSystem.Data.Custom.ChoiceLeft(iTrial) = NaN;
+BpodSystem.Data.Custom.ChoiceSwitch(iTrial) = NaN;
 BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = NaN;
 BpodSystem.Data.Custom.Feedback(iTrial) = true;
 BpodSystem.Data.Custom.FeedbackTimeL(iTrial) = NaN;
@@ -27,6 +28,16 @@ if any(strcmp('stay_Cin',statesThisTrial))
     catch
     end
 end
+
+
+
+if any(strcmp('Switch',statesThisTrial))
+    BpodSystem.Data.Custom.SwitchChoice(iTrial) = 1;
+else
+    BpodSystem.Data.Custom.SwitchChoice(iTrial) = 0;
+end
+
+
 if any(strcmp('stimulus_delivery_min',statesThisTrial))
     try
     if any(strcmp('stimulus_delivery',statesThisTrial))

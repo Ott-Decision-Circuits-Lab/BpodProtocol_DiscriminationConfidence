@@ -87,12 +87,12 @@ switch Action
         AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
         AxesHandles.HandleVevaiometric.YLabel.String = 'IR%';
         AxesHandles.HandleVevaiometric.Title.String = 'Vevaiometric';
-        %% Trial rate
+        %% SwitchedTrials
         hold(AxesHandles.HandleTrialRate,'on')
-        BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k','Visible','off'); %#ok<NBRAK>
-        AxesHandles.HandleTrialRate.XLabel.String = 'Time (min)'; % FIGURE OUT UNIT
-        AxesHandles.HandleTrialRate.YLabel.String = 'nTrials';
-        AxesHandles.HandleTrialRate.Title.String = 'Trial rate';
+        %BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k','Visible','off'); %#ok<NBRAK>
+        AxesHandles.HandleTrialRate.XLabel.String = {'Correct','Incorrect'}; % FIGURE OUT UNIT
+        AxesHandles.HandleTrialRate.YLabel.String = 'switch %';
+        AxesHandles.HandleTrialRate.Title.String = 'Trial Switch';
         %% Stimulus delay
         hold(AxesHandles.HandleFix,'on')
         AxesHandles.HandleFix.XLabel.String = 'Time (ms)';
@@ -372,10 +372,18 @@ switch Action
                 BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch.XData = 0;
             end
         end
-        %% Trial rate
+        %% Trial rate (changed to switch trials SR) 
+        
+        cla(AxesHandles.TrialRate)
+        
         if TaskParameters.GUI.ShowTrialRate
-            BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = (BpodSystem.Data.TrialStartTimestamp-min(BpodSystem.Data.TrialStartTimestamp))/60;
-            BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = 1:numel(BpodSystem.Data.Custom.ChoiceLeft);
+            switchCorrect=sum(BpodSystem.Data.Custom.ChoiceSwitch & BpodSystem.Data.Custom.ChoiceCorrect);
+            switchInCorrect=sum(BpodSystem.Data.Custom.ChoiceSwitch & ~BpodSystem.Data.Custom.ChoiceCorrect);
+            
+            BpodSystem.GUIHandles.TrialRate.bar = bar([switchCorrect, switchInCorrect]);
+            
+            SwitchP=(switchCorrect+switchInCorrect)/length(BpodSystem.Data.Custom.ChoiceCorrect);
+            cornertext(AxesHandles.TrialRate,sprintf('P=%1.2f',SwitchP));
         end
         if TaskParameters.GUI.ShowFix
             %% Stimulus delay

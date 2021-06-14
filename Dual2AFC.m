@@ -328,6 +328,7 @@ BpodSystem.Data.Custom.BlockTrialR(1) = 1;
 BpodSystem.Data.Custom.ErrorLoopTrial(1) = 0;
 BpodSystem.Data.Custom.ChoiceLeft = [];
 BpodSystem.Data.Custom.ChoiceCorrect = [];
+BpodSystem.Data.Custom.ChoiceSwitch=[];
 BpodSystem.Data.Custom.Feedback = false(0);
 BpodSystem.Data.Custom.FeedbackTimeL = [];
 BpodSystem.Data.Custom.FeedbackTimeR = [];
