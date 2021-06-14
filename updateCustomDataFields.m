@@ -31,8 +31,16 @@ end
 
 
 
-if any(strcmp('Switch',statesThisTrial))
+if any(strcmp('RightCorrectSwitch',statesThisTrial))
     BpodSystem.Data.Custom.SwitchChoice(iTrial) = 1;
+elseif any(strcmp('RightIncorrectSwitch',statesThisTrial))
+    BpodSystem.Data.Custom.SwitchChoice(iTrial) = 1;
+elseif any(strcmp('LeftCorrectSwitch',statesThisTrial))
+    BpodSystem.Data.Custom.SwitchChoice(iTrial) = 1;
+
+elseif any(strcmp('LeftIncorrectSwitch',statesThisTrial))
+    BpodSystem.Data.Custom.SwitchChoice(iTrial) = 1;
+
 else
     BpodSystem.Data.Custom.SwitchChoice(iTrial) = 0;
 end
@@ -86,6 +94,40 @@ if any(strcmp('unrewarded_Rin',statesThisTrial))
     %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 end
 
+
+FeedbackTimeL_LSwitch=0;
+FeedbackTimeR_RSwitch=0;
+if any(strcmp('RightCorrectSwitch',statesThisTrial))
+    %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
+    %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
+    FeedbackPortTimesRSwitch = BpodSystem.Data.RawEvents.Trial{end}.States.RightCorrectSwitch;
+    FeedbackTimeR_RSwitch = sum(FeedbackPortTimesRSwitch(:,2)-FeedbackPortTimesRSwitch(:,1));
+    %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+elseif any(strcmp('RightIncorrectSwitch',statesThisTrial))
+    %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
+    %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
+    FeedbackPortTimesRSwitch = BpodSystem.Data.RawEvents.Trial{end}.States.RightIncorrectSwitch;
+    FeedbackTimeR_RSwitch = sum(FeedbackPortTimesRSwitch(:,2)-FeedbackPortTimesRSwitch(:,1));
+    %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+  
+end
+
+if any(strcmp('LeftCorrectSwitch',statesThisTrial))
+    %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
+    %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
+    FeedbackPortTimesLSwitch = BpodSystem.Data.RawEvents.Trial{end}.States.LeftCorrectSwitch;
+    FeedbackTimeL_LSwitch = sum(FeedbackPortTimesLSwitch(:,2)-FeedbackPortTimesLSwitch(:,1));
+    %BpodSystem.Data.Cusom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+elseif any(strcmp('LeftIncorrectSwitch',statesThisTrial))
+    %BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
+    %BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
+    FeedbackPortTimesLSwitch = BpodSystem.Data.RawEvents.Trial{end}.States.LeftIncorrectSwitch;
+    FeedbackTimeL_LSwitch = sum(FeedbackPortTimesLSwitch(:,2)-FeedbackPortTimesLSwitch(:,1));
+    %BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+  
+end
+
+
 if any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
     BpodSystem.Data.Custom.FixBroke(iTrial) = true;
     
@@ -121,11 +163,18 @@ elseif any(strcmp('timeOut_IncorrectChoiceR',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
 end 
 
-BpodSystem.Data.Custom.FeedbackTimeR(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe;
-BpodSystem.Data.Custom.FeedbackTimeL(iTrial)=FeedbackTimeL+FeedbackTimeL_unRe;
-BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe;
+BpodSystem.Data.Custom.FeedbackTimeR(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeR_RSwitch;
+BpodSystem.Data.Custom.FeedbackTimeL(iTrial)=FeedbackTimeL+FeedbackTimeL_unRe+FeedbackTimeL_LSwitch;
+BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial)=FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe+FeedbackTimeL_LSwitch+FeedbackTimeR_RSwitch;
 
+if BpodSystem.Data.Custom.ChoiceLeft(iTrial) ==1
+     BpodSystem.Data.Custom.InvestmentRatio(iTrial)=BpodSystem.Data.Custom.FeedbackTimeL(iTrial)/BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial);
 
+elseif BpodSystem.Data.Custom.ChoiceLeft(iTrial) ==0
+     BpodSystem.Data.Custom.InvestmentRatio(iTrial)=BpodSystem.Data.Custom.FeedbackTimeR(iTrial)/BpodSystem.Data.Custom.FeedbackTimeTotal(iTrial);
+end
+
+    
 
 if any(strcmp('missed_choice',statesThisTrial)) % if missed choice, add a trial to the block
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
@@ -141,13 +190,7 @@ if any(strcmp('skipped_feedback',statesThisTrial))
     BpodSystem.Data.Custom.Feedback(iTrial) = false;
 end
 if any(strncmp('water_',statesThisTrial,6))
-    BpodSystem.Data.Custom.Rewarded(iTrial) = true;
-    if BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 1
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = (FeedbackTimeL+FeedbackTimeL_unRe)/(FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe);
-    elseif BpodSystem.Data.Custom.ChoiceLeft(iTrial) == 0
-        BpodSystem.Data.Custom.InvestmentRatio(iTrial) = (FeedbackTimeR+FeedbackTimeR_unRe)/(FeedbackTimeR+FeedbackTimeR_unRe+FeedbackTimeL+FeedbackTimeL_unRe);
-    end
-        
+    BpodSystem.Data.Custom.Rewarded(iTrial) = true;        
 end
 
 %debug --> GUI only updates every other isnan(ChoiceLeft)? Checks for nans
