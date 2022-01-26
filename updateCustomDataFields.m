@@ -5,6 +5,8 @@ global TaskParameters
 %% Standard values
 BpodSystem.Data.Custom.ChoiceLeft(iTrial) = NaN;
 BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = NaN;
+BpodSystem.Data.Custom.ChoiceSwitch(iTrial) = NaN;
+BpodSystem.Data.Custom.SwitchBaited(iTrial) = NaN;
 BpodSystem.Data.Custom.Feedback(iTrial) = true;
 BpodSystem.Data.Custom.FeedbackTime(iTrial) = NaN;
 BpodSystem.Data.Custom.FixBroke(iTrial) = false;
@@ -59,6 +61,20 @@ elseif any(strcmp('unrewarded_Rin',statesThisTrial))
     BpodSystem.Data.Custom.ChoiceLeft(iTrial) = 0;
     BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = 0;
     FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Rin;
+    BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+elseif any(strcmp('unrewarded_Sin',statesThisTrial))
+    BpodSystem.Data.Custom.ChoiceSwitch(iTrial) =1;
+    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = NaN;
+    BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = NaN;
+    FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.unrewarded_Sin;
+    BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
+    BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
+elseif any(strcmp('rewarded_Sin',statesThisTrial))
+    BpodSystem.Data.Custom.ChoiceSwitch(iTrial) =1;
+    BpodSystem.Data.Custom.ChoiceLeft(iTrial) = NaN;
+    BpodSystem.Data.Custom.ChoiceCorrect(iTrial) = NaN;
+    FeedbackPortTimes = BpodSystem.Data.RawEvents.Trial{end}.States.rewarded_Sin;
     BpodSystem.Data.Custom.FeedbackTime(iTrial) = FeedbackPortTimes(end,end)-FeedbackPortTimes(1,1);
     BpodSystem.Data.Custom.ResolutionTime(iTrial)  = FeedbackPortTimes(end,end);
 elseif any(strcmp('broke_fixation',statesThisTrial)) % if broke fixation, add a trial to the block
@@ -187,6 +203,12 @@ elseif TaskParameters.GUI.RewardDrift == true
     end
     
     BpodSystem.Data.Custom.RewardMagnitude(iTrial+1,:) = RewardMag;
+    if TaskParameters.GUI.SwitchRewardAmount > mean(BpodSystem.Data.Custom.RewardBase(iTrial+1,:))
+        BpodSystem.Data.Custom.SwitchBaited(iTrial+1)=1;
+    else
+        BpodSystem.Data.Custom.SwitchBaited(iTrial+1)=0;
+    end
+    
     BpodSystem.Data.Custom.RichLeft(iTrial+1)=RewardMag(1) > RewardMag(2);
     BpodSystem.Data.Custom.RichRight(iTrial+1) = RewardMag(2) > RewardMag(1);
     BpodSystem.Data.Custom.RichEqual(iTrial+1)= RewardMag(1) == RewardMag(2); 
@@ -277,6 +299,9 @@ switch TaskParameters.GUIMeta.FeedbackDelaySelection.String{TaskParameters.GUI.F
 end
 
 %% Drawing future trials
+
+%determine if switch trial is baited
+
 
 %determine if catch trial
 if iTrial > TaskParameters.GUI.StartEasyTrials

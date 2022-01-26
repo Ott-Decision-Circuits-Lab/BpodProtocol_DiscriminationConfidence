@@ -40,14 +40,16 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ErrorLoopDiffBoundary = 0.15;  %boundary for omega difficulty that repeats
     TaskParameters.GUI.ErrorLoopReplace = 2; %preallocated trials
     TaskParameters.GUI.Ports_LMR = 123;
+    TaskParameters.GUI.Ports_Switch = 4;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
     TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','DrinkingTime','DrinkingGrace', 'CenterGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','AuditoryDiscretize','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','ErrorLoop','ErrorLoopRate', 'ErrorLoopDiffBoundary', 'ErrorLoopReplace','Ports_LMR','PortLEDs'};
     %% Reward&BlockGeneral
     TaskParameters.GUI.RewardAmount = 25; %low reward amount, high reward amount hardcoded as x1.66
+    TaskParameters.GUI.SwitchRewardAmount = 25; 
     TaskParameters.GUI.RewardMin=6;
     TaskParameters.GUI.RewardMax=38;
-    TaskParameters.GUI.BlockMean=2000;
+    TaskParameters.GUI.BlockMean=150;
     TaskParameters.GUI.BlockNoise=0; %noise re: block length
     TaskParameters.GUIPanels.Reward = {'RewardAmount','RewardMin', 'RewardMax', 'BlockMean','BlockNoise'};
     
