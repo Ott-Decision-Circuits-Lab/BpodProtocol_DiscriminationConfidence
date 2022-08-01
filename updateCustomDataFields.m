@@ -417,7 +417,9 @@ TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.Parame
 if ~TaskParameters.GUI.LaserSoftCode
     %laser via programm pulsepal (without custom train via softvode)
     BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(BpodSystem.Data.Custom.PulsePalParamStimulus);
-    ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+    if ~BpodSystem.EmulatorMode
+        ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+    end
 end
 
 % send auditory stimuli to PulsePal for next trial
