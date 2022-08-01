@@ -277,7 +277,7 @@ switch Action
                     if iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
-                        if sum(ndxAud&~ndxNan&ndxBlock) > 1
+                        if sum(ndxAud&~ndxNan&ndxBlock) > 5
                             BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
                             BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ndxAud&~ndxNan&ndxBlock),...
                                 BpodSystem.Data.Custom.ChoiceLeft(ndxAud&~ndxNan&ndxBlock)','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
