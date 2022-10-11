@@ -1,26 +1,38 @@
-function ClickTimes = GeneratePoissonClickTrain(ClickRate, Duration)
-% ClickTimes = click time points in us
+function ClickTrain = GeneratePoissonClickTrain(ClickRate, Duration, SamplingRate, ClickLength)
+% ClickTrain = a vector of relative amplitude of a click train
 % ClickRate = mean click rate in Hz
 % Duration = click train duration in seconds
+% SamplingRate = sampling rate of the analogue module, in Hz
+% ClickLength = how many frame does a click occupy
 
-SamplingRate = 1000000;
-nSamples = Duration*SamplingRate;
-ExponentialMean = round((1/ClickRate)*SamplingRate); % Calculates mean of exponential distribution
-InvertedMean = ExponentialMean*-1;
-PreallocateSize = round(ClickRate*Duration*2);
-ClickTimes = zeros(1,PreallocateSize);
-Pos = 0;
-Time = 0;
-Building = 1;
-while Building == 1
-    Pos = Pos + 1;
-    Interval = InvertedMean*log(rand)+100; % +100 ensures no duplicate timestamps at PulsePal resolution of 100us
-    Time = Time + Interval;
-    if Time > nSamples
-        Building = 0;
-    else
-        ClickTimes(Pos) = Time;
-    end
+
+if nargin<4
+    ClickLength = 1;
 end
-ClickTimes = ClickTimes(1:Pos-1); % Trim click train preallocation to length
-ClickTimes = round(ClickTimes/100)/10000; % Make clicks multiples of 100us - necessary for pulse time programming
+if nargin<3
+    SamplingRate = 25000; % in Hz
+end
+if nargin<2
+    Duration = 1; % in seconds
+end
+
+nSamples = Duration*SamplingRate;
+ClickTime = zeros(1,round(ClickRate*Duration*2)); % in sampling frame scale
+
+N = 1;
+ClickTime(N) = round(-log(rand)*SamplingRate/ClickRate);
+
+while ClickTime(N) < SamplingRate*Duration
+    N = N+1;
+    next_t_in = 0;
+    while next_t_in <= ClickLength % check if time-interval for next click is smaller than click length
+        next_t_in = round(-log(rand)*SamplingRate/ClickRate);
+    end
+    ClickTime(N) = ClickTime(N-1) + next_t_in;
+end
+ClickTime = ClickTime(1:N-1); % Remove unallocate slots
+
+ClickTrain = zeros(1, SamplingRate*Duration);
+for i = 1:ClickLength
+    ClickTrain(ClickTime + i-1) = 1;
+end
