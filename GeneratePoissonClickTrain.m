@@ -16,7 +16,6 @@ if nargin<2
     Duration = 1; % in seconds
 end
 
-nSamples = Duration*SamplingRate;
 ClickTime = zeros(1,round(ClickRate*Duration*2)); % in sampling frame scale
 
 N = 1;
@@ -35,4 +34,8 @@ ClickTime = ClickTime(1:N-1); % Remove unallocate slots
 ClickTrain = zeros(1, SamplingRate*Duration);
 for i = 1:ClickLength
     ClickTrain(ClickTime + i-1) = 1;
+end
+
+% make a "starting" click to indicate the start of stimuli
+ClickTrain(1:ClickLength) = 1;
 end

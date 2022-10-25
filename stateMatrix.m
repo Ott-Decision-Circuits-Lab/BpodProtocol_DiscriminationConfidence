@@ -17,8 +17,8 @@ RightPortIn = strcat('Port',num2str(RightPort),'In');
 LeftValve = 2^(LeftPort-1);
 RightValve = 2^(RightPort-1);
 
-LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,1), LeftPort);
-RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.RewardMagnitude(iTrial,2), RightPort);
+LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitude(iTrial,1), LeftPort);
+RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitude(iTrial,2), RightPort);
 
 %port LEDs
 if TaskParameters.GUI.PortLEDs
@@ -27,10 +27,10 @@ else
     PortLEDs = 0;
 end
 
-if BpodSystem.Data.Custom.AuditoryTrial(iTrial) %auditory trial
-    LeftRewarded = BpodSystem.Data.Custom.LeftRewarded(iTrial);
+if BpodSystem.Data.Custom.TrialData.AuditoryTrial(iTrial) %auditory trial
+    LeftRewarded = BpodSystem.Data.Custom.TrialData.LeftRewarded(iTrial);
 else %olfactory trial
-    LeftRewarded = BpodSystem.Data.Custom.OdorID(iTrial) == 1;
+    LeftRewarded = BpodSystem.Data.Custom.TrialData.OdorID(iTrial) == 1;
 end
 
 if LeftRewarded == 1
@@ -43,7 +43,7 @@ else
     error('Bpod:Olf2AFC:unknownStim','Undefined stimulus');
 end
 
-if BpodSystem.Data.Custom.CatchTrial(iTrial)
+if BpodSystem.Data.Custom.TrialData.CatchTrial(iTrial)
     FeedbackDelayCorrect = 20;
 else
     FeedbackDelayCorrect = TaskParameters.GUI.FeedbackDelay;
@@ -63,7 +63,7 @@ if TaskParameters.GUI.Wire1VideoTrigger % video
     switch TaskParameters.GUI.VideoTrials
         case 1 %only catch & error
             Wire1OutError =	{'WireState', 1};
-            if BpodSystem.Data.Custom.CatchTrial(iTrial)
+            if BpodSystem.Data.Custom.TrialData.CatchTrial(iTrial)
                 Wire1OutCorrect =	{'WireState', 1};
             else
                 Wire1OutCorrect =	{};
@@ -85,7 +85,7 @@ BNC2OutReward = 0;
 BNC2OutFB = 0;
 BNC2OutITI = 0;
 BNC2OutWaitC=0;
-if  BpodSystem.Data.Custom.LaserTrial(iTrial) %laser trial. BNC2 to high (1 still low).
+if  BpodSystem.Data.Custom.TrialData.LaserTrial(iTrial) %laser trial. BNC2 to high (1 still low).
     if TaskParameters.GUI.LaserTimeInvestment
     BNC2OutWT = 2;%waiting time states
     end
@@ -109,7 +109,7 @@ if  BpodSystem.Data.Custom.LaserTrial(iTrial) %laser trial. BNC2 to high (1 stil
     end
 end
 
-if  BpodSystem.Data.Custom.LaserTrial(max([1,iTrial-1]))%last trial was laser trial
+if  BpodSystem.Data.Custom.TrialData.LaserTrial(max([1,iTrial-1]))%last trial was laser trial
     if TaskParameters.GUI.LaserITI
         BNC2OutWaitC = 2; %'iti' (pre center poke enter)
     end
@@ -140,8 +140,8 @@ sma = AddState(sma, 'Name', 'broke_fixation',...
 %     'Timer', 0.1,... % Time for odor to reach nostrils (Junya filtered these trials out offline)
 %     'StateChangeConditions', {CenterPortOut,'ITI','Tup','odor_delivery'},...
 %     'OutputActions', {'SoftCode',BpodSystem.Data.Custom.OdorPair(iTrial)});
-if BpodSystem.Data.Custom.AuditoryTrial(iTrial)
-    if BpodSystem.Data.Custom.ClickTask(iTrial)
+if BpodSystem.Data.Custom.TrialData.AuditoryTrial(iTrial)
+    if BpodSystem.Data.Custom.TrialData.ClickTask(iTrial)
         sma = AddState(sma, 'Name', 'stay_Cin',...
             'Timer', TaskParameters.GUI.StimDelay,...
             'StateChangeConditions', {CenterPortOut,'broke_fixation','Tup', 'stimulus_delivery_min'},...

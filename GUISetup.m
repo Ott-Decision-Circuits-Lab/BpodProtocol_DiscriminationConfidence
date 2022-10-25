@@ -1,14 +1,12 @@
 function TaskParameters = GUISetup()
-
 global BpodSystem
-global TaskParameters
-
-
 
 %% Task parameters
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
+    TaskParameters.GUI.SessionDescription = 'abc';
+    TaskParameters.GUIMeta.SessionDescription.Style = 'edittext';
     TaskParameters.GUI.ITI = 1; 
     TaskParameters.GUI.PreITI = 0; 
     TaskParameters.GUI.CenterWaitMax = 20; 
@@ -30,12 +28,20 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'MaxSessionTime','CenterWaitMax','ITI','PreITI','RewardAmount','DrinkingTime','DrinkingGrace','ChoiceDeadLine','TimeOutIncorrectChoice','TimeOutBrokeFixation','TimeOutEarlyWithdrawal','TimeOutSkippedFeedback','PercentAuditory','StartEasyTrials','Percent50Fifty','PercentCatch','CatchError','Ports_LMR','PortLEDs'};
+    TaskParameters.GUIPanels.General = {'SessionDescription','MaxSessionTime','CenterWaitMax','ITI',...
+                                        'PreITI','RewardAmount','DrinkingTime','DrinkingGrace',...
+                                        'ChoiceDeadLine','TimeOutIncorrectChoice',...
+                                        'TimeOutBrokeFixation','TimeOutEarlyWithdrawal',...
+                                        'TimeOutSkippedFeedback','PercentAuditory',...
+                                        'StartEasyTrials','Percent50Fifty','PercentCatch',...
+                                        'CatchError','Ports_LMR','PortLEDs'};
+    
     %% BiasControl
     TaskParameters.GUI.TrialSelection = 3;
     TaskParameters.GUIMeta.TrialSelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.TrialSelection.String = {'Flat','Manual','BiasCorrecting','Competitive'};
     TaskParameters.GUIPanels.BiasControl = {'TrialSelection'};
+    
     %% StimDelay
     TaskParameters.GUI.StimDelayAutoincrement = 0;
     TaskParameters.GUIMeta.StimDelayAutoincrement.Style = 'checkbox';
@@ -46,7 +52,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.StimDelayDecr = 0.01;
     TaskParameters.GUI.StimDelay = TaskParameters.GUI.StimDelayMin;
     TaskParameters.GUIMeta.StimDelay.Style = 'text';
-    TaskParameters.GUIPanels.StimDelay = {'StimDelayAutoincrement','StimDelayMin','StimDelayMax','StimDelayIncr','StimDelayDecr','StimDelay'};
+    TaskParameters.GUIPanels.StimDelay = {'StimDelayAutoincrement','StimDelayMin','StimDelayMax',...
+                                          'StimDelayIncr','StimDelayDecr','StimDelay'};
+    
     %% FeedbackDelay
     TaskParameters.GUI.FeedbackDelaySelection = 1;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
@@ -65,30 +73,40 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.String = {'None','Tone','PortLED'};
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
     TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
-    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin','FeedbackDelayMax','FeedbackDelayIncr','FeedbackDelayDecr','FeedbackDelayTau','FeedbackDelayGrace','FeedbackDelay','IncorrectChoiceFeedbackType','SkippedFeedbackFeedbackType'};
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelaySelection','FeedbackDelayMin',...
+                                              'FeedbackDelayMax','FeedbackDelayIncr',...
+                                              'FeedbackDelayDecr','FeedbackDelayTau',...
+                                              'FeedbackDelayGrace','FeedbackDelay',...
+                                              'IncorrectChoiceFeedbackType',...
+                                              'SkippedFeedbackFeedbackType'};
+    
     %% OdorParams
     TaskParameters.GUI.OdorA_bank = 3;
     TaskParameters.GUI.OdorB_bank = 4;
-    %     TaskParameters.GUI.OdorSettings = 0;
-    %     TaskParameters.GUI.OdorTable.OdorFracA = 50+[-1; 1]*round(logspace(log10(6),log10(90),3)/2);
-    %     TaskParameters.GUI.OdorTable.OdorFracA = sort(TaskParameters.GUI.OdorTable.OdorFracA(:));
+    TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
+    
+%     TaskParameters.GUI.OdorSettings = 0;
+%     TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
+%     TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
+%     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
+    
+    TaskParameters.GUI.OdorTable.OdorFracA = 50+[-1; 1]*round(logspace(log10(6),log10(90),3)/2);
+    TaskParameters.GUI.OdorTable.OdorFracA = sort(TaskParameters.GUI.OdorTable.OdorFracA(:));
     TaskParameters.GUI.OdorTable.OdorFracA = [5, 30, 45, 55, 70, 95]';
     TaskParameters.GUI.OdorTable.OdorProb = ones(size(TaskParameters.GUI.OdorTable.OdorFracA))/numel(TaskParameters.GUI.OdorTable.OdorFracA);
     TaskParameters.GUIMeta.OdorTable.Style = 'table';
     TaskParameters.GUIMeta.OdorTable.String = 'Odor probabilities';
     TaskParameters.GUIMeta.OdorTable.ColumnLabel = {'a = Frac Odor A','P(a)'};
     TaskParameters.GUI.OdorStimulusTimeMin = 0;
-    %     TaskParameters.GUIMeta.OdorSettings.Style = 'pushbutton';
-    %     TaskParameters.GUIMeta.OdorSettings.String = 'Odor settings';
-    %     TaskParameters.GUIMeta.OdorSettings.Callback = @GUIOdorSettings;
-    TaskParameters.GUIPanels.Olfactometer = {'OdorA_bank', 'OdorB_bank'};
     TaskParameters.GUIPanels.OlfStimuli = {'OdorTable','OdorStimulusTimeMin'};
+    
     %% Auditory Params
     %clicks
     TaskParameters.GUI.AuditoryAlpha = 1;
     TaskParameters.GUI.LeftBiasAud = 0.5;
     TaskParameters.GUIMeta.LeftBiasAud.Style = 'text';
     TaskParameters.GUI.SumRates = 100;
+    
     %zador freq stimuli
     TaskParameters.GUI.Aud_nFreq = 18;
     TaskParameters.GUI.Aud_NoEvidence = 0;
@@ -105,11 +123,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.Aud_Levels.Style = 'table';
     TaskParameters.GUIMeta.Aud_Levels.String = 'Freq probabilities';
     TaskParameters.GUIMeta.Aud_Levels.ColumnLabel = {'a = Frac high','P(a)'};
+    
     %min auditory stimulus and general stuff
     TaskParameters.GUI.AuditoryStimulusTime = 0.35;
     TaskParameters.GUI.AuditoryStimulusType = 1;
     TaskParameters.GUIMeta.AuditoryStimulusType.Style = 'popupmenu';
     TaskParameters.GUIMeta.AuditoryStimulusType.String = {'Clicks','Freqs'};
+    
     TaskParameters.GUI.MinSampleAudMin = 0.35;
     TaskParameters.GUI.MinSampleAudMax = 0.35;
     TaskParameters.GUI.MinSampleAudAutoincrement = false;
@@ -123,6 +143,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.AudFreq = {'Aud_nFreq','Aud_NoEvidence','Aud_minFreq','Aud_maxFreq','Aud_Volume','Aud_ToneDuration','Aud_ToneOverlap','Aud_Ramp','Aud_SamplingRate','Aud_UseMiddleOctave'};
     TaskParameters.GUIPanels.AudFreqLevels = {'Aud_Levels'};
     TaskParameters.GUIPanels.AudMinSample= {'MinSampleAudMin','MinSampleAudMax','MinSampleAudAutoincrement','MinSampleAudIncr','MinSampleAudDecr','MinSampleAud'};
+    
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
     TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*5000;
@@ -132,6 +153,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.BlockTable.String = 'Block structure';
     TaskParameters.GUIMeta.BlockTable.ColumnLabel = {'Block#','Block Length','Rew L', 'Rew R'};
     TaskParameters.GUIPanels.BlockStructure = {'BlockTable'};
+    
     %% Plots
     %Show Plots
     TaskParameters.GUI.ShowPsycOlf = 0;
@@ -149,12 +171,14 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.ShowFeedback = 1;
     TaskParameters.GUIMeta.ShowFeedback.Style = 'checkbox';
     TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
+    
     %Vevaiometric
     TaskParameters.GUI.VevaiometricMinWT = 2;
     TaskParameters.GUI.VevaiometricNBin = 8;
     TaskParameters.GUI.VevaiometricShowPoints = 1;
     TaskParameters.GUIMeta.VevaiometricShowPoints.Style = 'checkbox';
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
+    
     %% Laser
     TaskParameters.GUI.LaserTrials = false;
     TaskParameters.GUI.LaserSoftCode = false;
@@ -178,6 +202,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserSoftCode','LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserRampDuration_ms','LaserTrainStartMin_s','LaserTrainStartMax_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
+    
     %% Video
     TaskParameters.GUI.Wire1VideoTrigger = false;
     TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'checkbox';
@@ -212,7 +237,7 @@ if isempty(fieldnames(TaskParameters))
 	TaskParameters.GUIMeta.PhotoPlotSidePokeLeave.Style='checkbox';
     TaskParameters.GUI.PhotoPlotReward=true;
 	TaskParameters.GUIMeta.PhotoPlotReward.Style='checkbox';    
-     TaskParameters.GUI.BaselineBegin=0.1;
+    TaskParameters.GUI.BaselineBegin=0.1;
     TaskParameters.GUI.BaselineEnd=1.1;
     TaskParameters.GUIPanels.PhotometryPlot={'TimeMin','TimeMax','NidaqMin','NidaqMax','PhotoPlotSidePokeIn','PhotoPlotSidePokeLeave','PhotoPlotReward','BaselineBegin','BaselineEnd'};
     
@@ -242,12 +267,12 @@ if isempty(fieldnames(TaskParameters))
                             'LED1_Name','LED1_Amp','LED1_Freq',...
                             'LED2_Name','LED2_Amp','LED2_Freq',...
                             'LED1b_Name','LED1b_Amp','LED1b_Freq'};
-                        
-                     % rig-specific
-        TaskParameters.GUI.nidaqDev='Dev2';
-        TaskParameters.GUIMeta.nidaqDev.Style='edittext';
-        
-        TaskParameters.GUIPanels.PhotometryRig={'nidaqDev'};      
+
+    % rig-specific
+    TaskParameters.GUI.nidaqDev='Dev2';
+    TaskParameters.GUIMeta.nidaqDev.Style='edittext';
+
+    TaskParameters.GUIPanels.PhotometryRig={'nidaqDev'};      
                         
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);

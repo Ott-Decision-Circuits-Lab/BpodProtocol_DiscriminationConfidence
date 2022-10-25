@@ -6,15 +6,15 @@ global nidaq
 
 Alignments = {[],[],[]};
 %Choice
-if ~isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial)) %Choice
+if ~isnan(BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)) %Choice
     Alignments{1} = 'start_'; %a little dangerous since generic state name start_ but so far (3/2019) only used for choice
 end
 %Leave
-if ~isnan(BpodSystem.Data.Custom.ChoiceLeft(iTrial)) && (BpodSystem.Data.Custom.ChoiceCorrect(iTrial) == 0 || BpodSystem.Data.Custom.CatchTrial(iTrial) == 1)
+if ~isnan(BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)) && (BpodSystem.Data.Custom.TrialData.ChoiceCorrect(iTrial) == 0 || BpodSystem.Data.Custom.TrialData.CatchTrial(iTrial) == 1)
     Alignments{2} = BpodSystem.Data.Custom.ResolutionTime(iTrial);
 end
 %Reward
-if  BpodSystem.Data.Custom.Rewarded(iTrial)==1
+if  BpodSystem.Data.Custom.TrialData.Rewarded(iTrial)==1
     Alignments{3} = 'water_';
 end
 

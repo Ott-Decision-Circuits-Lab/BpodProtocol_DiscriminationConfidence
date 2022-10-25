@@ -3,31 +3,24 @@ function Dual2AFC
 % This project is available on https://github.com/KepecsLab/BpodProtocols_Olf2AFC/
 
 global BpodSystem
-global nidaq
 global TaskParameters
-
-TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
-
-InitializeCustomDataFields(); % Initialize data (trial type) vectors and first values
-
+% global nidaq
+% 
 % ------------------------Setup Stimuli--------------------------------%
-if ~BpodSystem.EmulatorMode
-    [Player, fs] = SetupWavePlayer();
-    PunishSound = rand(1, fs*.5)*2 - 1;  % white noise
-    SoundIndex=1;
-    Player.loadWaveform(SoundIndex, PunishSound);
-    SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
-    LoadSoundMessages(SoundChannels);
-end
+% if ~BpodSystem.EmulatorMode
+%     [Player, fs] = SetupWavePlayer();
+%     PunishSound = rand(1, fs*.5)*2 - 1;  % white noise
+%     SoundIndex=1;
+%     Player.loadWaveform(SoundIndex, PunishSound);
+%     SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
+%     LoadSoundMessages(SoundChannels);
+% end
 % ---------------------------------------------------------------------%
-
-BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
-
+% 
 % %server data
 % [~,BpodSystem.Data.Custom.Rig] = system('hostname');
 % [~,BpodSystem.Data.Custom.Subject] = fileparts(fileparts(fileparts(fileparts(BpodSystem.Path.CurrentDataFile))));
-
-%% Configuring PulsePal
+% %% Configuring PulsePal
 % load PulsePalParamStimulus.mat
 % load PulsePalParamFeedback.mat
 % BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(PulsePalParamStimulus);
@@ -48,7 +41,8 @@ BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 %     end
 % end
 
-InitializePlots();
+TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
+BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 
 %% NIDAQ Initialization and Plots
@@ -62,9 +56,12 @@ iTrial = 1;
 
 while RunSession
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
-    
+    InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
+    LoadWaveformToWavePlayer(iTrial); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
     InitiateOlfactometer(iTrial);
     InitiatePsychtoolbox(iTrial);
+    InitializePlots(iTrial);
+  
     
     %% send state matrix to Bpod
     sma = stateMatrix(iTrial);
@@ -116,20 +113,9 @@ while RunSession
         end
         RunProtocol('StartPause')
     end
-    
-    %% insert session description in protocol into data.info
-    if iTrial == 1
-        BpodSystem.Data.Info.SessionDescription = ["To teach the subject the nose poking sequence with correct timings"];
-        BpodSystem.Data.Custom.General.SessionDescription = BpodSystem.Data.Info.SessionDescription;
-    end
-
-    % append session description in setting into data.info
-    if TaskParameters.GUI.SessionDescription ~= BpodSystem.Data.Info.SessionDescription(end)
-        BpodSystem.Data.Info.SessionDescription = [BpodSystem.Data.Info.SessionDescription, TaskParameters.GUI.SessionDescription];
-        BpodSystem.Data.Custom.General.SessionDescription = BpodSystem.Data.Info.SessionDescription;
-    end
-    
+        
     %% update custom data fields for this trial and draw future trials
+    InsertSessionDescription(iTrial);
     updateCustomDataFields(iTrial);
     SaveBpodSessionData();
     
@@ -142,7 +128,6 @@ while RunSession
     end
     
     iTrial = iTrial + 1;
-    
 end
 
 %% photometry check

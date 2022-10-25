@@ -8,7 +8,7 @@ global BpodSystem
 global TaskParameters
 
 if softCode < 11 %for olfactory
-    if BpodSystem.Data.Custom.OlfactometerStartup %if there has been a non-auditory trial and thus olfactometer initialized
+    if BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup %if there has been a non-auditory trial and thus olfactometer initialized
         
         firstbank = ['Bank' num2str(TaskParameters.GUI.OdorA_bank)];
         secbank = ['Bank' num2str(TaskParameters.GUI.OdorB_bank)];
@@ -16,15 +16,15 @@ if softCode < 11 %for olfactory
         if softCode < 9
             if ~BpodSystem.EmulatorMode
                 CommandValve = Valves2EthernetString(firstbank, softCode, secbank, softCode); % softCode := desired valve number
-                TCPWrite(BpodSystem.Data.Custom.OlfIp, 3336, CommandValve);
+                TCPWrite(BpodSystem.Data.Custom.SessionMeta.OlfIp, 3336, CommandValve);
             end
         elseif softCode == 9
-            nextTrial = numel(BpodSystem.Data.Custom.TrialNumber) + 2;
+            nextTrial = numel(BpodSystem.Data.Custom.TrialData.TrialNumber) + 2;
             OdorA_flow = BpodSystem.Data.Custom.OdorFracA(nextTrial);
             OdorB_flow = 100 - OdorA_flow;
             if ~BpodSystem.EmulatorMode
-                SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
-                SetBankFlowRate(BpodSystem.Data.Custom.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
+                SetBankFlowRate(BpodSystem.Data.Custom.SessionMeta.OlfIp, TaskParameters.GUI.OdorA_bank, OdorA_flow)
+                SetBankFlowRate(BpodSystem.Data.Custom.SessionMeta.OlfIp, TaskParameters.GUI.OdorB_bank, OdorB_flow)
             end
         end
         
@@ -34,29 +34,29 @@ end %if olfactory soft codes
 if softCode > 10 && softCode < 21 %for auditory clicks
     if ~BpodSystem.EmulatorMode
         if softCode == 11 %noise on chan 1
-            ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);
-            SendCustomPulseTrain(1,cumsum(randi(9,1,601))/10000,(rand(1,601)-.5)*20); % White(?) noise on channel 1+2
-            SendCustomPulseTrain(2,cumsum(randi(9,1,601))/10000,(rand(1,601)-.5)*20);
-            TriggerPulsePal(1,2);
-            ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
+%             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);
+%             SendCustomPulseTrain(1,cumsum(randi(9,1,601))/10000,(rand(1,601)-.5)*20); % White(?) noise on channel 1+2
+%             SendCustomPulseTrain(2,cumsum(randi(9,1,601))/10000,(rand(1,601)-.5)*20);
+%             TriggerPulsePal(1,2);
+%             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
         elseif softCode == 12 %beep on chan 2
-            ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);
-            SendCustomPulseTrain(2,0:.001:.3,(ones(1,301)*3));  % Beep on channel 1+2
-            SendCustomPulseTrain(1,0:.001:.3,(ones(1,301)*3));
-            TriggerPulsePal(1,2);
-            ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);            
+%             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamFeedback);
+%             SendCustomPulseTrain(2,0:.001:.3,(ones(1,301)*3));  % Beep on channel 1+2
+%             SendCustomPulseTrain(1,0:.001:.3,(ones(1,301)*3));
+%             TriggerPulsePal(1,2);
+%             ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);            
         end
     end
 end
 
 if softCode > 20 && softCode < 31 %for auditory freq
     if softCode == 21 
-        if BpodSystem.Data.Custom.PsychtoolboxStartup
+        if BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup
             PsychToolboxSoundServer('Play', 1);
         end
     end
     if softCode == 22
-        if BpodSystem.Data.Custom.PsychtoolboxStartup
+        if BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup
             PsychToolboxSoundServer('Stop', 1);
         end
     end    
@@ -65,7 +65,7 @@ end
 %laser stimulation protocols
 if softCode > 30 && softCode < 41 %for laser stuff
     if softCode==31
-        if  BpodSystem.Data.Custom.LaserTrial(end) && TaskParameters.GUI.LaserSoftCode %laser trial and laser via softcode setting
+        if  BpodSystem.Data.Custom.TrialData.LaserTrial(end) && TaskParameters.GUI.LaserSoftCode %laser trial and laser via softcode setting
             if TaskParameters.GUI.LaserTimeInvestment
                 %this soft code 'solution' only works for time investment
                 %inhibition with a significant delay to allow for loading
@@ -81,7 +81,7 @@ if softCode > 30 && softCode < 41 %for laser stuff
                 Params.LaserOutChan=4;
                 Params.TriggerInChan=2;
                 Params.CustomPulseTrainID=1;
-                Params.DelayStart=BpodSystem.Data.Custom.LaserTrialTrainStart(end);
+                Params.DelayStart=BpodSystem.Data.Custom.TrialData.LaserTrialTrainStart(end);
                 P=configurePulsePalLaser_CustomTrain(Params);
             end
         end
