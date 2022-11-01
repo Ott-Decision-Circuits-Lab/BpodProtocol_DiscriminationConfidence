@@ -43,7 +43,13 @@ global TaskParameters
 
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
+InitializePlots();
 
+if ~BpodSystem.EmulatorMode
+    [Player, fs]=SetupWavePlayer(25000); % 25kHz =sampling rate of 8Ch with 8Ch fully on
+    LoadIndependentWaveform(Player);
+    LoadTriggerProfileMatrix(Player);
+end
 
 %% NIDAQ Initialization and Plots
 if TaskParameters.GUI.Photometry
@@ -55,27 +61,28 @@ RunSession = true;
 iTrial = 1;
 
 while RunSession
-    TaskParameters = BpodParameterGUI('sync', TaskParameters);
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
-    LoadWaveformToWavePlayer(iTrial); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
-    InitiateOlfactometer(iTrial);
-    InitiatePsychtoolbox(iTrial);
-    InitializePlots(iTrial);
-  
     
-    %% send state matrix to Bpod
+    if ~BpodSystem.EmulatorMode
+        LoadTrialDependeWaveform(Player, iTrial); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
+        InitiateOlfactometer(iTrial);
+        InitiatePsychtoolbox();
+    end
+    
+    TaskParameters = BpodParameterGUI('sync', TaskParameters);
+    
     sma = stateMatrix(iTrial);
     SendStateMatrix(sma);
     
-    %% NIDAQ Get nidaq ready to start
+    % NIDAQ Get nidaq ready to start
     if TaskParameters.GUI.Photometry
         Nidaq_photometry('WaitToStart');
     end
     
-    %% Run Trial
+    % Run Trial
     RawEvents = RunStateMatrix;
     
-    %% NIDAQ Stop acquisition and save data in bpod structure
+    % NIDAQ Stop acquisition and save data in bpod structure
     if TaskParameters.GUI.Photometry
         Nidaq_photometry('Stop');
         [PhotoData,Photo2Data]=Nidaq_photometry('Save');
@@ -93,13 +100,15 @@ while RunSession
         end
     end
     
-    %% Bpod save
+    % Bpod save and update custom data fields for this trial
     if ~isempty(fieldnames(RawEvents))
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
+        InsertSessionDescription(iTrial);
+        updateCustomDataFields(iTrial);
         SaveBpodSessionData;
     end
     
-    %% pause conditions    
+    % pause conditions    
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
     if BpodSystem.Status.BeingUsed == 0
         return
@@ -113,12 +122,7 @@ while RunSession
         end
         RunProtocol('StartPause')
     end
-        
-    %% update custom data fields for this trial and draw future trials
-    InsertSessionDescription(iTrial);
-    updateCustomDataFields(iTrial);
-    SaveBpodSessionData();
-    
+            
     %% update behavior plots
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     
