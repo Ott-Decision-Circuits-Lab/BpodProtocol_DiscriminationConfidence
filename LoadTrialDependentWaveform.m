@@ -15,8 +15,8 @@ if ~BpodSystem.EmulatorMode
     % load auditory stimuli
     fs = Player.SamplingRate;
     
-    if TaskParameters.GUI.PlayStimulus == 2 % click task
-        [LeftClickTrain,RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.SampleTime, fs, ClickLength, SoundLevel);
+    if TaskParameters.GUI.AuditoryStimulusType == 1 % click task
+        [LeftClickTrain,RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.MinSampleAud, fs, ClickLength, SoundLevel);
 
         SoundIndex = 3;
         Player.loadWaveform(SoundIndex, LeftClickTrain);

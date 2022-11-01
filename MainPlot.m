@@ -30,8 +30,8 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.NoResponse = line(-1,[0 1], 'LineStyle','none','Marker','x','MarkerEdge','w','MarkerFace','none', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.Catch = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[0,0,0],'MarkerFace',[0,0,0], 'MarkerSize',4);
         set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-1.25, 1.25], 'YTick', [-1, 1],'YTickLabel', {'Right','Left'}, 'FontSize', 13);
-        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata',find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
-        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata',find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata', 0, 'ydata', 0); %find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata', 0, 'ydata', 0); %find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', 14);
         hold(AxesHandles.HandleOutcome, 'on');
         %% Psyc Olfactory

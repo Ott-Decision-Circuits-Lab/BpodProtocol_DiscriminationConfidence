@@ -64,9 +64,9 @@ while RunSession
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
     
     if ~BpodSystem.EmulatorMode
-        LoadTrialDependeWaveform(Player, iTrial); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
+        LoadTrialDependentWaveform(Player, iTrial, 5, 2); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
         InitiateOlfactometer(iTrial);
-        InitiatePsychtoolbox();
+        InitiatePsychtoolbox(iTrial);
     end
     
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
