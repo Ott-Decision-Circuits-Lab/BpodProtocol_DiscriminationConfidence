@@ -49,7 +49,7 @@ switch Mode
         end
         
         LeftClickRate = round(BpodSystem.Data.Custom.TrialData.AuditoryOmega(iTrial)*TaskParameters.GUI.SumRates);
-        RightClickRate = TaskParameters.GUI.SumRates - BpodSystem.Data.Custom.TrialData.LeftClickRate(iTrial);
+        RightClickRate = TaskParameters.GUI.SumRates - LeftClickRate;
         
         LeftClickTrain = GeneratePoissonClickTrain(LeftClickRate, Duration, SamplingRate, ClickLength);
         RightClickTrain = GeneratePoissonClickTrain(RightClickRate, Duration, SamplingRate, ClickLength);
