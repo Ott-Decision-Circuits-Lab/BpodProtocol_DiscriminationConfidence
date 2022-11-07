@@ -1,15 +1,16 @@
 function LoadIndependentWaveform(Player)
 % global Player
-% global TaskParameters
+global TaskParameters
 
 fs = Player.SamplingRate;
 
-PunishSound = rand(1, fs*0.5)*2 - 1;
+PunishSound = rand(1, fs*TaskParameters.GUI.TimeOutEarlyWithdrawal)*2 - 1;
 SoundIndex = 1;
 Player.loadWaveform(SoundIndex, PunishSound);
 
 SoundLevel = 0.8;
-ErrorSound = 1 * SoundLevel;
+ErrorSound = rand(1, fs*TaskParameters.GUI.TimeOutIncorrectChoice)*2 - 1; 
+% ErrorSound = ErrorSound * SoundLevel;
 SoundIndex = 2;
 Player.loadWaveform(SoundIndex, ErrorSound);
 

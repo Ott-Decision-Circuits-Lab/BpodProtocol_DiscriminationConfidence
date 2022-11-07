@@ -23,7 +23,7 @@ if ~BpodSystem.EmulatorMode
 
         SoundIndex = 4;
         Player.loadWaveform(SoundIndex, RightClickTrain);
-    elseif TaskParameters.GUI.PlayStimulus == 3 % freq task
+    elseif TaskParameters.GUI.AuditoryStimulusType == 2 % freq task
     
     end
 
