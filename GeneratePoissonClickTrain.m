@@ -19,7 +19,7 @@ end
 ClickTime = zeros(1,round(ClickRate*Duration*2)); % in sampling frame scale
 
 N = 1;
-ClickTime(N) = round(-log(rand)*SamplingRate/ClickRate);
+ClickTime(N) = 1; %round(-log(rand)*SamplingRate/ClickRate);
 
 while ClickTime(N) < SamplingRate*Duration
     N = N+1;
@@ -37,5 +37,5 @@ for i = 1:ClickLength
 end
 
 % make a "starting" click to indicate the start of stimuli
-ClickTrain(1:ClickLength) = 1;
+% ClickTrain(1:ClickLength) = 1;
 end
