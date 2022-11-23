@@ -16,15 +16,15 @@ windowCTA = 150; %window for CTA (ms)
 
 
 nTrials=BpodSystem.Data.nTrials;
-DV = BpodSystem.Data.Custom.SessionData.DV(1:nTrials-1);
-ChoiceLeft = BpodSystem.Data.Custom.SessionData.ChoiceLeft(1:nTrials-1);
-ST = BpodSystem.Data.Custom.SessionData.ST(1:nTrials-1);
-CatchTrial = BpodSystem.Data.Custom.SessionData.CatchTrial((1:nTrials-1));
-Feedback = BpodSystem.Data.Custom.SessionData.Feedback(1:nTrials-1);
-Correct = BpodSystem.Data.Custom.SessionData.ChoiceCorrect(1:nTrials-1);
-WT =  BpodSystem.Data.Custom.SessionData.FeedbackTime(1:nTrials-1);
+DV = BpodSystem.Data.Custom.TrialData.DV(1:nTrials-1);
+ChoiceLeft = BpodSystem.Data.Custom.TrialData.ChoiceLeft(1:nTrials-1);
+ST = BpodSystem.Data.Custom.TrialData.ST(1:nTrials-1);
+CatchTrial = BpodSystem.Data.Custom.TrialData.CatchTrial((1:nTrials-1));
+Feedback = BpodSystem.Data.Custom.TrialData.Feedback(1:nTrials-1);
+Correct = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(1:nTrials-1);
+WT =  BpodSystem.Data.Custom.TrialData.FeedbackTime(1:nTrials-1);
 if isfield(BpodSystem.Data.Custom,'LaserTrial')
-    LaserTrial =  BpodSystem.Data.Custom.SessionData.LaserTrial(1:nTrials-1);
+    LaserTrial =  BpodSystem.Data.Custom.TrialData.LaserTrial(1:nTrials-1);
 else
     LaserTrial=false(1,nTrials);
 end
@@ -44,11 +44,11 @@ ExperiencedDV=zeros(1,length(ST));
 
 %click task
 if TaskParameters.GUI.AuditoryStimulusType == 1 %click
-    LeftClickTrain = BpodSystem.Data.Custom.SessionData.LeftClickTrain(1:nTrials-1);
-    RightClickTrain = BpodSystem.Data.Custom.SessionData.RightClickTrain(1:nTrials-1);
+    LeftClickTrain = BpodSystem.Data.Custom.TrialData.LeftClickTrain(1:nTrials-1);
+    RightClickTrain = BpodSystem.Data.Custom.TrialData.RightClickTrain(1:nTrials-1);
     for t = 1 : length(ST)
-        R = BpodSystem.Data.Custom.SessionData.RightClickTrain{t};
-        L = BpodSystem.Data.Custom.SessionData.LeftClickTrain{t};
+        R = BpodSystem.Data.Custom.TrialData.RightClickTrain{t};
+        L = BpodSystem.Data.Custom.TrialData.LeftClickTrain{t};
         Ri = sum(R<=ST(t));if Ri==0, Ri=1; end
         Li = sum(L<=ST(t));if Li==0, Li=1; end
         ExperiencedDV(t) = log10(Li/Ri);
