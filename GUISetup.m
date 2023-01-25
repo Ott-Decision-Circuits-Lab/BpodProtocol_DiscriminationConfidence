@@ -286,8 +286,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Photometry = {'PhotometryRecording','PhotometryNidaq','PhotometryPlot','PhotometryRig'};
     
     %%Non-GUI Parameters (but saved)
+    % Setting TaskParameters.Figures.ParameterGUI.Position causes GUI
+    % issues on Linux using opengl
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
-    TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
     
 end
 BpodParameterGUI('init', TaskParameters);
