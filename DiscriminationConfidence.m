@@ -1,45 +1,9 @@
 function DiscriminationConfidence
-% 2-AFC olfactory and auditory discrimination task implented for Bpod fork https://github.com/KepecsLab/bpod
-% This project is available on https://github.com/KepecsLab/BpodProtocols_Olf2AFC/
+% 2-AFC olfactory and auditory discrimination task implented for Bpod 
+% (https://github.com/Ott-Decision-Circuits-Lab/Bpod_Gen2)
 
 global BpodSystem
 global TaskParameters
-% global nidaq
-% 
-% ------------------------Setup Stimuli--------------------------------%
-% if ~BpodSystem.EmulatorMode
-%     [Player, fs] = SetupWavePlayer();
-%     PunishSound = rand(1, fs*.5)*2 - 1;  % white noise
-%     SoundIndex=1;
-%     Player.loadWaveform(SoundIndex, PunishSound);
-%     SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
-%     LoadSoundMessages(SoundChannels);
-% end
-% ---------------------------------------------------------------------%
-% 
-% %server data
-% [~,BpodSystem.Data.Custom.Rig] = system('hostname');
-% [~,BpodSystem.Data.Custom.Subject] = fileparts(fileparts(fileparts(fileparts(BpodSystem.Path.CurrentDataFile))));
-% %% Configuring PulsePal
-% load PulsePalParamStimulus.mat
-% load PulsePalParamFeedback.mat
-% BpodSystem.Data.Custom.PulsePalParamStimulus=configurePulsePalLaser(PulsePalParamStimulus);
-% BpodSystem.Data.Custom.PulsePalParamFeedback=PulsePalParamFeedback;
-% clear PulsePalParamFeedback PulsePalParamStimulus
-% if BpodSystem.Data.Custom.AuditoryTrial(1)
-%    if ~BpodSystem.EmulatorMode
-%     
-%     if BpodSystem.Data.Custom.ClickTask(1) 
-%         ProgramPulsePal(BpodSystem.Data.Custom.PulsePalParamStimulus);
-%         SendCustomPulseTrain(1, BpodSystem.Data.Custom.RightClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.RightClickTrain{1}))*5);
-%         SendCustomPulseTrain(2, BpodSystem.Data.Custom.LeftClickTrain{1}, ones(1,length(BpodSystem.Data.Custom.LeftClickTrain{1}))*5);
-%     else
-%         InitiatePsychtoolbox(1);
-%         PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.AudSound{1});
-%         BpodSystem.Data.Custom.AudSound{1} = {};
-%     end
-%     end
-% end
 
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
@@ -51,12 +15,11 @@ if ~BpodSystem.EmulatorMode
     LoadTriggerProfileMatrix(Player);
 end
 
-%% NIDAQ Initialization and Plots
 if TaskParameters.GUI.Photometry
     [FigNidaq1,FigNidaq2]=InitializeNidaq();
 end
 
-%% Main loop
+% --------------------------Main loop------------------------------ %
 RunSession = true;
 iTrial = 1;
 
@@ -110,6 +73,7 @@ while RunSession
     
     % pause conditions    
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
+    
     if BpodSystem.Status.BeingUsed == 0
         return
     end
@@ -123,10 +87,10 @@ while RunSession
         RunProtocol('StartPause')
     end
             
-    %% update behavior plots
+    % update behavior plots
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     
-    %% update photometry plots
+    % update photometry plots
     if TaskParameters.GUI.Photometry
         PlotPhotometryData(FigNidaq1,FigNidaq2, PhotoData, Photo2Data);
     end
@@ -134,9 +98,8 @@ while RunSession
     iTrial = iTrial + 1;
 end
 
-%% photometry check
 if TaskParameters.GUI.Photometry
     CheckPhotometry(PhotoData, Photo2Data);
 end
 
-end
+end %DiscriminationConfidence()
