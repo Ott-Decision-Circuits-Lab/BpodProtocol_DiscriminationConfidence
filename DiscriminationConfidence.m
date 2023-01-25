@@ -7,17 +7,27 @@ global TaskParameters
 
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
-InitializePlots();
 
+% ------------------------Setup Stimuli--------------------------------%
 if ~BpodSystem.EmulatorMode
+%     [Player, fs] = SetupWavePlayer();
+%     PunishSound = rand(1, fs*.5)*2 - 1;  % white noise
+%     SoundIndex=1;
+%     Player.loadWaveform(SoundIndex, PunishSound);
+%     SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
+%     LoadSoundMessages(SoundChannels);
+
     [Player, fs]=SetupWavePlayer(25000); % 25kHz =sampling rate of 8Ch with 8Ch fully on
     LoadIndependentWaveform(Player);
     LoadTriggerProfileMatrix(Player);
 end
+% ---------------------------------------------------------------------%
 
 if TaskParameters.GUI.Photometry
     [FigNidaq1,FigNidaq2]=InitializeNidaq();
 end
+
+InitializePlots();
 
 % --------------------------Main loop------------------------------ %
 RunSession = true;
