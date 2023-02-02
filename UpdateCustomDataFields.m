@@ -1,4 +1,4 @@
-function updateCustomDataFields(iTrial)
+function UpdateCustomDataFields(iTrial)
 global BpodSystem
 global TaskParameters
 

@@ -77,7 +77,7 @@ while RunSession
     if ~isempty(fieldnames(RawEvents))
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         InsertSessionDescription(iTrial);
-        updateCustomDataFields(iTrial);
+        UpdateCustomDataFields(iTrial);
         SaveBpodSessionData;
     end
     
