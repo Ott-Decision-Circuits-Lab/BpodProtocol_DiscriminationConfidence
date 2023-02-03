@@ -39,8 +39,8 @@ data_table.Correct = trial_data.Correct(1:n_trials).';
 data_table.Rewarded = trial_data.Rewarded(1:n_trials).';
 data_table.RewardAvailable = trial_data.RewardAvailable(1:n_trials).';
 data_table.RewardDelay = trial_data.RewardDelay(1:n_trials).';
-data_table.RewardMagnitude_L = trial_data.RewardMagnitude(1:n_trials, 1);
-data_table.RewardMagnitude_R = trial_data.RewardMagnitude(1:n_trials, 2);
+data_table.LeftRewardMagnitude = trial_data.RewardMagnitude(1, 1:n_trials);
+data_table.RightRewardMagnitude = trial_data.RewardMagnitude(2, 1:n_trials);
 
 
 % -------------------------Misc variables------------------------------ %
