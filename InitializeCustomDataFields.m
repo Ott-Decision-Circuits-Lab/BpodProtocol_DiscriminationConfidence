@@ -7,98 +7,112 @@ global BpodSystem
 global TaskParameters
 
 if iTrial == 1
-    BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial) = NaN;
+    BpodSystem.Data.Custom.TrialData = [];
 end
 
-trial_data = BpodSystem.Data.Custom.TrialData;
+TDTemp = BpodSystem.Data.Custom.TrialData; % temporary container
+TDTemp.TrialNumber(iTrial) = iTrial;
 
-%% Initializing data (trial type) vectors
-trial_data.BlockNumber(iTrial) = 1;
-trial_data.BlockTrial(iTrial) = 1;
-trial_data.ChoiceLeft(iTrial) = NaN;
-trial_data.ChoiceCorrect(iTrial) = NaN;
-trial_data.Feedback(iTrial) = true;
-trial_data.FeedbackTime(iTrial) = NaN;
-trial_data.FixBroke(iTrial) = false;
-trial_data.EarlyWithdrawal(iTrial) = false;
-trial_data.FixDur(iTrial) = NaN;
-trial_data.MT(iTrial) = NaN;
-trial_data.CatchTrial(iTrial) = false;
-trial_data.OdorFracA(iTrial) = NaN; %randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';
-trial_data.OdorID(iTrial) = NaN; %2 - double(trial_data.OdorFracA > 50);
-trial_data.OdorPair(iTrial) = NaN; %ones(1,2)*2;
-trial_data.ST(iTrial) = NaN;
-trial_data.ResolutionTime(iTrial) = NaN;
-trial_data.Rewarded(iTrial) = false;
-trial_data.RewardMagnitude(iTrial, :) = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
-trial_data.TrialNumber(iTrial) = iTrial;
-trial_data.LaserTrial(iTrial) = false;
-trial_data.LaserTrialTrainStart(iTrial) = NaN;
-trial_data.AuditoryTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentAuditory;
-trial_data.ClickTask(iTrial) = TaskParameters.GUI.AuditoryStimulusType == 1;
-trial_data.AuditoryOmega(iTrial) = NaN;
-trial_data.LeftClickRate(iTrial) = NaN;
-trial_data.RightClickRate(iTrial) = NaN;
-% trial_data.LeftRewarded(iTrial) = NaN;
-trial_data.LeftClickTrain{iTrial} = [];
-trial_data.RightClickTrain{iTrial} = [];
-trial_data.AudFracHigh(iTrial) = NaN;
-trial_data.AudCloud{iTrial} = [];
-trial_data.AudSound{iTrial} = [];
-trial_data.DV = NaN;
-trial_data.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
-trial_data.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
-trial_data.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
-BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;
-BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
+% ---------------------Sample and Choice variables-------------------- %
+TDTemp.EarlyWithdrawal(iTrial) = false;
+TDTemp.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
+TDTemp.SampleLength(iTrial) = NaN;  %previously ST
 
-%% State-independent fields
+TDTemp.ChoiceLeft(iTrial) = NaN;
+TDTemp.MoveTime(iTrial) = NaN; %previously MT
+TDTemp.ResolutionTime(iTrial) = NaN;
+TDTemp.FixBroke(iTrial) = false;
+TDTemp.FixDur(iTrial) = NaN;
+
+TDTemp.Feedback(iTrial) = true;
+TDTemp.FeedbackTime(iTrial) = NaN;
+TDTemp.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
+
+% determine if catch trial
+if iTrial > TaskParameters.GUI.StartEasyTrials
+    TDTemp.CatchTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+else
+    TDTemp.CatchTrial(iTrial) = false;
+end
+% ---------------------------------------------------------------------- %
+
+
+% -----------------------Reward variables------------------------------ %
+TDTemp.LeftRewarded(iTrial) = rand<0.5;
+TDTemp.ChoiceCorrect(iTrial) = NaN;
+TDTemp.Rewarded(iTrial) = false;
+% ---------------------------------------------------------------------- %
+
+
+% -----------------------Block-dependent variables---------------------- %
+% The block determines the reward magnitude
 if iTrial > 1
-    if trial_data.BlockNumber(iTrial-1) < max(TaskParameters.GUI.BlockTable.BlockNumber) % Not final block
-        if trial_data.BlockTrial(iTrial-1) >= TaskParameters.GUI.BlockTable.BlockLen(TaskParameters.GUI.BlockTable.BlockNumber...
-                ==trial_data.BlockNumber(iTrial-1)) % Block transition
-            trial_data.BlockNumber(iTrial) = trial_data.BlockNumber(iTrial-1) + 1;
-            trial_data.BlockTrial(iTrial) = 1;
-        else
-            trial_data.BlockNumber(iTrial) = trial_data.BlockNumber(iTrial-1);
-            trial_data.BlockTrial(iTrial) = trial_data.BlockTrial(iTrial-1) + 1;
+    FinalBlock = max(TaskParameters.GUI.BlockTable.BlockNumber);
+    if TDTemp.BlockNumber(iTrial-1) < FinalBlock
+        BlockNumberMask = TaskParameters.GUI.BlockTable.BlockNumber == TDTemp.BlockNumber(iTrial-1);
+        CurrBlockLength = TaskParameters.GUI.BlockTable.BlockLen(BlockNumberMask);
+        if TDTemp.BlockTrial(iTrial-1) >= CurrBlockLength % Block transition
+            TDTemp.BlockNumber(iTrial) = TDTemp.BlockNumber(iTrial-1) + 1;
+            TDTemp.BlockTrial(iTrial) = 1;
+        else  % continue in same block and increment block trial number
+            TDTemp.BlockNumber(iTrial) = TDTemp.BlockNumber(iTrial-1);
+            TDTemp.BlockTrial(iTrial) = TDTemp.BlockTrial(iTrial-1) + 1;
         end
     else % Final block
-        trial_data.BlockTrial(iTrial) = trial_data.BlockTrial(iTrial-1) + 1;
-        trial_data.BlockNumber(iTrial) = trial_data.BlockNumber(iTrial-1);
+        TDTemp.BlockNumber(iTrial) = TDTemp.BlockNumber(iTrial-1);
+        TDTemp.BlockTrial(iTrial) = TDTemp.BlockTrial(iTrial-1) + 1;
     end
+else  % First trial of first block
+    TDTemp.BlockNumber(iTrial) = 1;
+    TDTemp.BlockTrial(iTrial) = 1;
 end
 
-trial_data.RewardMagnitude(iTrial,:) = TaskParameters.GUI.RewardAmount*...
-    [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumber==trial_data.BlockNumber(iTrial)),...
-    TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==trial_data.BlockNumber(iTrial))];
+% TDTemp.RewardMagnitudeL(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewL(1);
+% TDTemp.RewardMagnitudeR(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewR(1);
+BlockTableMask = TaskParameters.GUI.BlockTable.BlockNumber == TDTemp.BlockNumber(iTrial);
+TDTemp.RewardMagnitudeL(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewL(BlockTableMask);
+TDTemp.RewardMagnitudeR(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewR(BlockTableMask);
+% ---------------------------------------------------------------------- %
 
-%% determine if catch trial
+
+% -----------------------Stimulus-specific----------------------------- %
+TDTemp.DecisionVariable(iTrial) = NaN;  % e.g., relative click rate
+
+% -----Odor----- %
+TDTemp.OdorFracA(iTrial) = NaN; % randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';
+TDTemp.OdorID(iTrial) = NaN; % 2 - double(TDTemp.OdorFracA > 50);
+TDTemp.OdorPair(iTrial) = NaN; % ones(1,2)*2;
+
+% -----Laser----- %
 if iTrial > TaskParameters.GUI.StartEasyTrials
-    trial_data.CatchTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+    TDTemp.LaserTrial(iTrial) = rand(1,1) < TaskParameters.GUI.LaserTrials;
 else
-    trial_data.CatchTrial(iTrial) = false;
+    TDTemp.LaserTrial(iTrial) = false;
 end
 
-%% determine if laser trial
-if iTrial > TaskParameters.GUI.StartEasyTrials
-    trial_data.LaserTrial(iTrial) = rand(1,1) < TaskParameters.GUI.LaserTrials;
-else
-    trial_data.LaserTrial(iTrial) = false;
-end
-
-%determine laser stimulus delay
-if trial_data.LaserTrial(iTrial)
+TDTemp.LaserTrialTrainStart(iTrial) = NaN;
+if TDTemp.LaserTrial(iTrial)  % determine laser stimulus delay
     if TaskParameters.GUI.LaserTrainRandStart
-        trial_data.LaserTrialTrainStart(iTrial) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
-        trial_data.LaserTrialTrainStart(iTrial) = round(trial_data.LaserTrialTrainStart(iTrial)*10000)/10000;
+        TDTemp.LaserTrialTrainStart(iTrial) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
+        TDTemp.LaserTrialTrainStart(iTrial) = round(TDTemp.LaserTrialTrainStart(iTrial)*10000)/10000;
     else
-        trial_data.LaserTrialTrainStart(iTrial) = TaskParameters.GUI.LaserTrainStartMin_s;
+        TDTemp.LaserTrialTrainStart(iTrial) = TaskParameters.GUI.LaserTrainStartMin_s;
     end
 end
 
-
+% -----Auditory----- %
+TDTemp.AuditoryTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentAuditory;
+TDTemp.ClickTask(iTrial) = TaskParameters.GUI.AuditoryStimulusType == 1;
+TDTemp.AuditoryOmega(iTrial) = NaN;
+TDTemp.LeftClickRate(iTrial) = NaN;
+TDTemp.RightClickRate(iTrial) = NaN;
+TDTemp.LeftClickTrain{iTrial} = [];
+TDTemp.RightClickTrain{iTrial} = [];
+TDTemp.AudFracHigh(iTrial) = NaN;
+TDTemp.AudCloud{iTrial} = [];
+TDTemp.AudSound{iTrial} = [];
+TDTemp.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
 
 %% make auditory stimuli for first trials
@@ -134,8 +148,7 @@ end
 %                 BpodSystem.Data.Custom.LeftClickTrain{iTrial+a} = [];
 %                 BpodSystem.Data.Custom.RightClickTrain{iTrial+a} = [];
 %             end %if auditory
-%         end %for a=1:5
-            
+%         end %for a=1:5           
 %     case 2 %freq stimuli
 % 
 %         StimulusSettings.SamplingRate = TaskParameters.GUI.Aud_SamplingRate; % Sound card sampling rate;
@@ -149,7 +162,7 @@ end
 %         StimulusSettings.UseMiddleOctave=TaskParameters.GUI.Aud_UseMiddleOctave;
 %         StimulusSettings.Volume=TaskParameters.GUI.Aud_Volume;
 %         StimulusSettings.nTones = floor((TaskParameters.GUI.AuditoryStimulusTime-StimulusSettings.ToneDuration*StimulusSettings.ToneOverlap)/(StimulusSettings.ToneDuration*(1-StimulusSettings.ToneOverlap))); %number of tones
-        
+%       
 %         if iTrial > TaskParameters.GUI.StartEasyTrials
 %             newFracHigh = randsample(TaskParameters.GUI.Aud_Levels.AudFracHigh,5,1,TaskParameters.GUI.Aud_Levels.AudPFrac)';
 %             %include Fifty50 Trials
@@ -178,10 +191,10 @@ end
 %         BpodSystem.Data.Custom.AudCloud = [BpodSystem.Data.Custom.AudCloud, newCloud];
 %         BpodSystem.Data.Custom.AudSound = [BpodSystem.Data.Custom.AudSound, newSound];
 %         BpodSystem.Data.Custom.LeftRewarded = [BpodSystem.Data.Custom.LeftRewarded, LeftRewarded];
-
+%
 % end %switch/case auditory stimulus type
-
-
+%
+%
 % switch BpodSystem.Data.Custom.ClickTask(iTrial)
 %     case true
 %         if BpodSystem.Data.Custom.AuditoryTrial(a)
@@ -240,7 +253,10 @@ end
 %         BpodSystem.Data.Custom.LeftRewarded(a)= newFracHigh>50;
 % end % switch BpodSystem.Data.Custom.ClickTask(iTrial)
 
-trial_data.LeftRewarded(iTrial) = rand<0.5;
-BpodSystem.Data.Custom.TrialData = trial_data;
+% ---------------------------------------------------------------------- %
+
+
+% Write temporary data container to Custom Data
+BpodSystem.Data.Custom.TrialData = TDTemp;
 
 end %InitializeCustomDataFields

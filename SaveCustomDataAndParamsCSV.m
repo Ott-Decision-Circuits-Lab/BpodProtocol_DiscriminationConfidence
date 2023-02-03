@@ -1,6 +1,6 @@
 function SaveCustomDataAndParamsCSV()
 %{
-Function to write trial custom data from NosePoke
+Function to write trial custom data from DiscriminationConfidence
 into a tab separated value file (.tsv)
 
 Author: Greg Knoll
@@ -9,59 +9,69 @@ Date: October 13, 2022
 
 global BpodSystem
 
-n_trials = BpodSystem.Data.nTrials;
+nTrials = BpodSystem.Data.nTrials;
 
-trial_data = BpodSystem.Data.Custom.TrialData;
+TrialData = BpodSystem.Data.Custom.TrialData;
 
 %{
 ---------------------------------------------------------------------------
 preprocess the data
-- remove last entry in arrays that are n_trials+1 long (from the incomplete
+- remove last entry in arrays that are nTrials+1 long (from the incomplete
   last trial)
-- split any n_trials x 2 array into two n_trials x 1 arrays
+- split any nTrials x 2 array into two nTrials x 1 arrays
 
 then save in the table as a column (requires using .', which inverts the
 dimensions)
 ---------------------------------------------------------------------------
 %}
-data_table = table();
+DataTable = table();
 
 % ---------------------Sample and Choice variables-------------------- %
-data_table.EarlyWithdrawal = trial_data.EarlyWithdrawal(1:n_trials).';
-data_table.sample_length = trial_data.sample_length(1:n_trials).';
-data_table.ChoiceLeft = trial_data.ChoiceLeft(1:n_trials).';
-data_table.move_time = trial_data.move_time(1:n_trials).';
-data_table.port_entry_delay = trial_data.port_entry_delay(1:n_trials).';
+DataTable.EarlyWithdrawal = TrialData.EarlyWithdrawal(1:nTrials).';
+DataTable.SampleLength = TrialData.SampleLength(1:nTrials).';
+
+DataTable.ChoiceLeft = TrialData.ChoiceLeft(1:nTrials).';
+DataTable.MoveTime = TrialData.MoveTime(1:nTrials).';
+DataTable.ResolutionTime = TrialData.ResolutionTime(1:nTrials).';
+DataTable.FixBroke = TrialData.FixBroke(1:nTrials).';
+DataTable.FixDur = TrialData.FixDur(1:nTrials).';
+
+DataTable.Feedback = TrialData.Feedback(1:nTrials).';
+DataTable.FeedbackTime = TrialData.FeedbackTime(1:nTrials).';
+
+DataTable.CatchTrial = TrialData.CatchTrial(1:nTrials).';
 
 
 % -----------------------Reward variables------------------------------ %
-data_table.Correct = trial_data.Correct(1:n_trials).';
-data_table.Rewarded = trial_data.Rewarded(1:n_trials).';
-data_table.RewardAvailable = trial_data.RewardAvailable(1:n_trials).';
-data_table.RewardDelay = trial_data.RewardDelay(1:n_trials).';
-data_table.RewardMagnitude_L = trial_data.RewardMagnitude(1:n_trials, 1);
-data_table.RewardMagnitude_R = trial_data.RewardMagnitude(1:n_trials, 2);
+DataTable.LeftRewarded = TrialData.LeftRewarded(1:nTrials).';
+DataTable.ChoiceCorrect = TrialData.ChoiceCorrect(1:nTrials).';
+DataTable.Rewarded = TrialData.Rewarded(1:nTrials).';
+
+DataTable.RewardMagnitudeL = TrialData.RewardMagnitudeL(1:nTrials).';
+DataTable.RewardMagnitudeR = TrialData.RewardMagnitudeR(1:nTrials).';
 
 
-% -------------------------Misc variables------------------------------ %
-data_table.RandomThresholdPassed = trial_data.RandomThresholdPassed(1:n_trials).';
-data_table.LightLeft = trial_data.LightLeft(1:n_trials).';
+% -------------------------Stim variables------------------------------ %
+DataTable.DecisionVariable = TrialData.DecisionVariable(1:nTrials).';
+DataTable.LaserTrial = TrialData.LaserTrial(1:nTrials).';
+DataTable.AuditoryTrial = TrialData.AuditoryTrial(1:nTrials).';
+DataTable.ClickTask = TrialData.ClickTask(1:nTrials).';
 
 
 % ----------------------------Params----------------------------------- %
-param_names = BpodSystem.GUIData.ParameterGUI.ParamNames;
-param_vals = BpodSystem.Data.TrialSettings.';
-params_table = cell2table(param_vals, "VariableNames", param_names);
+ParamNames = BpodSystem.GUIData.ParameterGUI.ParamNames;
+ParamVals = BpodSystem.Data.TrialSettings.';
+ParamsTable = cell2table(ParamVals, "VariableNames", ParamNames);
 
 
 % --------------------------------------------------------------------- %
 % Combine the data and params tables and save to .csv
 % --------------------------------------------------------------------- %
-full_table = [data_table params_table];
+FullTable = [DataTable ParamsTable];
 
-[filepath, session_name, ext] = fileparts(BpodSystem.Path.CurrentDataFile);
-csv_name = "_trial_custom_data_and_params.csv";
-file_name = string(strcat("O:\data\", session_name, csv_name));
-writetable(full_table, file_name, "Delimiter", "\t")
+[filepath, SessionName, ext] = fileparts(BpodSystem.Path.CurrentDataFile);
+CSVName = "_trial_custom_data_and_params.csv";
+FileName = string(strcat("O:\data\", SessionName, CSVName));
+writetable(FullTable, FileName, "Delimiter", "\t")
 
-end  % save_custom_data_and_params_tsv()
+end  % SaveCustomDataAndParamsCSV()

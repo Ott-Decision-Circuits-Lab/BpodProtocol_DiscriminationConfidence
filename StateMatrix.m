@@ -17,8 +17,8 @@ RightPortIn = strcat('Port',num2str(RightPort),'In');
 LeftValve = 2^(LeftPort-1);
 RightValve = 2^(RightPort-1);
 
-LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitude(iTrial,1), LeftPort);
-RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitude(iTrial,2), RightPort);
+LeftValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitudeL(iTrial), LeftPort);
+RightValveTime  = GetValveTimes(BpodSystem.Data.Custom.TrialData.RewardMagnitudeR(iTrial), RightPort);
 
 %port LEDs
 if TaskParameters.GUI.PortLEDs

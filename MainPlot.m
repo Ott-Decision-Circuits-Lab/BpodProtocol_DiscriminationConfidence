@@ -18,7 +18,7 @@ switch Action
         %plot in specified axes
         BpodSystem.GUIHandles.OutcomePlot.Olf = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',8);
         BpodSystem.GUIHandles.OutcomePlot.Aud = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge',[.5,.5,.5],'MarkerFace',[.7,.7,.7], 'MarkerSize',8);
-        BpodSystem.GUIHandles.OutcomePlot.DV = line(1,1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
+        BpodSystem.GUIHandles.OutcomePlot.DecisionVariable = line(1,1, 'LineStyle','none','Marker','o','MarkerEdge','b','MarkerFace','b', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle = line(1,0, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross = line(1,0, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CumRwd = text(1,1,'0mL','verticalalignment','bottom','horizontalalignment','center');
@@ -30,8 +30,8 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.NoResponse = line(-1,[0 1], 'LineStyle','none','Marker','x','MarkerEdge','w','MarkerFace','none', 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.Catch = line(-1,[0 1], 'LineStyle','none','Marker','o','MarkerEdge',[0,0,0],'MarkerFace',[0,0,0], 'MarkerSize',4);
         set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-1.25, 1.25], 'YTick', [-1, 1],'YTickLabel', {'Right','Left'}, 'FontSize', 13);
-        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata', 0, 'ydata', 0); %find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
-        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata', 0, 'ydata', 0); %find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata', 0, 'ydata', 0); %find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata', 0, 'ydata', 0); %find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', 14);
         hold(AxesHandles.HandleOutcome, 'on');
         %% Psyc Olfactory
@@ -58,7 +58,7 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color','g','Marker','o','MarkerFaceColor','g', 'MarkerSize',2,'Visible','off','MarkerEdgeColor','g');
         AxesHandles.HandleVevaiometric.YLim = [0 10];
         AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
-        AxesHandles.HandleVevaiometric.XLabel.String = 'DV';
+        AxesHandles.HandleVevaiometric.XLabel.String = 'DecisionVariable';
         AxesHandles.HandleVevaiometric.YLabel.String = 'WT (s)';
         AxesHandles.HandleVevaiometric.Title.String = 'Vevaiometric';
         %% Trial rate
@@ -153,30 +153,39 @@ switch Action
         set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', iTrial+1, 'ydata', 0);
         
         %plot modality background
-        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata',find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
-        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata',find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DV(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Olf,'xdata',find(~BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(~BpodSystem.Data.Custom.TrialData.AuditoryTrial));
+        set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata',find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
         %plot past&future trials
-        set(BpodSystem.GUIHandles.OutcomePlot.DV, 'xdata', mn:numel(BpodSystem.Data.Custom.TrialData.DV), 'ydata',BpodSystem.Data.Custom.TrialData.DV(mn:end));
+        set(BpodSystem.GUIHandles.OutcomePlot.DecisionVariable, 'xdata', mn:numel(BpodSystem.Data.Custom.TrialData.DecisionVariable), 'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(mn:end));
         
         %Plot past trial outcomes
         indxToPlot = mn:iTrial;
         %Cumulative Reward Amount
-        R = BpodSystem.Data.Custom.TrialData.RewardMagnitude;
+        R = [BpodSystem.Data.Custom.TrialData.RewardMagnitudeL, BpodSystem.Data.Custom.TrialData.RewardMagnitudeR];
         ndxRwd = BpodSystem.Data.Custom.TrialData.Rewarded;
-        C = zeros(size(R)); C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==1&ndxRwd,1) = 1; C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==0&ndxRwd,2) = 1;
-        R = R.*C;
+        if ndxRwd
+            C = zeros(size(R)); 
+            C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==1&ndxRwd,1) = 1; 
+            C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==0&ndxRwd,2) = 1;
+            R = R.*C;
+            clear C
+        else
+            R = 0;
+        end
         set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [iTrial+1 1], 'string', ...
             [num2str(sum(R(:))/1000) ' mL']);
-        clear R C
+        clear R
+        
+
         %Plot Rewarded
         ndxCor = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(indxToPlot)==1;
         Xdata = indxToPlot(ndxCor);
-        Ydata = BpodSystem.Data.Custom.TrialData.DV(indxToPlot); Ydata = Ydata(ndxCor);
+        Ydata = BpodSystem.Data.Custom.TrialData.DecisionVariable(indxToPlot); Ydata = Ydata(ndxCor);
         set(BpodSystem.GUIHandles.OutcomePlot.Correct, 'xdata', Xdata, 'ydata', Ydata);
         %Plot Incorrect
         ndxInc = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(indxToPlot)==0;
         Xdata = indxToPlot(ndxInc);
-        Ydata = BpodSystem.Data.Custom.TrialData.DV(indxToPlot); Ydata = Ydata(ndxInc);
+        Ydata = BpodSystem.Data.Custom.TrialData.DecisionVariable(indxToPlot); Ydata = Ydata(ndxInc);
         set(BpodSystem.GUIHandles.OutcomePlot.Incorrect, 'xdata', Xdata, 'ydata', Ydata);
         %Plot Broken Fixation
         ndxBroke = BpodSystem.Data.Custom.TrialData.FixBroke(indxToPlot);
@@ -190,17 +199,17 @@ switch Action
         %Plot missed choice trials
         ndxMiss = isnan(BpodSystem.Data.Custom.TrialData.ChoiceLeft(indxToPlot))&~ndxBroke&~ndxEarly;
         Xdata = indxToPlot(ndxMiss);
-        Ydata = BpodSystem.Data.Custom.TrialData.DV(indxToPlot); Ydata = Ydata(ndxMiss);
+        Ydata = BpodSystem.Data.Custom.TrialData.DecisionVariable(indxToPlot); Ydata = Ydata(ndxMiss);
         set(BpodSystem.GUIHandles.OutcomePlot.NoResponse, 'xdata', Xdata, 'ydata', Ydata);
         %Plot NoFeedback trials
         ndxNoFeedback = ~BpodSystem.Data.Custom.TrialData.Feedback(indxToPlot);
         Xdata = indxToPlot(ndxNoFeedback&~ndxMiss);
-        Ydata = BpodSystem.Data.Custom.TrialData.DV(indxToPlot); Ydata = Ydata(ndxNoFeedback&~ndxMiss);
+        Ydata = BpodSystem.Data.Custom.TrialData.DecisionVariable(indxToPlot); Ydata = Ydata(ndxNoFeedback&~ndxMiss);
         set(BpodSystem.GUIHandles.OutcomePlot.NoFeedback, 'xdata', Xdata, 'ydata', Ydata);
         %Plot catch trials
         ndxCatch = BpodSystem.Data.Custom.TrialData.CatchTrial(indxToPlot);
         Xdata = indxToPlot(ndxCatch&~ndxMiss);
-        Ydata = BpodSystem.Data.Custom.TrialData.DV(indxToPlot); Ydata = Ydata(ndxCatch&~ndxMiss);
+        Ydata = BpodSystem.Data.Custom.TrialData.DecisionVariable(indxToPlot); Ydata = Ydata(ndxCatch&~ndxMiss);
         set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', Xdata, 'ydata', Ydata);
         %% Psyc Olf
         if TaskParameters.GUI.ShowPsycOlf
@@ -258,7 +267,7 @@ switch Action
         
         %% Psych Aud
         if TaskParameters.GUI.ShowPsycAud
-            AudDV = BpodSystem.Data.Custom.TrialData.DV(1:numel(BpodSystem.Data.Custom.TrialData.ChoiceLeft));
+            AudDV = BpodSystem.Data.Custom.TrialData.DecisionVariable(1:numel(BpodSystem.Data.Custom.TrialData.ChoiceLeft));
             ndxAud = BpodSystem.Data.Custom.TrialData.AuditoryTrial(1:numel(BpodSystem.Data.Custom.TrialData.ChoiceLeft));
             if isfield(BpodSystem.Data.Custom,'BlockNumber')
                 BlockNumber = BpodSystem.Data.Custom.TrialData.BlockNumber;
@@ -300,7 +309,7 @@ switch Action
             ndxError = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(1:iTrial) == 0 ; %all (completed) error trials (including catch errors)
             ndxCorrectCatch = BpodSystem.Data.Custom.TrialData.CatchTrial(1:iTrial) & BpodSystem.Data.Custom.TrialData.ChoiceCorrect(1:iTrial) == 1; %only correct catch trials
             ndxMinWT = BpodSystem.Data.Custom.TrialData.FeedbackTime > TaskParameters.GUI.VevaiometricMinWT;
-            DV = BpodSystem.Data.Custom.TrialData.DV(1:iTrial);
+            DV = BpodSystem.Data.Custom.TrialData.DecisionVariable(1:iTrial);
             DVNBin = TaskParameters.GUI.VevaiometricNBin;
             BinIdx = discretize(DV,linspace(-1,1,DVNBin+1));
             WTerr = grpstats(BpodSystem.Data.Custom.TrialData.FeedbackTime(ndxError&ndxMinWT),BinIdx(ndxError&ndxMinWT),'mean')';

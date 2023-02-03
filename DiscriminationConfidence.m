@@ -32,6 +32,8 @@ InitializePlots();
 % --------------------------Main loop------------------------------ %
 RunSession = true;
 iTrial = 1;
+BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;
+BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
 
 while RunSession
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
@@ -97,6 +99,11 @@ while RunSession
         RunProtocol('StartPause')
     end
             
+    
+    % update hidden TaskParameter fields
+    TaskParameters.Figures.OutcomePlot.Position = BpodSystem.ProtocolFigures.SideOutcomePlotFig.Position;
+    TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
+    
     % update behavior plots
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
     
