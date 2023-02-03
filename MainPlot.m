@@ -242,7 +242,7 @@ switch Action
                         end
                     else
                         lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
-                        bias = tanh(.3 * BpodSystem.Data.Custom.TrialData.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
+                        bias = tanh(.3 * [1 -1] * BpodSystem.Data.Custom.TrialData.RewardMagnitude(:, find(ndxBlock,1)));
                         lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
                         %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.TrialData.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
                         BpodSystem.GUIHandles.OutcomePlot.PsycOlf(iBlock) = line(AxesHandles.HandlePsycOlf,setStim,psyc, 'LineStyle','none','Marker','o',...
@@ -293,7 +293,7 @@ switch Action
                         end
                     else
                         lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
-                        bias = tanh(.3 * BpodSystem.Data.Custom.TrialData.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]');
+                        bias = tanh(.3 * [1 -1] * BpodSystem.Data.Custom.TrialData.RewardMagnitude(:, find(ndxBlock,1)));
                         lineColor(1) = 0.08+0.04*bias; lineColor(2) = .75; lineColor(3) = abs(bias); lineColor = hsv2rgb(lineColor);
                         %                     lineColor = lineColor + [0 0.3843*(tanh(BpodSystem.Data.Custom.TrialData.RewardMagnitude(find(ndxBlock,1),:) * [1 -1]')) 0]
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock) = line(AxesHandles.HandlePsycAud,PsycX,PsycY, 'LineStyle','none','Marker','o',...
