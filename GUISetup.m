@@ -158,19 +158,26 @@ if isempty(fieldnames(TaskParameters))
     %Show Plots
     TaskParameters.GUI.ShowPsycOlf = 0;
     TaskParameters.GUIMeta.ShowPsycOlf.Style = 'checkbox';
+
     TaskParameters.GUI.ShowPsycAud = 1;
     TaskParameters.GUIMeta.ShowPsycAud.Style = 'checkbox';
+
     TaskParameters.GUI.ShowVevaiometric = 1;
     TaskParameters.GUIMeta.ShowVevaiometric.Style = 'checkbox';
+
     TaskParameters.GUI.ShowTrialRate = 1;
     TaskParameters.GUIMeta.ShowTrialRate.Style = 'checkbox';
+
     TaskParameters.GUI.ShowFix = 1;
     TaskParameters.GUIMeta.ShowFix.Style = 'checkbox';
-    TaskParameters.GUI.ShowST = 1;
-    TaskParameters.GUIMeta.ShowST.Style = 'checkbox';
+
+    TaskParameters.GUI.ShowSampleLength = 1;
+    TaskParameters.GUIMeta.ShowSampleLength.Style = 'checkbox';
+
     TaskParameters.GUI.ShowFeedback = 1;
     TaskParameters.GUIMeta.ShowFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
+
+    TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowSampleLength','ShowFeedback'};
     
     %Vevaiometric
     TaskParameters.GUI.VevaiometricMinWT = 2;
