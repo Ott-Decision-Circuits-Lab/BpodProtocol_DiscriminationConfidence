@@ -30,7 +30,7 @@ trial_data.CatchTrial(iTrial) = false;
 trial_data.ST(iTrial) = NaN;
 trial_data.ResolutionTime(iTrial) = NaN;
 trial_data.Rewarded(iTrial) = false;
-trial_data.RewardMagnitude(iTrial, :) = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)];
+trial_data.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount*[TaskParameters.GUI.BlockTable.RewL(1), TaskParameters.GUI.BlockTable.RewR(1)]';
 trial_data.TrialNumber(iTrial) = iTrial;
 trial_data.LaserTrial(iTrial) = false;
 trial_data.LaserTrialTrainStart(iTrial) = NaN;
@@ -70,9 +70,9 @@ if iTrial > 1
     end
 end
 
-trial_data.RewardMagnitude(iTrial,:) = TaskParameters.GUI.RewardAmount*...
+trial_data.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount*...
     [TaskParameters.GUI.BlockTable.RewL(TaskParameters.GUI.BlockTable.BlockNumber==trial_data.BlockNumber(iTrial)),...
-    TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==trial_data.BlockNumber(iTrial))];
+    TaskParameters.GUI.BlockTable.RewR(TaskParameters.GUI.BlockTable.BlockNumber==trial_data.BlockNumber(iTrial))]';
 
 %% determine if catch trial
 if iTrial > TaskParameters.GUI.StartEasyTrials
