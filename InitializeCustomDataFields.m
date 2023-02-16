@@ -105,10 +105,12 @@ end
 TDTemp.AuditoryTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentAuditory;
 TDTemp.ClickTask(iTrial) = TaskParameters.GUI.AuditoryStimulusType == 1;
 TDTemp.AuditoryOmega(iTrial) = NaN;
+
 TDTemp.LeftClickRate(iTrial) = NaN;
 TDTemp.RightClickRate(iTrial) = NaN;
 TDTemp.LeftClickTrain{iTrial} = [];
 TDTemp.RightClickTrain{iTrial} = [];
+
 TDTemp.AudFracHigh(iTrial) = NaN;
 TDTemp.AudCloud{iTrial} = [];
 TDTemp.AudSound{iTrial} = [];

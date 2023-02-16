@@ -21,6 +21,8 @@ if ~BpodSystem.EmulatorMode
     LoadIndependentWaveform(Player);
     LoadTriggerProfileMatrix(Player);
 end
+BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;
+BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
 % ---------------------------------------------------------------------%
 
 if TaskParameters.GUI.Photometry
@@ -32,8 +34,6 @@ InitializePlots();
 % --------------------------Main loop------------------------------ %
 RunSession = true;
 iTrial = 1;
-BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;
-BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
 
 while RunSession
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
