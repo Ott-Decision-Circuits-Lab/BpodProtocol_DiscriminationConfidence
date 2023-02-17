@@ -38,8 +38,12 @@ iTrial = 1;
 while RunSession
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
     
-    if ~BpodSystem.EmulatorMode
-        LoadTrialDependentWaveform(Player, iTrial, 5, 2); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
+    SoundLevel = 5;
+    ClickLength = 2;
+    if BpodSystem.EmulatorMode
+        [LeftClickTrain, RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.AuditoryStimulusTime, 25000, ClickLength, SoundLevel, 'beta');
+    else
+        LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
         InitiateOlfactometer(iTrial);
         InitiatePsychtoolbox(iTrial);
     end
