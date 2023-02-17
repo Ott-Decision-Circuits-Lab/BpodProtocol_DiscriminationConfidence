@@ -31,7 +31,7 @@ TDTemp.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelay;
 
 % determine if catch trial
 if iTrial > TaskParameters.GUI.StartEasyTrials
-    TDTemp.CatchTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentCatch;
+    TDTemp.CatchTrial(iTrial) = rand(1,1)*100 < TaskParameters.GUI.PercentCatch;
 else
     TDTemp.CatchTrial(iTrial) = false;
 end
