@@ -5,6 +5,8 @@ global BpodSystem
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
+    TaskParameters.GUI.EphysSession = false;
+    TaskParameters.GUIMeta.EphysSession.Style = 'checkbox';
     TaskParameters.GUI.SessionDescription = 'abc';
     TaskParameters.GUIMeta.SessionDescription.Style = 'edittext';
     TaskParameters.GUI.ITI = 1; 
@@ -28,7 +30,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'SessionDescription','MaxSessionTime','CenterWaitMax','ITI',...
+    TaskParameters.GUIPanels.General = {'EphysSession','SessionDescription',...
+                                        'MaxSessionTime','CenterWaitMax','ITI',...
                                         'PreITI','RewardAmount','DrinkingTime','DrinkingGrace',...
                                         'ChoiceDeadLine','TimeOutIncorrectChoice',...
                                         'TimeOutBrokeFixation','TimeOutEarlyWithdrawal',...
@@ -284,7 +287,7 @@ if isempty(fieldnames(TaskParameters))
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
-    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
+    TaskParameters.GUITabs.General = {'General','StimDelay','BiasControl','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
