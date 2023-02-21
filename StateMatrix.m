@@ -64,9 +64,7 @@ else
     StimDeliverySound = {'WavePlayer1',['P' 3]};
     SideInSound = {'WavePlayer1',['P' 63]};
     IncorrectChoiceSound = {'WavePlayer1', ['P' 4]};
-    if TaskParameters.GUI.EarlyWithdrawalNoise
-        EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
-    end
+    EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
 end
 
 %Wire1 settings

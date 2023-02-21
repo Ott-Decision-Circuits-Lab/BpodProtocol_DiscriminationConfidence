@@ -16,9 +16,9 @@ windowCTA = 150; %window for CTA (ms)
 
 
 nTrials=BpodSystem.Data.nTrials;
-DV = BpodSystem.Data.Custom.TrialData.DV(1:nTrials-1);
+DV = BpodSystem.Data.Custom.TrialData.DecisionVariable(1:nTrials-1);
 ChoiceLeft = BpodSystem.Data.Custom.TrialData.ChoiceLeft(1:nTrials-1);
-ST = BpodSystem.Data.Custom.TrialData.ST(1:nTrials-1);
+ST = BpodSystem.Data.Custom.TrialData.SampleLength(1:nTrials-1);
 CatchTrial = BpodSystem.Data.Custom.TrialData.CatchTrial((1:nTrials-1));
 Feedback = BpodSystem.Data.Custom.TrialData.Feedback(1:nTrials-1);
 Correct = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(1:nTrials-1);
@@ -26,7 +26,7 @@ WT =  BpodSystem.Data.Custom.TrialData.FeedbackTime(1:nTrials-1);
 if isfield(BpodSystem.Data.Custom,'LaserTrial')
     LaserTrial =  BpodSystem.Data.Custom.TrialData.LaserTrial(1:nTrials-1);
 else
-    LaserTrial=false(1,nTrials);
+    LaserTrial=false(1,nTrials-1);
 end
 %define "completed trial"
 % not that abvious for errors
