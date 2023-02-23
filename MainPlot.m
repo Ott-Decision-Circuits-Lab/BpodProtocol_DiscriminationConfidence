@@ -192,19 +192,9 @@ switch Action
         indxToPlot = mn:iTrial;
         Ydata = TDTemp.DecisionVariable(indxToPlot); 
 
-        %Cumulative Reward Amount
-        R = 0;
-        ndxRwd = TDTemp.Rewarded;
-        if sum(ndxRwd)
-            LeftRewardedChoices = LeftChoices==1 & ndxRwd;
-            TotalLeftReward = dot(TDTemp.RewardMagnitudeL, LeftRewardedChoices);
-            RightRewardedChoices = LeftChoices==0 & ndxRwd;
-            TotalRightReward = dot(TDTemp.RewardMagnitudeR, RightRewardedChoices);
-            R = TotalLeftReward + TotalRightReward;
-        end
+        CumRewardTotal = CalculateCumulativeReward();
         set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [iTrial+1 1], 'string', ...
-            [num2str(R/1000) ' mL']);
-        clear R
+            [num2str(CumRewardTotal/1000) ' mL']);
 
         %Plot Rewarded
         ndxCor = TDTemp.ChoiceCorrect(indxToPlot)==1;
