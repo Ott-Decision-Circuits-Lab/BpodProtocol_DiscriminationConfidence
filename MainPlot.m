@@ -4,7 +4,9 @@ global BpodSystem
 global TaskParameters
 
 StimTypeMarkerY = -1.75;
-
+ColorCorr = '#0fb7e4';
+ColorIncorr = '#ad0b94';
+ColorCatch = '#ea720a';
 
 switch Action
     case 'init'
@@ -29,13 +31,13 @@ switch Action
         % Current trial and target
         BpodSystem.GUIHandles.OutcomePlot.DecisionVariable = line(0, .5, 'LineStyle','none','Marker','_','MarkerEdge','#0ca98c','MarkerFace','#11f3ca', 'MarkerSize', MarkerSize+5);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle = line(1,0, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize', MarkerSize);
-        BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross = line(1,0, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize', MarkerSize);
+        %BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross = line(1,0, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize', MarkerSize);
         
         % Responses and reward
         BpodSystem.GUIHandles.OutcomePlot.CumRwd = text(1,1.1,'0mL','verticalalignment','bottom','horizontalalignment','center', 'FontSize', MarkerFont);
-        BpodSystem.GUIHandles.OutcomePlot.Correct = line(-0.5,1.2, 'LineStyle','none','Marker','^','MarkerEdge','#0b8bad','MarkerFace','#0fb7e4', 'MarkerSize', MarkerSize);
-        BpodSystem.GUIHandles.OutcomePlot.Incorrect = line(-0.5,-1.2, 'LineStyle','none','Marker','v','MarkerEdge','#ad0b94','MarkerFace','#e50fc4', 'MarkerSize', MarkerSize);
-        BpodSystem.GUIHandles.OutcomePlot.Catch = line(-.1, 0, 'LineStyle','none','Marker','square','MarkerEdge', '#ea4b0a','MarkerFace', 'none', 'MarkerSize', MarkerSize+5);
+        BpodSystem.GUIHandles.OutcomePlot.Correct = line(-0.5,1.2, 'LineStyle','none','Marker','^','MarkerEdge', ColorCorr,'MarkerFace','#0fb7e4', 'MarkerSize', MarkerSize);
+        BpodSystem.GUIHandles.OutcomePlot.Incorrect = line(-0.5,-1.2, 'LineStyle','none','Marker','v','MarkerEdge', ColorIncorr,'MarkerFace','#e50fc4', 'MarkerSize', MarkerSize);
+        BpodSystem.GUIHandles.OutcomePlot.Catch = line(-.1, 0, 'LineStyle','none','Marker','square','MarkerEdge', ColorCatch,'MarkerFace', 'none', 'MarkerSize', MarkerSize+5);
         
 
         % Indicators of an invalid trial
@@ -50,9 +52,12 @@ switch Action
         set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata', -.5, 'ydata', StimTypeMarkerY); %find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', MarkerFont);
         hold(AxesHandles.HandleOutcome, 'on');
+        lgd = legend({'Olfactory', 'Auditory', 'DV', 'Current Trial', 'Correct', 'Incorr', 'Catch', 'Broke Fix', 'Early Withdr', 'No Feedback', 'No Response'});
+        lgd.NumColumns = 2;
+        lgd.FontSize = 8;
 
         %% Psyc Olfactory
-        BpodSystem.GUIHandles.OutcomePlot.PsycOlf = line(AxesHandles.HandlePsycOlf,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
+        BpodSystem.GUIHandles.OutcomePlot.PsycOlf = line(AxesHandles.HandlePsycOlf,[5 95],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',5,'Visible','off');
         BpodSystem.GUIHandles.OutcomePlot.PsycOlfFit = line(AxesHandles.HandlePsycOlf,[0 100],[.5 .5],'color','k','Visible','off');
         AxesHandles.HandlePsycOlf.YLim = [-.05 1.05];
         AxesHandles.HandlePsycOlf.XLim = 100*[-.05 1.05];
@@ -61,7 +66,7 @@ switch Action
         AxesHandles.HandlePsycOlf.Title.String = 'Psychometric Olf';
 
         %% Psyc Auditory
-        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',6,'Visible','off');
+        BpodSystem.GUIHandles.OutcomePlot.PsycAud = line(AxesHandles.HandlePsycAud,[-1 1],[.5 .5], 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace','k', 'MarkerSize',5,'Visible','off');
         BpodSystem.GUIHandles.OutcomePlot.PsycAudFit = line(AxesHandles.HandlePsycAud,[-1. 1.],[.5 .5],'color','k','Visible','off');
         AxesHandles.HandlePsycAud.YLim = [-.05 1.05];
         AxesHandles.HandlePsycAud.XLim = [-1.05, 1.05];
@@ -71,10 +76,10 @@ switch Action
         
         %% Vevaiometric curve
         hold(AxesHandles.HandleVevaiometric,'on')
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','g','Visible','off','LineWidth',2);
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color','r','Visible','off','LineWidth',2);
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color','r','Marker','o','MarkerFaceColor','r', 'MarkerSize',2,'Visible','off','MarkerEdgeColor','r');
-        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color','g','Marker','o','MarkerFaceColor','g', 'MarkerSize',2,'Visible','off','MarkerEdgeColor','g');
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color',ColorCatch,'Visible','off','LineWidth',1);
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','-','Color',ColorIncorr,'Visible','off','LineWidth',1);
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsErr = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color',ColorIncorr,'Marker','o','MarkerFaceColor', 'none', 'MarkerSize',2,'Visible','off','MarkerEdgeColor',ColorIncorr);
+        BpodSystem.GUIHandles.OutcomePlot.VevaiometricPointsCatch = line(AxesHandles.HandleVevaiometric,-2,-1, 'LineStyle','none','Color',ColorCatch,'Marker','s','MarkerFaceColor', 'none', 'MarkerSize',2,'Visible','off','MarkerEdgeColor', ColorCatch);
         AxesHandles.HandleVevaiometric.YLim = [0 10];
         AxesHandles.HandleVevaiometric.XLim = [-1.05, 1.05];
         AxesHandles.HandleVevaiometric.XLabel.String = 'Decision Variable';
@@ -179,7 +184,7 @@ switch Action
         StimTypeYMarkers = StimTypeMarkerY * ones(size(TDTemp.TrialNumber));
         
         set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle, 'xdata', iTrial+1, 'ydata', 0);
-        set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', iTrial+1, 'ydata', 0);
+        %set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', iTrial+1, 'ydata', 0);
         
         % plot modality background
         set(BpodSystem.GUIHandles.OutcomePlot.Olf, 'xdata', find(~TDTemp.AuditoryTrial), 'ydata', StimTypeYMarkers(~TDTemp.AuditoryTrial));  %TDTemp.DecisionVariable(~TDTemp.AuditoryTrial));
@@ -403,13 +408,15 @@ switch Action
 
             BpodSystem.GUIHandles.OutcomePlot.HistBroke = histogram(AxesHandles.HandleFix,TDTemp.FixDur(TDTemp.FixBroke)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistBroke.BinWidth = 50;
-            BpodSystem.GUIHandles.OutcomePlot.HistBroke.FaceColor = 'r';
+            BpodSystem.GUIHandles.OutcomePlot.HistBroke.FaceColor = ColorIncorr;
             BpodSystem.GUIHandles.OutcomePlot.HistBroke.EdgeColor = 'none';
+            BpodSystem.GUIHandles.OutcomePlot.HistBroke.FaceAlpha = 0.25;
+            BpodSystem.GUIHandles.OutcomePlot.HistBroke.EdgeAlpha = 0.25;
             
             BpodSystem.GUIHandles.OutcomePlot.HistFix = histogram(AxesHandles.HandleFix,TDTemp.FixDur(~TDTemp.FixBroke)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistFix.BinWidth = 50;
             BpodSystem.GUIHandles.OutcomePlot.HistFix.FaceColor = 'none';
-            BpodSystem.GUIHandles.OutcomePlot.HistFix.EdgeColor = 'b';
+            BpodSystem.GUIHandles.OutcomePlot.HistFix.EdgeColor = ColorCorr;
 
             BreakP = mean(TDTemp.FixBroke);
             cornertext(AxesHandles.HandleFix,sprintf('P=%1.2f',BreakP))
@@ -422,13 +429,15 @@ switch Action
 
             BpodSystem.GUIHandles.OutcomePlot.HistSTEarly = histogram(AxesHandles.HandleSampleLength,TDTemp.SampleLength(TDTemp.EarlyWithdrawal)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.BinWidth = 50;
-            BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.FaceColor = 'r';
+            BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.FaceColor = ColorIncorr;
             BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.EdgeColor = 'none';
+            BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.FaceAlpha = 0.25;
+            BpodSystem.GUIHandles.OutcomePlot.HistSTEarly.EdgeAlpha = 0.25;
 
             BpodSystem.GUIHandles.OutcomePlot.HistST = histogram(AxesHandles.HandleSampleLength,TDTemp.SampleLength(~TDTemp.EarlyWithdrawal)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistST.BinWidth = 50;
             BpodSystem.GUIHandles.OutcomePlot.HistST.FaceColor = 'none';
-            BpodSystem.GUIHandles.OutcomePlot.HistST.EdgeColor = 'b';
+            BpodSystem.GUIHandles.OutcomePlot.HistST.EdgeColor = ColorCorr;
 
             EarlyP = sum(TDTemp.EarlyWithdrawal)/sum(~TDTemp.FixBroke);
             cornertext(AxesHandles.HandleSampleLength,sprintf('P=%1.2f',EarlyP))
@@ -444,14 +453,16 @@ switch Action
             end
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed = histogram(AxesHandles.HandleFeedback,TDTemp.FeedbackTime(~TDTemp.Feedback(1:iTrial)&~TDTemp.CatchTrial(1:iTrial)&~ndxExclude)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.BinWidth = 100;
-            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = 'r';
+            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceColor = ColorIncorr;
             BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeColor = 'none';
+            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.FaceAlpha = 0.25;
+            BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.EdgeAlpha = 0.25;
             %BpodSystem.GUIHandles.OutcomePlot.HistNoFeed.Normalization = 'probability';
 
             BpodSystem.GUIHandles.OutcomePlot.HistFeed = histogram(AxesHandles.HandleFeedback,TDTemp.FeedbackTime(TDTemp.Feedback(1:iTrial)&~TDTemp.CatchTrial(1:iTrial)&~ndxExclude)*1000);
             BpodSystem.GUIHandles.OutcomePlot.HistFeed.BinWidth = 50;
             BpodSystem.GUIHandles.OutcomePlot.HistFeed.FaceColor = 'none';
-            BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = 'b';
+            BpodSystem.GUIHandles.OutcomePlot.HistFeed.EdgeColor = ColorCorr;
             %BpodSystem.GUIHandles.OutcomePlot.HistFeed.Normalization = 'probability';
 
             LeftSkip = sum(~TDTemp.Feedback(1:iTrial)&~TDTemp.CatchTrial(1:iTrial)&~ndxExclude&LeftChoices(1:iTrial)==1)/sum(~TDTemp.CatchTrial(1:iTrial)&~ndxExclude&LeftChoices(1:iTrial)==1);
@@ -463,7 +474,7 @@ end
 end
 
 function [mn,mx] = rescaleX(AxesHandle,CurrentTrial,nTrialsToShow)
-FractionWindowStickpoint = .75; % After this fraction of visible trials, the trial position in the window "sticks" and the window begins to slide through trials.
+FractionWindowStickpoint = .66; % After this fraction of visible trials, the trial position in the window "sticks" and the window begins to slide through trials.
 mn = max(round(CurrentTrial - FractionWindowStickpoint*nTrialsToShow),1);
 mx = mn + nTrialsToShow - 1;
 set(AxesHandle,'XLim',[mn-1 mx+1]);
