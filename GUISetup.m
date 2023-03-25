@@ -5,6 +5,8 @@ global BpodSystem
 TaskParameters = BpodSystem.ProtocolSettings;
 if isempty(fieldnames(TaskParameters))
     %% General
+    TaskParameters.GUI.EphysSession = false;
+    TaskParameters.GUIMeta.EphysSession.Style = 'checkbox';
     TaskParameters.GUI.SessionDescription = 'abc';
     TaskParameters.GUIMeta.SessionDescription.Style = 'edittext';
     TaskParameters.GUI.ITI = 1; 
@@ -28,7 +30,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.MaxSessionTime = 180;
     TaskParameters.GUI.PortLEDs = true;
     TaskParameters.GUIMeta.PortLEDs.Style = 'checkbox';
-    TaskParameters.GUIPanels.General = {'SessionDescription','MaxSessionTime','CenterWaitMax','ITI',...
+    TaskParameters.GUIPanels.General = {'EphysSession','SessionDescription',...
+                                        'MaxSessionTime','CenterWaitMax','ITI',...
                                         'PreITI','RewardAmount','DrinkingTime','DrinkingGrace',...
                                         'ChoiceDeadLine','TimeOutIncorrectChoice',...
                                         'TimeOutBrokeFixation','TimeOutEarlyWithdrawal',...
@@ -59,11 +62,11 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.FeedbackDelaySelection = 1;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp'};
-    TaskParameters.GUI.FeedbackDelayMin = 0;
+    TaskParameters.GUI.FeedbackDelayMin = 0.5;
     TaskParameters.GUI.FeedbackDelayMax = 0;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
-    TaskParameters.GUI.FeedbackDelayTau = 0.05;
+    TaskParameters.GUI.FeedbackDelayTau = 1.5;
     TaskParameters.GUI.FeedbackDelayGrace = 0;
     TaskParameters.GUI.IncorrectChoiceFeedbackType = 2;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
@@ -158,19 +161,26 @@ if isempty(fieldnames(TaskParameters))
     %Show Plots
     TaskParameters.GUI.ShowPsycOlf = 0;
     TaskParameters.GUIMeta.ShowPsycOlf.Style = 'checkbox';
+
     TaskParameters.GUI.ShowPsycAud = 1;
     TaskParameters.GUIMeta.ShowPsycAud.Style = 'checkbox';
+
     TaskParameters.GUI.ShowVevaiometric = 1;
     TaskParameters.GUIMeta.ShowVevaiometric.Style = 'checkbox';
+
     TaskParameters.GUI.ShowTrialRate = 1;
     TaskParameters.GUIMeta.ShowTrialRate.Style = 'checkbox';
+
     TaskParameters.GUI.ShowFix = 1;
     TaskParameters.GUIMeta.ShowFix.Style = 'checkbox';
-    TaskParameters.GUI.ShowST = 1;
-    TaskParameters.GUIMeta.ShowST.Style = 'checkbox';
+
+    TaskParameters.GUI.ShowSampleLength = 1;
+    TaskParameters.GUIMeta.ShowSampleLength.Style = 'checkbox';
+
     TaskParameters.GUI.ShowFeedback = 1;
     TaskParameters.GUIMeta.ShowFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowST','ShowFeedback'};
+
+    TaskParameters.GUIPanels.ShowPlots = {'ShowPsycOlf','ShowPsycAud','ShowVevaiometric','ShowTrialRate','ShowFix','ShowSampleLength','ShowFeedback'};
     
     %Vevaiometric
     TaskParameters.GUI.VevaiometricMinWT = 2;
@@ -277,7 +287,7 @@ if isempty(fieldnames(TaskParameters))
     %%
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
     %% Tabs
-    TaskParameters.GUITabs.General = {'StimDelay','BiasControl','General','FeedbackDelay','BlockStructure'};
+    TaskParameters.GUITabs.General = {'General','StimDelay','BiasControl','FeedbackDelay','BlockStructure'};
     TaskParameters.GUITabs.Odor = {'Olfactometer','OlfStimuli'};
     TaskParameters.GUITabs.Auditory = {'AudGeneral','AudMinSample','AudClicks','AudFreq','AudFreqLevels'};
     TaskParameters.GUITabs.Plots = {'ShowPlots','Vevaiometric'};
@@ -286,8 +296,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Photometry = {'PhotometryRecording','PhotometryNidaq','PhotometryPlot','PhotometryRig'};
     
     %%Non-GUI Parameters (but saved)
+    % Setting TaskParameters.Figures.ParameterGUI.Position causes GUI
+    % issues on Linux using opengl
     TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
-    TaskParameters.Figures.ParameterGUI.Position =  [9, 454, 1474, 562];
     
 end
 BpodParameterGUI('init', TaskParameters);
