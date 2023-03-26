@@ -16,8 +16,8 @@ if ~BpodSystem.EmulatorMode
 %     Player.loadWaveform(SoundIndex, PunishSound);
 %     SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
 %     LoadSoundMessages(SoundChannels);
-
-    [Player, fs]=SetupWavePlayer(25000); % 25kHz =sampling rate of 8Ch with 8Ch fully on
+    ChannelNumber = 4;
+    [Player, fs]=SetupWavePlayer(ChannelNumber); % 25kHz =sampling rate of 8Ch with 8Ch fully on
     LoadIndependentWaveform(Player);
     LoadTriggerProfileMatrix(Player);
 end
