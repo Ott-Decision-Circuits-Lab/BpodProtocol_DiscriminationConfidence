@@ -1,4 +1,4 @@
-function PlotPhotometryData(FigNidaq1,FigNidaq2, PhotoData, Photo2Data)
+function PlotPhotometryData(iTrial, FigNidaq1, FigNidaq2, PhotoData, Photo2Data)
 
 global BpodSystem
 global TaskParameters
@@ -11,7 +11,7 @@ if ~isnan(BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)) %Choice
 end
 %Leave
 if ~isnan(BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)) && (BpodSystem.Data.Custom.TrialData.ChoiceCorrect(iTrial) == 0 || BpodSystem.Data.Custom.TrialData.CatchTrial(iTrial) == 1)
-    Alignments{2} = BpodSystem.Data.Custom.ResolutionTime(iTrial);
+    Alignments{2} = BpodSystem.Data.Custom.TrialData.ResolutionTime(iTrial);
 end
 %Reward
 if  BpodSystem.Data.Custom.TrialData.Rewarded(iTrial)==1
