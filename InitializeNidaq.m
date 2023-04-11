@@ -1,6 +1,6 @@
 function [FigNidaq1,FigNidaq2]=InitializeNidaq()
 %% NIDAQ Initialization and Plots
-
+global BpodSystem
 global TaskParameters
 
 
@@ -18,5 +18,8 @@ else
     FigNidaq2=[];
 end
 
+% temp patch for the sake of saving plots
+BpodSystem.GUIHandles.Nidaq1=FigNidaq1;
+BpodSystem.GUIHandles.Nidaq2=FigNidaq2;
 
 end  % InitializeNidaq()
