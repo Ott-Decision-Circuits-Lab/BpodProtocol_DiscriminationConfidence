@@ -40,30 +40,30 @@ CompletedTrials = (Feedback&Correct==1) | (Correct==0) | CatchTrial&~isnan(Choic
 nTrialsCompleted = sum(CompletedTrials);
 
 %calculate exerienced dv
-ExperiencedDV=zeros(1,length(ST));
+ExperiencedDV=DV;
 
-%click task
-if TaskParameters.GUI.AuditoryStimulusType == 1 %click
-    LeftClickTrain = BpodSystem.Data.Custom.TrialData.LeftClickTrain(1:nTrials-1);
-    RightClickTrain = BpodSystem.Data.Custom.TrialData.RightClickTrain(1:nTrials-1);
-    for t = 1 : length(ST)
-        R = BpodSystem.Data.Custom.TrialData.RightClickTrain{t};
-        L = BpodSystem.Data.Custom.TrialData.LeftClickTrain{t};
-        Ri = sum(R<=ST(t));if Ri==0, Ri=1; end
-        Li = sum(L<=ST(t));if Li==0, Li=1; end
-        ExperiencedDV(t) = log10(Li/Ri);
-        %         ExperiencedDV(t) = (Li-Ri)./(Li+Ri);
-    end
-elseif TaskParameters.GUI.AuditoryStimulusType == 2 %freq
-%     LevelsLow = 1:ceil(TaskParameters.GUI.Aud_nFreq/3);
-%     LevelsHigh = ceil(TaskParameters.GUI.Aud_nFreq*2/3)+1:TaskParameters.GUI.Aud_nFreq;
-%     AudCloud = BpodSystem.Data.Custom.AudCloud(1:nTrials-1);
+% %click task
+% if TaskParameters.GUI.AuditoryStimulusType == 1 %click
+%     LeftClickTrain = BpodSystem.Data.Custom.TrialData.LeftClickTrain(1:nTrials-1);
+%     RightClickTrain = BpodSystem.Data.Custom.TrialData.RightClickTrain(1:nTrials-1);
 %     for t = 1 : length(ST)
-%         NLow = sum(ismember(AudCloud{t},LevelsLow)); if NLow==0, NLow=1; end
-%         NHigh = sum(ismember(AudCloud{t},LevelsHigh)); if NHigh==0, NHigh=1; end
-%         ExperiencedDV(t) = log10(NHigh/NLow);
+%         R = BpodSystem.Data.Custom.TrialData.RightClickTrain{t};
+%         L = BpodSystem.Data.Custom.TrialData.LeftClickTrain{t};
+%         Ri = sum(R<=ST(t));if Ri==0, Ri=1; end
+%         Li = sum(L<=ST(t));if Li==0, Li=1; end
+%         ExperiencedDV(t) = log10(Li/Ri);
+%         %         ExperiencedDV(t) = (Li-Ri)./(Li+Ri);
 %     end
-end
+% elseif TaskParameters.GUI.AuditoryStimulusType == 2 %freq
+% %     LevelsLow = 1:ceil(TaskParameters.GUI.Aud_nFreq/3);
+% %     LevelsHigh = ceil(TaskParameters.GUI.Aud_nFreq*2/3)+1:TaskParameters.GUI.Aud_nFreq;
+% %     AudCloud = BpodSystem.Data.Custom.AudCloud(1:nTrials-1);
+% %     for t = 1 : length(ST)
+% %         NLow = sum(ismember(AudCloud{t},LevelsLow)); if NLow==0, NLow=1; end
+% %         NHigh = sum(ismember(AudCloud{t},LevelsHigh)); if NHigh==0, NHigh=1; end
+% %         ExperiencedDV(t) = log10(NHigh/NLow);
+% %     end
+% end
 
 %caclulate  grace periods
 GracePeriods=[];
