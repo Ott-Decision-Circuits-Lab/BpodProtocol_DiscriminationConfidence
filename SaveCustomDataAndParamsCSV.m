@@ -71,7 +71,8 @@ FullTable = [DataTable ParamsTable];
 
 [filepath, SessionName, ext] = fileparts(BpodSystem.Path.CurrentDataFile);
 CSVName = "_trial_custom_data_and_params.csv";
-FileName = string(strcat("O:\data\", SessionName, CSVName));
+FileName = strcat('\\ottlabfs.bccn-berlin.pri\ottlab\data\', BpodSystem.Data.Info.Subject,...
+                  '\bpod_session\', SessionName(end-14:end), '\', SessionName, CSVName);
 writetable(FullTable, FileName, "Delimiter", "\t")
 
 end  % SaveCustomDataAndParamsCSV()
