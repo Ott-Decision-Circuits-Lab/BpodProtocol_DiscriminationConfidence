@@ -70,9 +70,17 @@ ParamsTable = cell2table(ParamVals, "VariableNames", ParamNames);
 FullTable = [DataTable ParamsTable];
 
 [filepath, SessionName, ext] = fileparts(BpodSystem.Path.CurrentDataFile);
+
+SessionFolder = strcat('\\ottlabfs.bccn-berlin.pri\ottlab\data\', BpodSystem.Data.Info.Subject,...
+                  '\bpod_session\', SessionName(end-14:end));
+if ~isfolder(SessionFolder)
+    disp('bpod_session is not a directory. A folder is created.')
+    mkdir(SessionFolder);
+end
+
 CSVName = "_trial_custom_data_and_params.csv";
-FileName = strcat('\\ottlabfs.bccn-berlin.pri\ottlab\data\', BpodSystem.Data.Info.Subject,...
-                  '\bpod_session\', SessionName(end-14:end), '\', SessionName, CSVName);
+FileName = strcat(SessionFolder, '\', SessionName, CSVName);
+
 writetable(FullTable, FileName, "Delimiter", "\t")
 
 end  % SaveCustomDataAndParamsCSV()
