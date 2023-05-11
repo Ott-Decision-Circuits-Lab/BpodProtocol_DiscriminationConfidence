@@ -1,30 +1,45 @@
-function FigHandle = Analysis()
+function FigHandle = Analysis(DataFile)
 global TaskParameters
-global BpodSystem
 
-GracePeriodsMax = TaskParameters.GUI.FeedbackDelayGrace; %assumes same for each trial
-StimTime = TaskParameters.GUI.AuditoryStimulusTime; %assumes same for each trial
-MinWT = TaskParameters.GUI.VevaiometricMinWT; %assumes same for each trial
+
+if nargin < 1
+    global BpodSystem
+    if isempty(BpodSystem)
+        [datafile, datapath] = uigetfile();
+        load(fullfile(datapath, datafile));
+    else
+        SessionData = BpodSystem.Data;
+    end
+else
+    load(DataFile);
+end
+
+GracePeriodsMax = SessionData.SettingsFile.GUI.FeedbackDelayGrace; %assumes same for each trial
+StimTime = SessionData.SettingsFile.GUI.AuditoryStimulusTime; %assumes same for each trial
+MinWT = SessionData.SettingsFile.GUI.VevaiometricMinWT; %assumes same for each trial
 MaxWT = 10;
 AudBin = 8; %Bins for psychometric
 AudBinWT = 6;%Bins for vevaiometric
 windowCTA = 150; %window for CTA (ms)
 
-[~,Animal ] = fileparts(fileparts(fileparts(fileparts(BpodSystem.Path.CurrentDataFile))));
-
+%[~,Animal ] = fileparts(fileparts(fileparts(fileparts(BpodSystem.Path.CurrentDataFile))));
+Animal = str2double(SessionData.Info.Subject);
+if isnan(Animal)
+    Animal = -1;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-nTrials=BpodSystem.Data.nTrials;
-DV = BpodSystem.Data.Custom.TrialData.DecisionVariable(1:nTrials-1);
-ChoiceLeft = BpodSystem.Data.Custom.TrialData.ChoiceLeft(1:nTrials-1);
-ST = BpodSystem.Data.Custom.TrialData.SampleLength(1:nTrials-1);
-CatchTrial = BpodSystem.Data.Custom.TrialData.CatchTrial((1:nTrials-1));
-Feedback = BpodSystem.Data.Custom.TrialData.Feedback(1:nTrials-1);
-Correct = BpodSystem.Data.Custom.TrialData.ChoiceCorrect(1:nTrials-1);
-WT =  BpodSystem.Data.Custom.TrialData.FeedbackTime(1:nTrials-1);
-if isfield(BpodSystem.Data.Custom,'LaserTrial')
-    LaserTrial =  BpodSystem.Data.Custom.TrialData.LaserTrial(1:nTrials-1);
+nTrials=SessionData.nTrials;
+DV = SessionData.Custom.TrialData.DecisionVariable(1:nTrials-1);
+ChoiceLeft = SessionData.Custom.TrialData.ChoiceLeft(1:nTrials-1);
+ST = SessionData.Custom.TrialData.SampleLength(1:nTrials-1);
+CatchTrial = SessionData.Custom.TrialData.CatchTrial((1:nTrials-1));
+Feedback = SessionData.Custom.TrialData.Feedback(1:nTrials-1);
+Correct = SessionData.Custom.TrialData.ChoiceCorrect(1:nTrials-1);
+WT =  SessionData.Custom.TrialData.FeedbackTime(1:nTrials-1);
+if isfield(SessionData.Custom,'LaserTrial')
+    LaserTrial =  SessionData.Custom.TrialData.LaserTrial(1:nTrials-1);
 else
     LaserTrial=false(1,nTrials-1);
 end
@@ -44,11 +59,11 @@ ExperiencedDV=DV;
 
 % %click task
 % if TaskParameters.GUI.AuditoryStimulusType == 1 %click
-%     LeftClickTrain = BpodSystem.Data.Custom.TrialData.LeftClickTrain(1:nTrials-1);
-%     RightClickTrain = BpodSystem.Data.Custom.TrialData.RightClickTrain(1:nTrials-1);
+%     LeftClickTrain = SessionData.Custom.TrialData.LeftClickTrain(1:nTrials-1);
+%     RightClickTrain = SessionData.Custom.TrialData.RightClickTrain(1:nTrials-1);
 %     for t = 1 : length(ST)
-%         R = BpodSystem.Data.Custom.TrialData.RightClickTrain{t};
-%         L = BpodSystem.Data.Custom.TrialData.LeftClickTrain{t};
+%         R = SessionData.Custom.TrialData.RightClickTrain{t};
+%         L = SessionData.Custom.TrialData.LeftClickTrain{t};
 %         Ri = sum(R<=ST(t));if Ri==0, Ri=1; end
 %         Li = sum(L<=ST(t));if Li==0, Li=1; end
 %         ExperiencedDV(t) = log10(Li/Ri);
@@ -57,7 +72,7 @@ ExperiencedDV=DV;
 % elseif TaskParameters.GUI.AuditoryStimulusType == 2 %freq
 % %     LevelsLow = 1:ceil(TaskParameters.GUI.Aud_nFreq/3);
 % %     LevelsHigh = ceil(TaskParameters.GUI.Aud_nFreq*2/3)+1:TaskParameters.GUI.Aud_nFreq;
-% %     AudCloud = BpodSystem.Data.Custom.AudCloud(1:nTrials-1);
+% %     AudCloud = SessionData.Custom.AudCloud(1:nTrials-1);
 % %     for t = 1 : length(ST)
 % %         NLow = sum(ismember(AudCloud{t},LevelsLow)); if NLow==0, NLow=1; end
 % %         NHigh = sum(ismember(AudCloud{t},LevelsHigh)); if NHigh==0, NHigh=1; end
@@ -70,11 +85,11 @@ GracePeriods=[];
 GracePeriodsL=[];
 GracePeriodsR=[];
 for t = 1 : length(ST)
-    GracePeriods = [GracePeriods;BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,2)-BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,1);BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,2)-BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,1)];
+    GracePeriods = [GracePeriods;SessionData.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,2)-SessionData.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,1);SessionData.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,2)-SessionData.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,1)];
     if ChoiceLeft(t) == 1
-        GracePeriodsL = [GracePeriodsL;BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,2)-BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,1)];
+        GracePeriodsL = [GracePeriodsL;SessionData.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,2)-SessionData.RawEvents.Trial{t}.States.rewarded_Lin_grace(:,1)];
     elseif ChoiceLeft(t)==0
-        GracePeriodsR = [GracePeriodsR;BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,2)-BpodSystem.Data.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,1)];
+        GracePeriodsR = [GracePeriodsR;SessionData.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,2)-SessionData.RawEvents.Trial{t}.States.rewarded_Rin_grace(:,1)];
     end
 end
 
@@ -91,7 +106,7 @@ end
 CondColors={[0,0,0],[.9,.1,.1]};
 
 %%
-FigHandle = figure('Position',[ 360         187        1056         598],'NumberTitle','off','Name',Animal);
+FigHandle = figure('Position',[ 360         187        1056         598],'NumberTitle','off','Name', SessionData.Info.Subject);
 % ExperiencedDV=DV;
 
 %Psychometric
@@ -200,7 +215,7 @@ for i =1:length(LaserCond)
         [Re,Pe] = EvaluateVevaiometric(DVError,WTError);
         Rcatch{i}=Rc;Pcatch{i}=Pc;Rerror{i}=Re;Perror{i}=Pe;
         %confidence auc
-        [auc(i),~,auc_sem(i)] = rocarea_torben(WTCatch,WTError,'bootstrap',200);
+        %[auc(i),~,auc_sem(i)] = rocarea_torben(WTCatch,WTError,'bootstrap',200);
         
     end
 end
