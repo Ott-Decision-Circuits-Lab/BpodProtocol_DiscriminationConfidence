@@ -25,7 +25,9 @@ TrialStates = RawEvents.Trial{end}.States;
 statesThisTrial = RawData.OriginalStateNamesByNumber{iTrial}(RawData.OriginalStateData{iTrial});
 
 if any(strcmp('stay_Cin',statesThisTrial))
+    TDTemp.Initiated(iTrial) = 1;  % whether the rat participated at all
     TDTemp.FixDur(iTrial) = diff(TrialStates.stay_Cin);
+    
 end
 
 if any(strcmp('stimulus_delivery_min',statesThisTrial))

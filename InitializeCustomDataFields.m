@@ -15,6 +15,7 @@ TDTemp.TrialNumber(iTrial) = iTrial;
 
 
 % ---------------------Sample and Choice variables-------------------- %
+TDTemp.Initiated(iTrial) = false;
 TDTemp.EarlyWithdrawal(iTrial) = false;
 TDTemp.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 TDTemp.SampleLength(iTrial) = NaN;  %previously ST

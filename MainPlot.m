@@ -89,9 +89,10 @@ switch Action
         %% Trial rate
         hold(AxesHandles.HandleTrialRate,'on')
         BpodSystem.GUIHandles.OutcomePlot.TrialRate = line(AxesHandles.HandleTrialRate,[0],[0], 'LineStyle','-','Color','k','Visible','off'); %#ok<NBRAK>
+        BpodSystem.GUIHandles.OutcomePlot.PercentInitiated = text(AxesHandles.HandleTrialRate,0.05,.95,'Participation = 0%','FontSize',8,'Units','normalized','Visible','off');
         AxesHandles.HandleTrialRate.XLabel.String = 'Time (min)'; % FIGURE OUT UNIT
-        AxesHandles.HandleTrialRate.YLabel.String = '# Trials';
-        AxesHandles.HandleTrialRate.Title.String = 'Trial rate';
+        AxesHandles.HandleTrialRate.YLabel.String = '# Trials initiated';
+        AxesHandles.HandleTrialRate.Title.String = 'Participation';
 
         %% Stimulus delay
         hold(AxesHandles.HandleFix,'on')
@@ -399,7 +400,13 @@ switch Action
             TrialStarts = BpodSystem.Data.TrialStartTimestamp;
             RelativeStartsMinutes = (TrialStarts - min(TrialStarts)) / 60;
             BpodSystem.GUIHandles.OutcomePlot.TrialRate.XData = RelativeStartsMinutes;
-            BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = 1:numel(LeftChoices);
+
+            nInitiated = cumsum(BpodSystem.Data.Custom.TrialData.Initiated);
+            BpodSystem.GUIHandles.OutcomePlot.TrialRate.YData = nInitiated;
+
+            PercentInitiated = nInitiated(end)/iTrial * 100;
+            set(BpodSystem.GUIHandles.OutcomePlot.PercentInitiated, 'string', ['Participation = ' sprintf('%1.1f', PercentInitiated) '%']);
+            AxesHandles.HandleTrialRate.YLim = [0 nInitiated(end)+1];
         end
 
         if TaskParameters.GUI.ShowFix
