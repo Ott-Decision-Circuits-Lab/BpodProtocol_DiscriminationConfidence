@@ -7,16 +7,18 @@ if nargin < 1
     if isempty(BpodSystem)
         [datafile, datapath] = uigetfile();
         load(fullfile(datapath, datafile));
+        GUISettings = SessionData.SettingsFile.GUI;
     else
         SessionData = BpodSystem.Data;
+        GUISettings = TaskParameters.GUI;
     end
 else
     load(DataFile);
 end
 
-GracePeriodsMax = SessionData.SettingsFile.GUI.FeedbackDelayGrace; %assumes same for each trial
-StimTime = SessionData.SettingsFile.GUI.AuditoryStimulusTime; %assumes same for each trial
-MinWT = SessionData.SettingsFile.GUI.VevaiometricMinWT; %assumes same for each trial
+GracePeriodsMax = GUISettings.FeedbackDelayGrace; %assumes same for each trial
+StimTime = GUISettings.AuditoryStimulusTime; %assumes same for each trial
+MinWT = GUISettings.VevaiometricMinWT; %assumes same for each trial
 MaxWT = 10;
 AudBin = 8; %Bins for psychometric
 AudBinWT = 6;%Bins for vevaiometric
