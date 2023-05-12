@@ -115,17 +115,18 @@ if sum(LaserTrial)>0
 else
     LaserCond=false;
 end
-CondColors={[0,0,0],[.9,.1,.1]};
+% CondColors={[0,0,0],[.9,.1,.1]};
+CondColors = {'k', '#F7497A', '#1BA8D2', '#D4D1D1'};
 
 %% ---------------------------------------------------------------------
 %%                      Start Figure Creation
 %% ---------------------------------------------------------------------
 if TaskType==1
-    FigPositionSize = [ 360         187        1056         300];
+    FigPositionSize = [ 360         187        1500         500];
     nRows = 1;
     nCols = 3;
 elseif TaskType==3
-    FigPositionSize = [ 360         187        1056         600];
+    FigPositionSize = [ 360         187        1500         1000];
     nRows = 2;
     nCols = 4;
 end
@@ -138,21 +139,42 @@ FigHandle = figure('Position', FigPositionSize, 'NumberTitle', 'off', ...
 %% ---------------------------------------------------------------------
 subplot(nRows,nCols,1)
 hold on
-for i = 1:length(LaserCond)
-    CompletedTrialsCond = CompletedTrials & LaserTrial == LaserCond(i);
-    AudDV = ExperiencedDV(CompletedTrialsCond);
-    if ~isempty(AudDV)
-        BinIdx = discretize(AudDV,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBin+1));
-        PsycY = grpstats(ChoiceLeft(CompletedTrialsCond),BinIdx,'mean');
-        PsycX = grpstats(ExperiencedDV(CompletedTrialsCond),BinIdx,'mean');
-        plot(PsycX,PsycY,'ok','MarkerFaceColor',CondColors{i},'MarkerEdgeColor','w','MarkerSize',6)
-        XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
-        YFit = glmval(glmfit(AudDV,ChoiceLeft(CompletedTrialsCond)','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
-        plot(XFit,YFit,'Color',CondColors{i});
-        xlabel('DV');ylabel('p left')
-        text(0.95*min(get(gca,'XLim')),0.96*max(get(gca,'YLim')),[num2str(round(nanmean(Correct(CompletedTrialsCond))*100)),'%,n=',num2str(nTrialsCompleted)]);
+
+nBlocks = max(GUISettings.BlockTable.BlockNumber);
+BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
+for i = 1:nBlocks
+    BlockBegin = BlockIdx(i) + 1;
+    BlockEnd = BlockIdx(i+1);
+    if BlockBegin < nTrials
+        if BlockEnd > nTrials
+            BlockEnd = nTrials - 1;
+        end
+        CompletedTrialsBlock = CompletedTrials(1, BlockBegin:BlockEnd);
+        AudDV = ExperiencedDV(CompletedTrialsBlock);
+        if ~isempty(AudDV)
+            DVAxis = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, AudBin+1);
+            BinIdx = discretize(AudDV, DVAxis);
+    
+            PsycY = grpstats(ChoiceLeft(CompletedTrialsBlock), BinIdx, 'mean');
+            PsycX = grpstats(ExperiencedDV(CompletedTrialsBlock), BinIdx, 'mean');
+            plot(PsycX,PsycY,'ok','MarkerFaceColor', CondColors{i}, ...
+                                  'MarkerEdgeColor', CondColors{i}, ...
+                                  'MarkerSize', 6);
+    
+            XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
+            YFit = glmval(glmfit(AudDV, ChoiceLeft(CompletedTrialsBlock)','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
+            plot(XFit, YFit, 'Color', CondColors{i}, 'LineWidth', 2);
+    
+            xlabel('DV');
+            ylabel('p left')
+            text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
+                [num2str(round(nanmean(Correct(CompletedTrialsBlock))*100)), ...
+                 '% Correct, nTrials=',num2str(BlockEnd-BlockBegin+1)], ...
+                 'Color', CondColors{i});
+        end
     end
 end
+legend('','Equal','','L>R','','R>L','','Equal', 'Location', 'southeast')
 
 
 %% ---------------------------------------------------------------------
@@ -207,8 +229,8 @@ if ~all(isnan(GracePeriodsL)) && numel(center) > 1 && ~all(isnan(GracePeriodsR))
     gr = hist(GracePeriodsR,center);gr=gr/sum(gr);
     hold on
     plot(center,g,'k','LineWidth',2)
-    plot(center,gl,'m','LineWidth',1)
-    plot(center,gr,'c','LineWidth',1)
+    plot(center,gl, 'Color', CondColors{2},'LineWidth',2)
+    plot(center,gr, 'Color', CondColors{3},'LineWidth',2)
     legend('Both','Left','Right', 'Location', 'east')
     xlabel('Grace period (s)');ylabel('p');
     text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.05,['n=',num2str(sum(~isnan(GracePeriods))),' (L=',num2str(sum(~isnan(GracePeriodsL))),'/R=',num2str(sum(~isnan(GracePeriodsR))),')']);
@@ -228,15 +250,17 @@ if length(LaserCond)==1
     xlabel('waiting time (s)'); ylabel ('n trials');
     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
-    histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor',[.2,.2,1]);
-    histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor',[.8,.6,.1]);
+    histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
+    histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor', CondColors{3});
 
     meanWTL = nanmean(WTnoFeedbackL);
     meanWTR = nanmean(WTnoFeedbackR);
-    line([meanWTL,meanWTL],get(gca,'YLim'),'Color',[.2,.2,1]);
-    line([meanWTR,meanWTR],get(gca,'YLim'),'Color',[.8,.6,.1]);
-    text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_l=',num2str(round(meanWTL*10)/10)],'Color',[.2,.2,1]);
-    text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_r=',num2str(round(meanWTR*10)/10)],'Color',[.8,.6,.1]);
+    line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
+    line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
+    text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+        ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
+    text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+        ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
     
     PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
     PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
