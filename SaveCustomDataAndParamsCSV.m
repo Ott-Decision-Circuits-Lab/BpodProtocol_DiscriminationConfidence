@@ -8,6 +8,7 @@ Date: October 13, 2022
 %}
 
 global BpodSystem
+global TaskParameters
 
 nTrials = BpodSystem.Data.nTrials;
 
@@ -78,8 +79,13 @@ if ~isfolder(SessionFolder)
     mkdir(SessionFolder);
 end
 
+if TaskParameters.GUI.FeedbackDelaySelection == 1  % reward-bias task
+   TaskName = "_reward-bias";
+elseif TaskParameters.GUI.FeedbackDelaySelection == 3 % time-investment task
+   TaskName = "_time-investment";
+end
 CSVName = "_trial_custom_data_and_params.csv";
-FileName = strcat(SessionFolder, '\', SessionName, CSVName);
+FileName = strcat(SessionFolder, '\', SessionName, TaskName, CSVName);
 
 writetable(FullTable, FileName, "Delimiter", "\t")
 
