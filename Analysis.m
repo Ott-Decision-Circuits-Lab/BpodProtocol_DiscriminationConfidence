@@ -127,7 +127,11 @@ if TaskType==1
     nCols = 3;
 elseif TaskType==3
     FigPositionSize = [ 360         187        1500         1000];
-    nRows = 2;
+    if sum(CatchTrial)
+        nRows = 2;
+    else
+        nRows = 1;
+    end
     nCols = 4;
 end
 FigHandle = figure('Position', FigPositionSize, 'NumberTitle', 'off', ...
@@ -300,7 +304,7 @@ end
 
 
 
-
+if sum(CatchTrial)
 %% ---------------------------------------------------------------------
 %% conditioned psychometric
 %% ---------------------------------------------------------------------
@@ -425,7 +429,7 @@ ylabel('AUC')
 
 RedoTicks(gcf);
 
-
+end % if sum(CatchTrial)
 end % if TaskType==3
 
 
