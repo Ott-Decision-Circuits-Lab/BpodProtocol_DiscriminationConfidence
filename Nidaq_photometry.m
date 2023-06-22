@@ -8,10 +8,22 @@ switch action
 nidaq.device            = TaskParameters.GUI.nidaqDev;
 nidaq.duration      	= TaskParameters.GUI.NidaqDuration;
 nidaq.sample_rate     	= TaskParameters.GUI.NidaqSamplingRate;
-nidaq.ai_channels       = {'ai0','ai1'};  
+nidaq.ai_channels       = {'ai0','ai1'};           % photodetectors
 nidaq.ai_data           = [];
 nidaq.ao_channels       = {'ao0','ao1'};           % LED1 and LED2
 nidaq.ao_data           = [];
+
+% for the doric minicube:
+% ai0: green photodetector
+% ai1: red photodetector
+% ao0: "LED1" should be blue (470nm) LED
+% ao1: "LED2" should be yellow (535nm) LED
+% there are only 2 ao channels on our NIDAQ card.
+% isosbestic is currently coded as LED2
+    % main limitation is that it needs to be driven at a different
+    % frequency than the green LED, and so it needs to be on a different
+    % ao.  but then the red LED won't be able to be separated.
+
 
 daq.reset
 daq.HardwareInfo.getInstance('DisableReferenceClockSynchronization',true); % Necessary for this Nidaq
