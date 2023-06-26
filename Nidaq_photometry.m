@@ -8,21 +8,22 @@ switch action
 nidaq.device            = TaskParameters.GUI.nidaqDev;
 nidaq.duration      	= TaskParameters.GUI.NidaqDuration;
 nidaq.sample_rate     	= TaskParameters.GUI.NidaqSamplingRate;
-nidaq.ai_channels       = {'ai0','ai1'};           % photodetectors
+nidaq.ai_channels       = {'ai0','ai1'};           % photodetectors (green and red)
 nidaq.ai_data           = [];
 nidaq.ao_channels       = {'ao0','ao1'};           % LED1 and LED2
 nidaq.ao_data           = [];
 
 % for the doric minicube:
-% ai0: green photodetector
-% ai1: red photodetector
-% ao0: "LED1" should be blue (470nm) LED
-% ao1: "LED2" should be yellow (535nm) LED
+% ai0: green photodetector (F1)
+% ai1: red photodetector (F2)
+% ao0: "LED1", is blue (470nm) LED
+% ao1: "LED2", is either yellow (535nm) LED or UV (405nm) LED
 % there are only 2 ao channels on our NIDAQ card.
 % isosbestic is currently coded as LED2
     % main limitation is that it needs to be driven at a different
     % frequency than the green LED, and so it needs to be on a different
-    % ao.  but then the red LED won't be able to be separated.
+    % ao. but then the red LED won't be able to be on a separate frequency.
+    % this may not be a huge problem, but it's the sacrifice made.
 
 
 daq.reset
@@ -92,7 +93,10 @@ end
 % saves output channels for photometry
 if TaskParameters.GUI.Photometry
     if TaskParameters.GUI.Modulation
-        if TaskParameters.GUI.DbleFibers || TaskParameters.GUI.RedChannel
+        if TaskParameters.GUI.RedChannel & TaskParameters.GUI.Isobestic405
+            photometryData  = [photometryData  nidaq.ao_data(1:size(photometryData,1),:)];
+            photometry2Data = [photometry2Data nidaq.ao_data(1:size(photometry2Data,1),2)];
+        elseif TaskParameters.GUI.DbleFibers || TaskParameters.GUI.RedChannel
             photometryData  = [photometryData  nidaq.ao_data(1:size(photometryData,1),1)];
             photometry2Data = [photometry2Data nidaq.ao_data(1:size(photometry2Data,1),2)];
         elseif TaskParameters.GUI.Isobestic405
