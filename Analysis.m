@@ -126,11 +126,12 @@ if TaskType==1
     nRows = 1;
     nCols = 3;
 elseif TaskType==3
-    FigPositionSize = [ 360         187        1500         1000];
     if sum(CatchTrial)
+        FigPositionSize = [ 360         187        1500         1000];
         nRows = 2;
     else
         nRows = 1;
+        FigPositionSize = [ 360         187        1500         500];
     end
     nCols = 4;
 end
@@ -144,6 +145,7 @@ FigHandle = figure('Position', FigPositionSize, 'NumberTitle', 'off', ...
 subplot(nRows,nCols,1)
 hold on
 
+DVAxis = linspace(-1, 1, 21);
 nBlocks = max(GUISettings.BlockTable.BlockNumber);
 BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
 for i = 1:nBlocks
@@ -153,27 +155,32 @@ for i = 1:nBlocks
         if BlockEnd > nTrials
             BlockEnd = nTrials - 1;
         end
-        CompletedTrialsBlock = CompletedTrials(1, BlockBegin:BlockEnd);
-        AudDV = ExperiencedDV(CompletedTrialsBlock);
+        CompletedTrialsBlock = CompletedTrials(BlockBegin:BlockEnd);
+        LeftChoicesBlock = ChoiceLeft(BlockBegin:BlockEnd);
+        LeftChoicesBlock = LeftChoicesBlock(CompletedTrialsBlock);
+        AudDV = ExperiencedDV(BlockBegin:BlockEnd);
+        AudDV = AudDV(CompletedTrialsBlock);
+        CorrectBlock = Correct(BlockBegin:BlockEnd);
+        CorrectBlock = CorrectBlock(CompletedTrialsBlock);
         if ~isempty(AudDV)
-            DVAxis = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, AudBin+1);
             BinIdx = discretize(AudDV, DVAxis);
-    
-            PsycY = grpstats(ChoiceLeft(CompletedTrialsBlock), BinIdx, 'mean');
-            PsycX = grpstats(ExperiencedDV(CompletedTrialsBlock), BinIdx, 'mean');
+
+            PsycY = grpstats(LeftChoicesBlock, BinIdx, 'mean');
+            PsycX = grpstats(AudDV, BinIdx, 'mean');
             plot(PsycX,PsycY,'ok','MarkerFaceColor', CondColors{i}, ...
                                   'MarkerEdgeColor', CondColors{i}, ...
                                   'MarkerSize', 6);
     
             XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
-            YFit = glmval(glmfit(AudDV, ChoiceLeft(CompletedTrialsBlock)','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
+            YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
             plot(XFit, YFit, 'Color', CondColors{i}, 'LineWidth', 2);
     
             xlabel('DV');
             ylabel('p left')
+            
             text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
-                [num2str(round(nanmean(Correct(CompletedTrialsBlock))*100)), ...
-                 '% Correct, nTrials=',num2str(BlockEnd-BlockBegin+1)], ...
+                [num2str(round(nanmean(CorrectBlock)*100)), ...
+                 '% Correct, nTrials=',num2str(sum(CompletedTrialsBlock))], ...
                  'Color', CondColors{i});
         end
     end
