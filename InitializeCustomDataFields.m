@@ -78,7 +78,7 @@ TDTemp.RewardMagnitudeR(iTrial) = TaskParameters.GUI.RewardAmount * TaskParamete
 
 
 % -----------------------Stimulus-specific----------------------------- %
-TDTemp.DecisionVariable(iTrial) = NaN;  % e.g., relative click rate
+TDTemp.DecisionVariable(iTrial) = NaN;  % e.g., relative click rate (previously DV)
 
 % -----Odor----- %
 TDTemp.OdorFracA(iTrial) = NaN; % randsample([min(TaskParameters.GUI.OdorTable.OdorFracA) max(TaskParameters.GUI.OdorTable.OdorFracA)],2)';

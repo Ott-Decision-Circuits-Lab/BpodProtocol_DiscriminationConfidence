@@ -117,6 +117,7 @@ else
 end
 % CondColors={[0,0,0],[.9,.1,.1]};
 CondColors = {'k', '#F7497A', '#1BA8D2', '#D4D1D1'};
+CondStrings = {'Equal-1', '', '', 'Equal-2'};
 
 %% ---------------------------------------------------------------------
 %%                      Start Figure Creation
@@ -155,6 +156,17 @@ for i = 1:nBlocks
         if BlockEnd > nTrials
             BlockEnd = nTrials - 1;
         end
+        if i==1 | i>3
+            LocalColor = CondColors{i};
+        else
+            if GUISettings.BlockTable.RewL(i) > GUISettings.BlockTable.RewR(i)
+                LocalColor = CondColors{2};
+                CondStrings{i} = 'L>R';
+            else
+                LocalColor = CondColors{3};
+                CondStrings{i} = 'R>L';
+            end
+        end
         CompletedTrialsBlock = CompletedTrials(BlockBegin:BlockEnd);
         LeftChoicesBlock = ChoiceLeft(BlockBegin:BlockEnd);
         LeftChoicesBlock = LeftChoicesBlock(CompletedTrialsBlock);
@@ -167,13 +179,13 @@ for i = 1:nBlocks
 
             PsycY = grpstats(LeftChoicesBlock, BinIdx, 'mean');
             PsycX = grpstats(AudDV, BinIdx, 'mean');
-            plot(PsycX,PsycY,'ok','MarkerFaceColor', CondColors{i}, ...
-                                  'MarkerEdgeColor', CondColors{i}, ...
+            plot(PsycX,PsycY,'ok','MarkerFaceColor', LocalColor, ...
+                                  'MarkerEdgeColor', LocalColor, ...
                                   'MarkerSize', 6);
     
             XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
             YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
-            plot(XFit, YFit, 'Color', CondColors{i}, 'LineWidth', 2);
+            plot(XFit, YFit, 'Color', LocalColor, 'LineWidth', 2);
     
             xlabel('DV');
             ylabel('p left')
@@ -181,11 +193,11 @@ for i = 1:nBlocks
             text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
                 [num2str(round(nanmean(CorrectBlock)*100)), ...
                  '% Correct, nTrials=',num2str(sum(CompletedTrialsBlock))], ...
-                 'Color', CondColors{i});
+                 'Color', LocalColor);
         end
     end
 end
-legend('','Equal','','L>R','','R>L','','Equal', 'Location', 'southeast')
+legend('',CondStrings{1},'',CondStrings{2},'',CondStrings{3},'',CondStrings{4}, 'Location', 'southeast')
 
 
 %% ---------------------------------------------------------------------
