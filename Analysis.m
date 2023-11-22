@@ -150,27 +150,28 @@ CondStrings = {'Equal-1', '', '', 'Equal-2'};
 %%                      Start Figure Creation
 %% ---------------------------------------------------------------------
 if TaskType==1
-    FigPositionSize = [ 360         187        1500         500];
-    nRows = 1;
+    FigPositionSize = [ 360         187        1500         600];
+    nRows = 2;
     nCols = 3;
 elseif TaskType==3
     if sum(CatchTrial)
-        FigPositionSize = [ 360         187        1500         1000];
+        FigPositionSize = [ 360         187        1500         900];
         nRows = 3;
     else
-        nRows = 1;
-        FigPositionSize = [ 360         187        1500         500];
+        nRows = 2;
+        FigPositionSize = [ 360         187        1500         600];
     end
-    nCols = 4;
+    nCols = 3;
 end
 FigHandle = figure('Position', FigPositionSize, 'NumberTitle', 'off', ...
                    'Name', SessionData.Info.Subject);
 
 
+
 %% ---------------------------------------------------------------------
 %% Psychometric
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,1)
+subplot(nRows,nCols,4)
 hold on
 
 DVAxis = linspace(-1, 1, 21);
@@ -230,44 +231,44 @@ legend('',CondStrings{1},'',CondStrings{2},'',CondStrings{3},'',CondStrings{4}, 
 %% ---------------------------------------------------------------------
 %% sampling time
 %% ---------------------------------------------------------------------
-panel=subplot(nRows,nCols,2);
-hold on
-if sum(CompletedTrials)>1
-    center = linspace(min(ST(CompletedTrials)),max(ST(CompletedTrials)),15);
-    h=hist(ST(CompletedTrials),center);
-    if ~isempty(h)
-        h=h/sum(h);
-        % ylabel('p')
-        plot(abs(ExperiencedDV(CompletedTrials)),ST(CompletedTrials),'.k');
-        xlabel('DV');
-        ylabel('Sampling time [s]')
-        ylim([mean(ST(CompletedTrials)) - 0.0001, mean(ST(CompletedTrials)) + 0.0001]);
-
-        ax2 = axes('Position',panel.Position);
-        panel.Position=ax2.Position;
-        plot(h,center,'r','LineWidth',2,'Parent',ax2);
-        ylim([mean(ST(CompletedTrials)) - 0.0001, mean(ST(CompletedTrials)) + 0.0001]);
-        yticks([]);
-
-        ax2.YAxis.Visible='off';
-        ax2.XAxisLocation='top';
-        ax2.Color='none';
-        ax2.XAxis.FontSize = 8;
-        ax2.XAxis.Color=[1,0,0];
-        ax2.XLabel.String = 'p';
-        ax2.XLabel.Position=[0.15,3.1,0];
-        [r,p]=corr(abs(ExperiencedDV(CompletedTrials&~isnan(ST)))',ST(CompletedTrials&~isnan(ST))','type','Spearman');
-        text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.00001,['r=',num2str(round(r*100)/100),', p=',num2str(round(p*100)/100)]);
-        
-    end
-end
+% panel=subplot(nRows,nCols,2);
+% hold on
+% if sum(CompletedTrials)>1
+%     center = linspace(min(ST(CompletedTrials)),max(ST(CompletedTrials)),15);
+%     h=hist(ST(CompletedTrials),center);
+%     if ~isempty(h)
+%         h=h/sum(h);
+%         % ylabel('p')
+%         plot(abs(ExperiencedDV(CompletedTrials)),ST(CompletedTrials),'.k');
+%         xlabel('DV');
+%         ylabel('Sampling time [s]')
+%         ylim([mean(ST(CompletedTrials)) - 0.0001, mean(ST(CompletedTrials)) + 0.0001]);
+% 
+%         ax2 = axes('Position',panel.Position);
+%         panel.Position=ax2.Position;
+%         plot(h,center,'r','LineWidth',2,'Parent',ax2);
+%         ylim([mean(ST(CompletedTrials)) - 0.0001, mean(ST(CompletedTrials)) + 0.0001]);
+%         yticks([]);
+% 
+%         ax2.YAxis.Visible='off';
+%         ax2.XAxisLocation='top';
+%         ax2.Color='none';
+%         ax2.XAxis.FontSize = 8;
+%         ax2.XAxis.Color=[1,0,0];
+%         ax2.XLabel.String = 'p';
+%         ax2.XLabel.Position=[0.15,3.1,0];
+%         [r,p]=corr(abs(ExperiencedDV(CompletedTrials&~isnan(ST)))',ST(CompletedTrials&~isnan(ST))','type','Spearman');
+%         text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.00001,['r=',num2str(round(r*100)/100),', p=',num2str(round(p*100)/100)]);
+%         
+%     end
+% end
 
 
 
 %% ---------------------------------------------------------------------
 %% grace periods
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,3)
+subplot(nRows,nCols,5)
 %remove "full" grace periods
 GracePeriods(GracePeriods>=GracePeriodsMax-0.001 & GracePeriods<=GracePeriodsMax+0.001 )=[];
 GracePeriodsR(GracePeriodsR>=GracePeriodsMax-0.001 & GracePeriodsR<=GracePeriodsMax+0.001 )=[];
@@ -295,7 +296,7 @@ if TaskType==3
 ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
 if length(LaserCond)==1
     %no laser
-    subplot(nRows,nCols,4)
+    subplot(nRows,nCols,6)
     hold on
     xlabel('waiting time (s)'); ylabel ('n trials');
     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
@@ -355,7 +356,7 @@ if sum(CatchTrial)
 %% conditioned psychometric
 %% ---------------------------------------------------------------------
 %
-subplot(nRows,nCols,5)
+subplot(nRows,nCols,7)
 hold on
 %low
 WTmed=median(WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT));
@@ -388,7 +389,7 @@ end
 %% ---------------------------------------------------------------------
 %% calibration
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,6)
+subplot(nRows,nCols,8)
 hold on
 xlabel('Waiting time (s)');ylabel('p correct')
 WTBin=5;
@@ -412,7 +413,7 @@ end
 %% ---------------------------------------------------------------------
 %% Vevaiometric
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,7)
+subplot(nRows,nCols,9)
 hold on
 
 xlabel('DV');ylabel('Waiting time (s)')
@@ -465,21 +466,23 @@ end
 %% ---------------------------------------------------------------------
 %% confidence index
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,8)
-hold on
-for i =1:length(LaserCond)
-    errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
-end
-xlabel('DV quantile')
-ylabel('AUC')
+% subplot(nRows,nCols,8)
+% hold on
+% for i =1:length(LaserCond)
+%     errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
+% end
+% xlabel('DV quantile')
+% ylabel('AUC')
+% 
+% RedoTicks(gcf);
 
-RedoTicks(gcf);
+end % if sum(CatchTrial)
+end % if TaskType==3
 
 %% ---------------------------------------------------------------------
 %% Event overview across session
 %% ---------------------------------------------------------------------
-%subplot(nRows,nCols,9)
-TrialOverviewHandle = axes(FigHandle, 'Position', [0.125    0.125    0.49    0.2]);
+TrialOverviewHandle = axes(FigHandle, 'Position', [0.025    0.7    0.55    0.28]);
 hold on
 set(TrialOverviewHandle,...
     'TickDir', 'out',...
@@ -561,8 +564,7 @@ ChoiceLeftHandle = line(TrialOverviewHandle,...
 %% ---------------------------------------------------------------------
 %% Event count and ratio in session
 %% ---------------------------------------------------------------------
-%subplot(nRows,nCols,10)
-EventOverviewHandle = axes(FigHandle, 'Position', [0.747    0.125    0.16    0.20]);
+EventOverviewHandle = axes(FigHandle, 'Position', [0.77    0.7    0.16    0.27]);
 hold on
 YTickLabel = {strcat(num2str(nTrials), ' | 100%'),...
               strcat(num2str(length(NoTrialStartndxTrial)), ' | ', sprintf('%04.1f', 100*length(NoTrialStartndxTrial)/nTrials), '%'),...
@@ -617,12 +619,8 @@ end
 
 ChoiceLeftLegend = ["Right", "Left"];
 EventRatioLegendHandle = legend(EventOverviewHandle, ChoiceLeftLegend,...
-                                'Position', [0.78    0.06    0.10    0.012],...
+                                'Position', [0.7    0.97    0.10    0.012],...
                                 'NumColumns', 2);
-
-end % if sum(CatchTrial)
-end % if TaskType==3
-
 
 
 end  % Analysis()
