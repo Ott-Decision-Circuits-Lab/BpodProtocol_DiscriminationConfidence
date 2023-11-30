@@ -13,17 +13,21 @@ if ~BpodSystem.EmulatorMode
     if ~isfield(BpodSystem.ModuleUSB, 'WavePlayer1') && ~isfield(BpodSystem.ModuleUSB, 'HiFi1')
         warning('Warning: To run this protocol with sound or laser, you will need to pair an Analog Output Module or a HiFi Module(hardware) with its USB port. Click the USB config button on the Bpod console.')
     else
+        if exist('Player')
+            clearvars(Player)
+        end
         if isfield(BpodSystem.ModuleUSB, 'HiFi1')
             [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
-        end
-        if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+            LoadIndependentWaveform(Player);
+        elseif isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
             ChannelNumber = 4;
             [Player, ~] = SetupWavePlayer(ChannelNumber); % 25kHz =sampling rate of 8Ch with 8Ch fully on
+
+            LoadIndependentWaveform(Player);
+            LoadTriggerProfileMatrix(Player);
+            % SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
+            % LoadSoundMessages(SoundChannels);
         end
-        LoadIndependentWaveform(Player);
-        LoadTriggerProfileMatrix(Player);
-        % SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
-        % LoadSoundMessages(SoundChannels);
     end
 end
 BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;

@@ -61,10 +61,19 @@ if BpodSystem.EmulatorMode
     SideInSound = {};
     IncorrectChoiceSound = {};
 else
-    StimDeliverySound = {'WavePlayer1',['P' 3]};
-    SideInSound = {'WavePlayer1',['P' 63]};
-    IncorrectChoiceSound = {'WavePlayer1', ['P' 4]};
-    EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
+    if BpodSystem.Data.Custom.SessionMeta.PlayerType=="HiFi"
+        StimDeliverySound = {'HiFi1', ['P' 2]};
+        IncorrectChoiceSound = {'HiFi1', ['P' 1]};
+        EarlyWithdrawalSound = {'HiFi1', ['P' 0]}; %play the 1st profile
+        %SideInSound = {'HiFi1',['P' 63]};
+        SideInSound = {};
+        
+    elseif BpodSystem.Data.Custom.SessionMeta.PlayerType=="Analog"
+        StimDeliverySound = {'WavePlayer1',['P' 3]};
+        SideInSound = {'WavePlayer1',['P' 63]};
+        IncorrectChoiceSound = {'WavePlayer1', ['P' 4]};
+        EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
+    end
 end
 
 %Wire1 settings
