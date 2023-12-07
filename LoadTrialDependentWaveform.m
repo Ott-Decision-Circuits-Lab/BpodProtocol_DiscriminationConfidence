@@ -18,16 +18,11 @@ if ~BpodSystem.EmulatorMode
     if TaskParameters.GUI.AuditoryStimulusType == 1 % click task
         [LeftClickTrain, RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.AuditoryStimulusTime, fs, ClickLength, SoundLevel, 'beta');
 
-        
-        if BpodSystem.Data.Custom.SessionMeta.PlayerType=="HiFi"
-            Player.load(3, [LeftClickTrain RightClickTrain]);
-        elseif BpodSystem.Data.Custom.SessionMeta.PlayerType=="Analog"
-            LeftSoundIndex = 3;
-            Player.loadWaveform(LeftSoundIndex, LeftClickTrain);
-            RightSoundIndex = 4;
-            Player.loadWaveform(RightSoundIndex, RightClickTrain);
-        end
-        
+        LeftSoundIndex = 3;
+        Player.loadWaveform(LeftSoundIndex, LeftClickTrain);
+
+        RightSoundIndex = 4;
+        Player.loadWaveform(RightSoundIndex, RightClickTrain);
     elseif TaskParameters.GUI.AuditoryStimulusType == 2 % freq task
         warning('Error: Frequency stimulus has not been implemented.');
     end
