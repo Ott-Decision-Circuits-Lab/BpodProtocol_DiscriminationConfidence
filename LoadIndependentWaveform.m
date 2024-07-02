@@ -27,8 +27,8 @@ if TaskParameters.GUI.TimeOutIncorrectChoice > 0
 end 
 
 if TaskParameters.GUI.SkippedFeedbackFeedbackType == 2
-     t = linspace(0, 1, fs);  % Time vector for 1 second duration
-    SkipSound = cos(2 * pi * 440 * t);  % Cosine wave between -1 and 1, frequency 440Hz
+     t = linspace(0, 1, fs/3);  % Time vector
+    SkipSound = cos(2 * pi * 440 * t);  % Cosine wave between -1 and 1
     SoundIndex = 5;
     try
         Player.loadWaveform(SoundIndex, SkipSound);
