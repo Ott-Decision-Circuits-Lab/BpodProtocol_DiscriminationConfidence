@@ -26,4 +26,19 @@ if TaskParameters.GUI.TimeOutIncorrectChoice > 0
     end
 end 
 
+if TaskParameters.GUI.SkippedFeedbackFeedbackType == 2
+     t = linspace(0, 1, fs);  % Time vector for 1 second duration
+    SkipSound = cos(2 * pi * 440 * t);  % Cosine wave between -1 and 1, frequency 440Hz
+    SoundIndex = 5;
+    try
+        Player.loadWaveform(SoundIndex, SkipSound);
+    catch
+        fprintf('Error: SkippedFeedback beep sound not loaded.\n');
+    end
 end
+
+
+
+
+end
+

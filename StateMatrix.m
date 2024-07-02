@@ -60,11 +60,13 @@ if BpodSystem.EmulatorMode
     EarlyWithdrawalSound = {};
     SideInSound = {};
     IncorrectChoiceSound = {};
+    SkipFeedbackSound = {};
 else
     StimDeliverySound = {'WavePlayer1',['P' 3]};
     SideInSound = {'WavePlayer1',['P' 63]};
     IncorrectChoiceSound = {'WavePlayer1', ['P' 4]};
     EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
+    SkipFeedbackSound = {'WavePlayer1', ['P' 5]};
 end
 
 %Wire1 settings
@@ -371,7 +373,7 @@ if  TaskParameters.GUI.SkippedFeedbackFeedbackType == 2 % SkippedFeedbackFeedbac
     sma = AddState(sma, 'Name', 'timeOut_SkippedFeedback',...
         'Timer',TaskParameters.GUI.TimeOutSkippedFeedback,...
         'StateChangeConditions',{'Tup','ITI'},...
-        'OutputActions',{}); %'SoftCode',12,'BNCState',BNC2OutFB});
+        'OutputActions', SkipFeedbackSound); %'SoftCode',12,'BNCState',BNC2OutFB});
 elseif  TaskParameters.GUI.SkippedFeedbackFeedbackType == 3 % SkippedFeedbackFeedbackType == PortLED
     sma = AddState(sma, 'Name', 'timeOut_SkippedFeedback',...
         'Timer',0.1,...
