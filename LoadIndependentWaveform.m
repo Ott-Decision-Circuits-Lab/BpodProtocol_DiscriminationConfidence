@@ -5,7 +5,7 @@ global TaskParameters
 fs = Player.SamplingRate;
 
 if TaskParameters.GUI.TimeOutEarlyWithdrawal > 0
-    PunishSound = rand(1, fs*3)*2 - 1;
+    PunishSound = rand(1, fs*TaskParameters.GUI.TimeOutEarlyWithdrawal)*2 - 1;
     SoundIndex = 1;
     try
         Player.loadWaveform(SoundIndex, PunishSound);
