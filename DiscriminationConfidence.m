@@ -93,7 +93,12 @@ while RunSession
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         InsertSessionDescription(iTrial);
         UpdateCustomDataFields(iTrial);
-        SaveBpodSessionData;
+        try
+            SaveBpodSessionData;
+        catch
+            warning("Save error, continuing")
+            SaveBpodSessionData;
+        end
     end
     
     % pause conditions    
