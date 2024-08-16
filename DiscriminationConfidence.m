@@ -35,13 +35,17 @@ if TaskParameters.GUI.Photometry
 end
 
 %% set up pharmacology
-if TaskParameters.GUI.PharmacologyOn
-    prompt = {'Drug name:','Dosage:'};
-    dlgtitle = 'Pharmacology';
-    dims = [1 35];
-    definput = {'1x PBS','1 ml/kg i.p.'};
-    drugInfo = inputdlg(prompt,dlgtitle,dims,definput);
-    BpodSystem.Data.Custom.Pharmacology = drugInfo;
+try
+    if TaskParameters.GUI.PharmacologyOn
+        prompt = {'Drug name:','Dose:', 'Dosage unit'};
+        dlgtitle = 'Pharmacology';
+        dims = [1 35];
+        definput = {'1x PBS', '1', 'ml/kg i.p.'};
+        drugInfo = inputdlg(prompt,dlgtitle,dims, definput);
+        BpodSystem.Data.Custom.Pharmacology = drugInfo;
+    end
+catch
+    warning("Pharmacology setup failed.")
 end
 
 InitializePlots();
