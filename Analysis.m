@@ -155,7 +155,7 @@ if TaskType==1
     nCols = 3;
 elseif TaskType==3
     if sum(CatchTrial)
-        FigPositionSize = [ 360         187        1500         900];
+        FigPositionSize = [ 360         187        1500         800];
         nRows = 3;
     else
         nRows = 2;
