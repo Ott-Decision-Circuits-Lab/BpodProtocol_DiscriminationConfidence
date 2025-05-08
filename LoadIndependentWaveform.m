@@ -6,6 +6,9 @@ fs = Player.SamplingRate;
 
 if TaskParameters.GUI.TimeOutEarlyWithdrawal > 0
     PunishSound = rand(1, fs*3)*2 - 1;
+    SoundLevel = 0.8;
+    PunishSound = rand(1, fs*TaskParameters.GUI.TimeOutEarlyWithdrawal)*2 - 1;
+    PunishSound = PunishSound * SoundLevel;
     SoundIndex = 1;
     try
         Player.loadWaveform(SoundIndex, PunishSound);
@@ -17,7 +20,7 @@ end
 if TaskParameters.GUI.TimeOutIncorrectChoice > 0
     SoundLevel = 0.8;
     ErrorSound = rand(1, fs*TaskParameters.GUI.TimeOutIncorrectChoice)*2 - 1; 
-    % ErrorSound = ErrorSound * SoundLevel;
+    ErrorSound = ErrorSound * SoundLevel;
     SoundIndex = 2;
     try
         Player.loadWaveform(SoundIndex, ErrorSound);

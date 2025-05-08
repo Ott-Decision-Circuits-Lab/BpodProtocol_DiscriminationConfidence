@@ -36,6 +36,7 @@ if iTrial > TaskParameters.GUI.StartEasyTrials
 else
     TDTemp.CatchTrial(iTrial) = false;
 end
+
 % ---------------------------------------------------------------------- %
 
 
@@ -86,12 +87,14 @@ TDTemp.OdorID(iTrial) = NaN; % 2 - double(TDTemp.OdorFracA > 50);
 TDTemp.OdorPair(iTrial) = NaN; % ones(1,2)*2;
 
 % -----Laser----- %
-if iTrial > TaskParameters.GUI.StartEasyTrials
-    TDTemp.LaserTrial(iTrial) = rand(1,1) < TaskParameters.GUI.LaserTrials;
+% determine if laser trial
+if TaskParameters.GUI.LaserTrials && iTrial > TaskParameters.GUI.StartEasyTrials
+    TDTemp.LaserTrial(iTrial) = rand(1,1)*100 < TaskParameters.GUI.LaserTrialPercent;
 else
     TDTemp.LaserTrial(iTrial) = false;
 end
 
+%Random train start not implemented in state matrix so far 
 TDTemp.LaserTrialTrainStart(iTrial) = NaN;
 if TDTemp.LaserTrial(iTrial)  % determine laser stimulus delay
     if TaskParameters.GUI.LaserTrainRandStart

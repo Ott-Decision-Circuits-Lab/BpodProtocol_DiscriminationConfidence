@@ -14,7 +14,8 @@ min_value = varargin{1};
 max_value = varargin{2};
 tau = varargin{3};
 if length(varargin)>3
-    m = varargin{4}(1);n = varargin{4}(2);
+    m = varargin{4}(1);
+    n = varargin{4}(2);
 else
     m=1;n=1;
 end
