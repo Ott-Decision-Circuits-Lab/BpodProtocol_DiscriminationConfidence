@@ -191,7 +191,7 @@ if isempty(fieldnames(TaskParameters))
     
     %% Laser
     TaskParameters.GUI.LaserTrials = false;
-    TaskParameters.GUI.LaserColor = blue;    % 'blue', 'red'
+    TaskParameters.GUI.LaserColor = 'blue';    % 'blue', 'red'
     TaskParameters.GUI.LaserSoftCode = false;
     TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
     TaskParameters.GUI.LaserTrialPercent = 100;

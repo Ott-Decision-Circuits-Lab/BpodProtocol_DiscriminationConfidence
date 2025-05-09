@@ -4,7 +4,7 @@ global TaskParameters
 global BpodSystem
 
 if nargin<1
-    SamplingRate = 30000; % in Hz
+    SamplingRate = 10000; % in Hz <- max fs for laser is 30k but we use 10k so that it's easier to calculate the waveform
 end
 
 Amplitude = TaskParameters.GUI.LaserAmp;
@@ -25,4 +25,6 @@ delays = (0:numPulses-1)*Period;
 pulse = @(t) rectpuls(t-PulseDuration/2, PulseDuration); % Centered rectangular pulse
 LaserWaveform = Amplitude * pulstran(t', [delays' ones(numPulses,1)], pulse, fs);
 
+LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
+LaserWaveform = reshape(LaserWaveform, 1, []); % <- reshape it so that now one step becomes five steps
 end

@@ -67,10 +67,10 @@ else
     IncorrectChoiceSound = {'WavePlayer1', ['P' 4]};
     EarlyWithdrawalSound = {'WavePlayer1', ['P' 0]}; %play the 1st profile
     SkipFeedbackSound = {'WavePlayer1', ['P' 5]};
-    if TaskParameters.GUI.LaserColor == blue
+    if strcmpi(TaskParameters.GUI.LaserColor,'blue')
         ClicksAndLaserStimulation = {'WavePlayer1', ['P' 8]}; %play the 9th profile
         LaserStimulation = {'WavePlayer1', ['P' 6]}; %play the 7th profile
-    elseif TaskParameters.GUI.LaserColor == red
+    elseif strcmpi(TaskParameters.GUI.LaserColor, 'red')
         ClicksAndLaserStimulation = {'WavePlayer1', ['P' 9]}; %play the 10th profile
         LaserStimulation = {'WavePlayer1', ['P' 7]}; %play the 8th profile
     end
@@ -96,6 +96,8 @@ if TaskParameters.GUI.Wire1VideoTrigger % video
     end
 end
 
+%{
+obsolete
 %BNC2 settings -- assumes connection from Bpod BNC2 out to Trigger 2 of
 %PulsePal to trigger PulsePal's output channel 3+4 connected to laser & recording
 %system to switch laser on
@@ -137,7 +139,7 @@ if  BpodSystem.Data.Custom.TrialData.LaserTrial(max([1,iTrial-1]))%last trial wa
         BNC2OutWaitC = 2; %'iti' (pre center poke enter)
     end
 end
-    
+%}
 
 %% Build state matrix
 sma = NewStateMatrix();
@@ -313,7 +315,7 @@ if BpodSystem.Data.Custom.TrialData.LaserTrial(iTrial) && TaskParameters.GUI.Las
     sma = AddState(sma, 'Name', 'unrewarded_Lin_grace',...
         'Timer', TaskParameters.GUI.FeedbackDelayGrace,...
         'StateChangeConditions',{'Tup','skipped_feedback',LeftPortIn,'unrewarded_Lin','GlobalTimer2_End','skipped_feedback',CenterPortIn,'skipped_feedback',RightPortIn,'skipped_feedback'},...
-        'OutputActions', StopLaserWaveform); %'BNCState',BNC2OutWT});
+        'OutputActions', StopLaserWaveform); %'BNCState',BNC2OutWT}); <- not necessary
 
     sma = AddState(sma, 'Name', 'unrewarded_Rin',...
         'Timer', FeedbackDelayError,...
@@ -322,7 +324,7 @@ if BpodSystem.Data.Custom.TrialData.LaserTrial(iTrial) && TaskParameters.GUI.Las
     sma = AddState(sma, 'Name', 'unrewarded_Rin_grace',...
         'Timer', TaskParameters.GUI.FeedbackDelayGrace,...
         'StateChangeConditions',{'Tup','skipped_feedback',RightPortIn,'unrewarded_Rin','GlobalTimer2_End','skipped_feedback',CenterPortIn,'skipped_feedback',LeftPortIn,'skipped_feedback'},...
-        'OutputActions', StopLaserWaveform); %'BNCState',BNC2OutWT});
+        'OutputActions', StopLaserWaveform); %'BNCState',BNC2OutWT}); <- not necessary
 
     sma = AddState(sma, 'Name', 'water_L',...
         'Timer', LeftValveTime,...
