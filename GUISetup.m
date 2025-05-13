@@ -194,11 +194,12 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserColor = 'blue';    % 'blue', 'red'
     TaskParameters.GUI.LaserSoftCode = false;
     TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
-    TaskParameters.GUI.LaserTrialPercent = 100;
+    TaskParameters.GUI.LaserTrialPercent = 30;
+    TaskParameters.GUI.LaserStimProtocol = 'Mainen'; % 'Doya', 'Mainen'
     TaskParameters.GUI.LaserAmp = 5;
-    TaskParameters.GUI.LaserStimFreq = 20;  %in Hz
-    TaskParameters.GUI.LaserPulseDuration_ms = 50;
-    TaskParameters.GUI.LaserTrainDuration_ms = 1000;
+    TaskParameters.GUI.LaserStimFreq = 25;  %in Hz
+    TaskParameters.GUI.LaserPulseDuration_ms = 10;
+    TaskParameters.GUI.LaserTrainDuration_ms = 8000;
     TaskParameters.GUI.LaserRampDuration_ms = 0;
     TaskParameters.GUI.LaserTrainRandStart = false;
     TaskParameters.GUIMeta.LaserTrainRandStart.Style='checkbox';
@@ -211,7 +212,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserColor','LaserSoftCode','LaserTrialPercent', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserColor','LaserSoftCode','LaserTrialPercent', 'LaserStimProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserRampDuration_ms','LaserTrainStartMin_s','LaserTrainStartMax_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     

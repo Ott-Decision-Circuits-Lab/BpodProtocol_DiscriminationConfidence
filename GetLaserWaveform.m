@@ -16,14 +16,19 @@ RandomTrainStart = TaskParameters.GUI.LaserTrainRandStart;  %True-False argument
 MinimumTrainStart = TaskParameters.GUI.LaserTrainStartMin_s; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
 MaximumTrainStart = TaskParameters.GUI.LaserTrainStartMax_s; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
 
-Period = 1/StimulationFreq;
-t = 0:1/SamplingRate:TrainDuration;
-numPulses = floor(TrainDuration/Period);
-delays = (0:numPulses-1)*Period;
+if strcmpi(TaskParameters.GUI.LaserStimProtocol, 'Mainen')
+    Period = 1/StimulationFreq;
+    t = 0:1/SamplingRate:TrainDuration;
+    numPulses = floor(TrainDuration/Period);
+    delays = (0:numPulses-1)*Period;
 
-% Generate pulse train
-pulse = @(t) rectpuls(t-PulseDuration/2, PulseDuration); % Centered rectangular pulse
-LaserWaveform = Amplitude * pulstran(t', [delays' ones(numPulses,1)], pulse, fs);
+    % Generate pulse train
+    pulse = @(t) rectpuls(t-PulseDuration/2, PulseDuration); % Centered rectangular pulse
+    LaserWaveform = Amplitude * pulstran(t', [delays' ones(numPulses,1)], pulse, fs);
+
+elseif strcmpi(TaskParameters.GUI.LaserStimProtocol, 'Doya') 
+    LaserWaveform = 1;  % in Doya condition, laser is continuously on during stim period, is this syntax correct?
+end
 
 LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
 LaserWaveform = reshape(LaserWaveform, 1, []); % <- reshape it so that now one step becomes five steps

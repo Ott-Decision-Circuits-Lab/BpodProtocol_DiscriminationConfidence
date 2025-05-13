@@ -11,11 +11,11 @@ if ~BpodSystem.EmulatorMode
     % load Laser waveforms
     fs = Player.SamplingRate;
   
-    if LaserColor == blue
+    if strcmpi(LaserColor, 'blue')
         LaserWaveform = GetLaserWaveform(fs);
         LaserWaveformIndex = 7;
         Player.loadWaveform(LaserWaveformIndex, LaserWaveform);
-    elseif LaserColor == red
+    elseif strcmpi(LaserColor, 'red')
         LaserWaveform = GetLaserWaveform(fs);
         LaserWaveformIndex = 8;
         Player.loadWaveform(LaserWaveformIndex, LaserWaveform);
