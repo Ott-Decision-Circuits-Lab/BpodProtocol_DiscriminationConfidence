@@ -88,6 +88,8 @@ TDTemp.OdorPair(iTrial) = NaN; % ones(1,2)*2;
 
 % -----Laser----- %
 % determine if laser trial
+%TDTemp.LaserTrial(iTrial) = false;
+
 if TaskParameters.GUI.LaserTrials && iTrial > TaskParameters.GUI.StartEasyTrials
     TDTemp.LaserTrial(iTrial) = rand(1,1)*100 < TaskParameters.GUI.LaserTrialPercent;
 else
