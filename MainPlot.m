@@ -45,6 +45,7 @@ switch Action
         BpodSystem.GUIHandles.OutcomePlot.EarlyWithdrawal = line(-.4, 0, 'LineStyle','none','Marker','d','MarkerEdge','#974bde','MarkerFace','none', 'MarkerSize', MarkerSize);
         BpodSystem.GUIHandles.OutcomePlot.NoFeedback = line(-.3, 0, 'LineStyle','none','Marker','+','MarkerEdge','#974bde','MarkerFace','none', 'MarkerSize', MarkerSize);
         BpodSystem.GUIHandles.OutcomePlot.NoResponse = line(-.2, 0, 'LineStyle','none','Marker','x','MarkerEdge','#974bde','MarkerFace','none', 'MarkerSize', MarkerSize);
+        BpodSystem.GUIHandles.OutcomePlot.Laser = line(-.1, 0, 'LineStyle', 'none', 'Marker', 'h', 'MarkerEdge','y','MarkerFace','y', 'MarkerSize', MarkerSize);
         
         set(AxesHandles.HandleOutcome,'TickDir', 'out','XLim',[0, nTrialsToShow],'YLim', [-2, 2], 'YTick', [-1, 1],'YTickLabel', {'Right','Left'}, 'FontSize', MarkerFont);
         
@@ -231,6 +232,10 @@ switch Action
         %Plot catch trials
         ndxCatch = TDTemp.CatchTrial(indxToPlot) & ~ndxMiss;
         set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', indxToPlot(ndxCatch), 'ydata', Ydata(ndxCatch));
+
+        %Plot laser trials
+        ndxLaser = TDTemp.LaserTrial(indxToPlot) & ~ndxMiss;
+        set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', 1.2);  %set above left=1 line
         % --------------------------------------------------------------- %
 
 
