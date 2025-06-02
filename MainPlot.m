@@ -4,6 +4,7 @@ global BpodSystem
 global TaskParameters
 
 StimTypeMarkerY = -1.75;
+LaserMarkerY = -1.5;
 ColorCorr = '#0fb7e4';
 ColorIncorr = '#ad0b94';
 ColorCatch = '#ea720a';
@@ -53,7 +54,7 @@ switch Action
         set(BpodSystem.GUIHandles.OutcomePlot.Aud,'xdata', -.5, 'ydata', StimTypeMarkerY); %find(BpodSystem.Data.Custom.TrialData.AuditoryTrial),'ydata',BpodSystem.Data.Custom.TrialData.DecisionVariable(BpodSystem.Data.Custom.TrialData.AuditoryTrial));
         xlabel(AxesHandles.HandleOutcome, 'Trial#', 'FontSize', MarkerFont);
         hold(AxesHandles.HandleOutcome, 'on');
-        lgd = legend({'Olfactory', 'Auditory', 'DV', 'Current Trial', 'Correct', 'Incorr', 'Catch', 'Broke Fix', 'Early Withdr', 'No Feedback', 'No Response'});
+        lgd = legend({'Olfactory', 'Auditory', 'DV', 'Current Trial', 'Correct', 'Incorr', 'Catch', 'Broke Fix', 'Early Withdr', 'No Feedback', 'No Response', 'Laser'});
         lgd.NumColumns = 2;
         lgd.FontSize = 8;
 
@@ -184,6 +185,7 @@ switch Action
 
         [mn, ~] = rescaleX(AxesHandles.HandleOutcome,iTrial,nTrialsToShow); % recompute xlim
         StimTypeYMarkers = StimTypeMarkerY * ones(size(TDTemp.TrialNumber));
+        LaserYMarkers = LaserMarkerY * ones(size(TDTemp.TrialNumber));
         
         set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle, 'xdata', iTrial+1, 'ydata', 0);
         %set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', iTrial+1, 'ydata', 0);
@@ -235,7 +237,7 @@ switch Action
 
         %Plot laser trials
         ndxLaser = TDTemp.LaserTrial(indxToPlot) & ~ndxMiss;
-        set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', 1.2);  %set above left=1 line
+        set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', LaserYMarkers(TDTemp.LaserTrial));  %set above left=1 line
         % --------------------------------------------------------------- %
 
 
