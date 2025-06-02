@@ -190,12 +190,16 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
     
     %% Laser
-    TaskParameters.GUI.LaserTrials = false;
-    TaskParameters.GUI.LaserColor = 'blue';    % 'blue', 'red'
+    TaskParameters.GUI.LaserTrials = 0;
+    TaskParameters.GUI.LaserColor = 1; 
+    TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu';
+    TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
     TaskParameters.GUI.LaserSoftCode = false;
     TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
     TaskParameters.GUI.LaserTrialPercent = 30;
-    TaskParameters.GUI.LaserStimProtocol = 'Mainen'; % 'Doya', 'Mainen'
+    TaskParameters.GUI.LaserStimProtocol = 1;
+    TaskParameters.GUIMeta.LaserStimProtocol.Style = 'popupmenu';
+    TaskParameters.GUIMeta.LaserStimProtocol.String = {'Mainen','Doya'};
     TaskParameters.GUI.LaserAmp = 5;
     TaskParameters.GUI.LaserStimFreq = 25;  %in Hz
     TaskParameters.GUI.LaserPulseDuration_ms = 10;
