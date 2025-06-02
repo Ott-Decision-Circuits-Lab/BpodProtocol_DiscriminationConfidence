@@ -49,7 +49,7 @@ while RunSession
         [LeftClickTrain, RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.AuditoryStimulusTime, 25000, ClickLength, SoundLevel, 'beta');
     else
         LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
-        LoadTrialDependentLaserWaveform(Player, TaskParameters.GUI.LaserColor)   % load laser waveform for each trial
+        LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
         InitiateOlfactometer(iTrial);
         InitiatePsychtoolbox(iTrial);
     end
