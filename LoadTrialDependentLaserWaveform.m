@@ -10,11 +10,11 @@ if ~BpodSystem.EmulatorMode
   
     if strcmpi(TaskParameters.GUIMeta.LaserColor.String{TaskParameters.GUI.LaserColor}, 'blue')
         LaserWaveform = GetLaserWaveform(fs);
-        LaserWaveformIndex = 7;
+        LaserWaveformIndex = 8;
         Player.loadWaveform(LaserWaveformIndex, LaserWaveform);
     elseif strcmpi(TaskParameters.GUIMeta.LaserColor.String{TaskParameters.GUI.LaserColor}, 'red')
         LaserWaveform = GetLaserWaveform(fs);
-        LaserWaveformIndex = 8;
+        LaserWaveformIndex = 9;
         Player.loadWaveform(LaserWaveformIndex, LaserWaveform);
     end
 
