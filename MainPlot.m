@@ -185,7 +185,7 @@ switch Action
 
         [mn, ~] = rescaleX(AxesHandles.HandleOutcome,iTrial,nTrialsToShow); % recompute xlim
         StimTypeYMarkers = StimTypeMarkerY * ones(size(TDTemp.TrialNumber));
-        %LaserYMarkers = LaserMarkerY * ones(size(TDTemp.TrialNumber));
+        LaserYMarkers = LaserMarkerY * ones(size(TDTemp.TrialNumber));
         
         set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle, 'xdata', iTrial+1, 'ydata', 0);
         %set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', iTrial+1, 'ydata', 0);
@@ -237,7 +237,7 @@ switch Action
 
         %Plot laser trials
         ndxLaser = TDTemp.LaserTrial(indxToPlot) & ~ndxMiss;
-        set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', LaserMarkerY);
+        set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', LaserYMarkers(ndxLaser));
         % --------------------------------------------------------------- %
 
 

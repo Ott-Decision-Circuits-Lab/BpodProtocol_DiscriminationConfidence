@@ -21,14 +21,15 @@ if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.La
     Period = 1/StimulationFreq; % Period = 1/50Hz = 0.02s
     t = 0:1/SamplingRate:TrainDuration; %  t = 0:0.0001:1s (but GUI said in ms so wrong already)
     numPulses = floor(TrainDuration/Period); % TrainDuration in ms or s?
-    delays = (0:numPulses-1)*Period; % I guess this tries to get the of-set time of a pulse
+    delays = (0:numPulses-1)*Period; % I guess this tries to get the off-set time of a pulse
 
     % Generate pulse train
     pulse = @(t) rectpuls(t-PulseDuration/2, PulseDuration); % Centered rectangular pulse <- shape of one pulse
-    LaserWaveform = Amplitude * pulstran(t', [delays' ones(numPulses,1)], pulse); % unnecessary input for funciton
+    LaserWaveform = Amplitude * pulstran(t', [delays' ones(numPulses,1)], pulse); % unnecessary input for function
 
 elseif strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Doya') 
-    LaserWaveform = 1;  % in Doya condition, laser is continuously on during stim period, is this syntax correct?
+    t = 0:1/SamplingRate:TrainDuration;
+    LaserWaveform = ones(length(t), 1) * Amplitude;  % in Doya condition, laser is continuously on
 end
 
 LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
