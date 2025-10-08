@@ -12,15 +12,15 @@ StimulationFreq = TaskParameters.GUI.LaserStimFreq;
 PulseDuration = TaskParameters.GUI.LaserPulseDuration_ms / 1000; % so that now it is all in second
 TrainDuration = TaskParameters.GUI.LaserTrainDuration_ms / 1000;
 RampDuration = TaskParameters.GUI.LaserRampDuration_ms;     % Ramp not implemented
-RandomTrainStart = TaskParameters.GUI.LaserTrainRandStart;  %True-False argument   % Random start not implemented
-MinimumTrainStart = TaskParameters.GUI.LaserTrainStartMin_s; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
-MaximumTrainStart = TaskParameters.GUI.LaserTrainStartMax_s; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
+SpecifiedPhase = TaskParameters.GUI.LaserTrainSpecifiedPhase;  %True-False   % Stimulate only in specific phase of WT
+LaserTrainStart = TaskParameters.GUI.LaserTrainStart_s * 1000; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
+LaserTrainEnd = TaskParameters.GUI.LaserTrainEnd_s * 1000; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
 
-if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Mainen')
+if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Mainen') || TaskParameters.GUI.TonicStimProtocol
     % e.g. 1s train of 50Hz with pulse duration 10ms
     Period = 1/StimulationFreq; % Period = 1/50Hz = 0.02s
-    t = 0:1/SamplingRate:TrainDuration; %  t = 0:0.0001:1s (but GUI said in ms so wrong already)
-    numPulses = floor(TrainDuration/Period); % TrainDuration in ms or s?
+    t = 0:1/SamplingRate:TrainDuration; %  t = 0:0.0001:1s
+    numPulses = floor(TrainDuration/Period);
     delays = (0:numPulses-1)*Period; % I guess this tries to get the off-set time of a pulse
 
     % Generate pulse train
@@ -34,4 +34,10 @@ end
 
 LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
 LaserWaveform = reshape(LaserWaveform, 1, []); % <- reshape it so that now one step becomes five steps
+
+if SpecifiedPhase
+    LaserWaveform(1:LaserTrainStart-1) = 0;
+    LaserWaveform(LaserTrainEnd+1:end) = 0;    
+end
+
 end

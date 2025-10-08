@@ -9,12 +9,12 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.EphysSession.Style = 'checkbox';
     TaskParameters.GUI.SessionDescription = 'abc';
     TaskParameters.GUIMeta.SessionDescription.Style = 'edittext';
-    TaskParameters.GUI.ITI = 1; 
-    TaskParameters.GUI.PreITI = 0; 
+    TaskParameters.GUI.ITI = 0.5; 
+    TaskParameters.GUI.PreITI = 0.5; 
     TaskParameters.GUI.CenterWaitMax = 20; 
     TaskParameters.GUI.RewardAmount = 25;
     TaskParameters.GUI.DrinkingTime = 5;
-    TaskParameters.GUI.DrinkingGrace = 0.1;
+    TaskParameters.GUI.DrinkingGrace = 2;
     TaskParameters.GUI.ChoiceDeadLine = 3;
     TaskParameters.GUI.TimeOutIncorrectChoice = 0; % (s)
     TaskParameters.GUI.TimeOutBrokeFixation = 3; % (s)
@@ -24,7 +24,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.StartEasyTrials = 30;
     TaskParameters.GUI.Percent50Fifty = 0;
     TaskParameters.GUI.PercentCatch = 0;
-    TaskParameters.GUI.CatchError = false;
+    TaskParameters.GUI.CatchError = true;
     TaskParameters.GUIMeta.CatchError.Style = 'checkbox';
     TaskParameters.GUI.Ports_LMR = 123;
     TaskParameters.GUI.MaxSessionTime = 180;
@@ -59,19 +59,19 @@ if isempty(fieldnames(TaskParameters))
                                           'StimDelayIncr','StimDelayDecr','StimDelay'};
     
     %% FeedbackDelay
-    TaskParameters.GUI.FeedbackDelaySelection = 1;
+    TaskParameters.GUI.FeedbackDelaySelection = 3;
     TaskParameters.GUIMeta.FeedbackDelaySelection.Style = 'popupmenu';
     TaskParameters.GUIMeta.FeedbackDelaySelection.String = {'Fix','AutoIncr','TruncExp'};
     TaskParameters.GUI.FeedbackDelayMin = 0.5;
-    TaskParameters.GUI.FeedbackDelayMax = 0;
+    TaskParameters.GUI.FeedbackDelayMax = 8;
     TaskParameters.GUI.FeedbackDelayIncr = 0.01;
     TaskParameters.GUI.FeedbackDelayDecr = 0.01;
     TaskParameters.GUI.FeedbackDelayTau = 1.5;
-    TaskParameters.GUI.FeedbackDelayGrace = 0;
-    TaskParameters.GUI.IncorrectChoiceFeedbackType = 2;
+    TaskParameters.GUI.FeedbackDelayGrace = 0.3;
+    TaskParameters.GUI.IncorrectChoiceFeedbackType = 1;
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.IncorrectChoiceFeedbackType.String = {'None','Tone','PortLED'};
-    TaskParameters.GUI.SkippedFeedbackFeedbackType = 2;
+    TaskParameters.GUI.SkippedFeedbackFeedbackType = 1;
     TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.Style = 'popupmenu';
     TaskParameters.GUIMeta.SkippedFeedbackFeedbackType.String = {'None','Tone','PortLED'};
     TaskParameters.GUI.FeedbackDelay = TaskParameters.GUI.FeedbackDelayMin;
@@ -149,7 +149,7 @@ if isempty(fieldnames(TaskParameters))
     
     %% Block structure
     TaskParameters.GUI.BlockTable.BlockNumber = [1, 2, 3, 4]';
-    TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*5000;
+    TaskParameters.GUI.BlockTable.BlockLen = ones(4,1)*200;
     TaskParameters.GUI.BlockTable.RewL = [1 randsample([1 .6],2) 1]';
     TaskParameters.GUI.BlockTable.RewR = flipud(TaskParameters.GUI.BlockTable.RewL);
     TaskParameters.GUIMeta.BlockTable.Style = 'table';
@@ -191,24 +191,19 @@ if isempty(fieldnames(TaskParameters))
     
     %% Laser
     TaskParameters.GUI.LaserTrials = 0;
-    TaskParameters.GUI.LaserColor = 1; 
-    TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu';
-    TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
-    TaskParameters.GUI.LaserSoftCode = false;
-    TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
+    TaskParameters.GUI.LaserColor = 1; TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
+    TaskParameters.GUI.LaserSoftCode = false; TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
     TaskParameters.GUI.LaserTrialPercent = 30;
-    TaskParameters.GUI.LaserStimProtocol = 1;
-    TaskParameters.GUIMeta.LaserStimProtocol.Style = 'popupmenu';
-    TaskParameters.GUIMeta.LaserStimProtocol.String = {'Mainen','Doya'};
+    TaskParameters.GUI.LaserStimProtocol = 1; TaskParameters.GUIMeta.LaserStimProtocol.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserStimProtocol.String = {'Mainen','Doya'};
+    TaskParameters.GUI.TonicStimProtocol = false; TaskParameters.GUIMeta.TonicStimProtocol.Style='checkbox';
     TaskParameters.GUI.LaserAmp = 5;
     TaskParameters.GUI.LaserStimFreq = 25;  %in Hz
     TaskParameters.GUI.LaserPulseDuration_ms = 10;
     TaskParameters.GUI.LaserTrainDuration_ms = 8000;
     TaskParameters.GUI.LaserRampDuration_ms = 0;
-    TaskParameters.GUI.LaserTrainRandStart = false;
-    TaskParameters.GUIMeta.LaserTrainRandStart.Style='checkbox';
-    TaskParameters.GUI.LaserTrainStartMin_s = 0;
-    TaskParameters.GUI.LaserTrainStartMax_s = 3;
+    TaskParameters.GUI.LaserTrainSpecifiedPhase = false; TaskParameters.GUIMeta.LaserTrainSpecifiedPhase.Style='checkbox';
+    TaskParameters.GUI.LaserTrainStart_s = 0;
+    TaskParameters.GUI.LaserTrainEnd_s = 3;
     TaskParameters.GUI.LaserITI = 0; TaskParameters.GUIMeta.LaserITI.Style = 'checkbox';
     TaskParameters.GUI.LaserPreStim = 0; TaskParameters.GUIMeta.LaserPreStim.Style = 'checkbox';
     TaskParameters.GUI.LaserStim = 0; TaskParameters.GUIMeta.LaserStim.Style = 'checkbox';
@@ -216,8 +211,8 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserColor','LaserSoftCode','LaserTrialPercent', 'LaserStimProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
-    TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserTrainRandStart','LaserRampDuration_ms','LaserTrainStartMin_s','LaserTrainStartMax_s'};
+    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserColor','LaserSoftCode','LaserTrialPercent', 'LaserStimProtocol', 'TonicStimProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserRampDuration_ms','LaserTrainSpecifiedPhase','LaserTrainStart_s','LaserTrainEnd_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     
     %% Video

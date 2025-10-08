@@ -47,7 +47,7 @@ TDTemp.Rewarded(iTrial) = false;
 % ---------------------------------------------------------------------- %
 
 
-% -----------------------Block-dependent variables---------------------- %
+% -----------------------Reward Block-dependent variables---------------------- %
 % The block determines the reward magnitude
 if iTrial > 1
     FinalBlock = max(TaskParameters.GUI.BlockTable.BlockNumber);
@@ -75,7 +75,15 @@ end
 BlockTableMask = TaskParameters.GUI.BlockTable.BlockNumber == TDTemp.BlockNumber(iTrial);
 TDTemp.RewardMagnitudeL(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewL(BlockTableMask);
 TDTemp.RewardMagnitudeR(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewR(BlockTableMask);
+
+% -----------------------Tonic laser blocks---------------------- %
+if TDTemp.BlockNumber(iTrial) == 1 || TDTemp.BlockNumber(iTrial) == 3
+    TDTemp.TonicLaserBlock(iTrial) = 0;
+elseif TDTemp.BlockNumber(iTrial) == 2 || TDTemp.BlockNumber(iTrial) == 4
+    TDTemp.TonicLaserBlock(iTrial) = 1;
+end 
 % ---------------------------------------------------------------------- %
+
 
 
 % -----------------------Stimulus-specific----------------------------- %
