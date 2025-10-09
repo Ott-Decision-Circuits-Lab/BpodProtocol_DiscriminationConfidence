@@ -13,7 +13,7 @@ trigger_matrix(8, 4) = 9;  % eighth trigger profile: laser waveform for red lase
 trigger_matrix(9, 1:3) = [3 4 8];  % Ninth trigger profile: play clicks and blue laser waveforms
 trigger_matrix(10, [1 2 4]) = [3 4 9];  % Tenth trigger profile: play clicks and red laser waveforms
 trigger_matrix(11, 3:4) = 10;  % Eleventh trigger profile: stop waveform to stop laser upon state change
-trigger_matrix(12, 1:4) = [1 10];  % Twelfth trigger profile: play early withdrawal white noise and stop laser
+trigger_matrix(12, 1:4) = [1 1 10 10];  % Twelfth trigger profile: play early withdrawal white noise and stop laser
 
 Player.TriggerProfiles = trigger_matrix;
 
