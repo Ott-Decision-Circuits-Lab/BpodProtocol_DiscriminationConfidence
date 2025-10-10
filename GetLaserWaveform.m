@@ -33,9 +33,9 @@ elseif strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GU
 end
 
 if SpecifiedPhase
-    LaserOffStart = 0:1/SamplingRate:LaserTrainStart;
-    LaserOn = 0:1/SamplingRate:LaserTrainEnd;
-    LaserOffEnd = 0:1/SamplingRate:(TrainDuration-LaserTrainEnd);
+    TimeMask = (t >= LaserTrainStart) & (t <= LaserTrainEnd);
+    TimeMask = TimeMask(:);
+    LaserWaveform(~TimeMask) = 0;
 end
 
 LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
