@@ -104,16 +104,17 @@ else
     TDTemp.LaserTrial(iTrial) = false;
 end
 
-%Random train start not implemented in state matrix so far 
-TDTemp.LaserTrialTrainStart(iTrial) = NaN;
-if TDTemp.LaserTrial(iTrial)  % determine laser stimulus delay
-    if TaskParameters.GUI.LaserTrainRandStart
-        TDTemp.LaserTrialTrainStart(iTrial) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
-        TDTemp.LaserTrialTrainStart(iTrial) = round(TDTemp.LaserTrialTrainStart(iTrial)*10000)/10000;
-    else
-        TDTemp.LaserTrialTrainStart(iTrial) = TaskParameters.GUI.LaserTrainStartMin_s;
-    end
-end
+%Random train start not implemented in state matrix so far, not in GUI
+%anymore
+% TDTemp.LaserTrialTrainStart(iTrial) = NaN;
+% if TDTemp.LaserTrial(iTrial)  % determine laser stimulus delay
+%     if TaskParameters.GUI.LaserTrainRandStart
+%         TDTemp.LaserTrialTrainStart(iTrial) = rand(1,1)*(TaskParameters.GUI.LaserTrainStartMax_s-TaskParameters.GUI.LaserTrainStartMin_s) + TaskParameters.GUI.LaserTrainStartMin_s;
+%         TDTemp.LaserTrialTrainStart(iTrial) = round(TDTemp.LaserTrialTrainStart(iTrial)*10000)/10000;
+%     else
+%         TDTemp.LaserTrialTrainStart(iTrial) = TaskParameters.GUI.LaserTrainStartMin_s;
+%     end
+% end
 
 % -----Auditory----- %
 TDTemp.AuditoryTrial(iTrial) = rand(1,1) < TaskParameters.GUI.PercentAuditory;

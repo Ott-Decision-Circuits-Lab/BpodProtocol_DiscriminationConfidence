@@ -13,8 +13,8 @@ PulseDuration = TaskParameters.GUI.LaserPulseDuration_ms / 1000; % so that now i
 TrainDuration = TaskParameters.GUI.LaserTrainDuration_ms / 1000;
 RampDuration = TaskParameters.GUI.LaserRampDuration_ms;     % Ramp not implemented
 SpecifiedPhase = TaskParameters.GUI.LaserTrainSpecifiedPhase;  %True-False   % Stimulate only in specific phase of WT
-LaserTrainStart = TaskParameters.GUI.LaserTrainStart_s * 1000; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
-LaserTrainEnd = TaskParameters.GUI.LaserTrainEnd_s * 1000; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
+LaserTrainStart = TaskParameters.GUI.LaserTrainStart_s; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
+LaserTrainEnd = TaskParameters.GUI.LaserTrainEnd_s; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
 
 if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Mainen') || TaskParameters.GUI.TonicStimProtocol
     % e.g. 1s train of 50Hz with pulse duration 10ms
@@ -32,12 +32,13 @@ elseif strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GU
     LaserWaveform = ones(length(t), 1) * Amplitude;  % in Doya condition, laser is continuously on
 end
 
+if SpecifiedPhase
+    LaserOffStart = 0:1/SamplingRate:LaserTrainStart;
+    LaserOn = 0:1/SamplingRate:LaserTrainEnd;
+    LaserOffEnd = 0:1/SamplingRate:(TrainDuration-LaserTrainEnd);
+end
+
 LaserWaveform = repmat(LaserWaveform, 5, 1); % <- make 5 copies in rows
 LaserWaveform = reshape(LaserWaveform, 1, []); % <- reshape it so that now one step becomes five steps
-
-if SpecifiedPhase
-    LaserWaveform(1:LaserTrainStart-1) = 0;
-    LaserWaveform(LaserTrainEnd+1:end) = 0;    
-end
 
 end
