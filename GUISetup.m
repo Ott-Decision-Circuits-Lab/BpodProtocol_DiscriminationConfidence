@@ -190,13 +190,13 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIPanels.Vevaiometric = {'VevaiometricMinWT','VevaiometricNBin','VevaiometricShowPoints'};
     
     %% Laser
+    TaskParameters.GUI.ControlSession = false; TaskParameters.GUIMeta.ControlSession.Style = 'checkbox';
     TaskParameters.GUI.LaserTrials = 0;
     TaskParameters.GUI.LaserColor = 1; TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
-    TaskParameters.GUI.LaserSoftCode = false; TaskParameters.GUIMeta.LaserSoftCode.Style='checkbox';
     TaskParameters.GUI.LaserTrialPercent = 30;
     TaskParameters.GUI.LaserStimProtocol = 1; TaskParameters.GUIMeta.LaserStimProtocol.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserStimProtocol.String = {'Mainen','Doya'};
-    TaskParameters.GUI.TonicStimProtocol = false; TaskParameters.GUIMeta.TonicStimProtocol.Style='checkbox';
-    TaskParameters.GUI.LaserAmp = 5;
+    TaskParameters.GUI.TonicProtocol = false; TaskParameters.GUIMeta.TonicProtocol.Style='checkbox';
+    TaskParameters.GUI.LaserAmp = 2.5;
     TaskParameters.GUI.LaserStimFreq = 25;  %in Hz
     TaskParameters.GUI.LaserPulseDuration_ms = 10;
     TaskParameters.GUI.LaserTrainDuration_ms = 8000;
@@ -211,7 +211,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
-    TaskParameters.GUIPanels.LaserGeneral = {'LaserTrials','LaserColor','LaserSoftCode','LaserTrialPercent', 'LaserStimProtocol', 'TonicStimProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserGeneral = {'ControlSession','LaserTrials','LaserTrialPercent','LaserColor','LaserStimProtocol', 'TonicProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserRampDuration_ms','LaserTrainSpecifiedPhase','LaserTrainStart_s','LaserTrainEnd_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     
