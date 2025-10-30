@@ -211,9 +211,15 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.LaserTimeInvestment = 1; TaskParameters.GUIMeta.LaserTimeInvestment.Style = 'checkbox';
     TaskParameters.GUI.LaserRew = 0; TaskParameters.GUIMeta.LaserRew.Style = 'checkbox';
     TaskParameters.GUI.LaserFeedback = 0; TaskParameters.GUIMeta.LaserFeedback.Style = 'checkbox';
+    TaskParameters.GUI.TonicLaserTable.BlockNumber = [1, 2, 3, 4, 5]';
+    TaskParameters.GUI.TonicLaserTable.BlockLen = [200, 200, 200, 200, 5000];
+    TaskParameters.GUI.TonicLaserTable.TonicLaserOn = [0, 1, 0, 1, 0];
+    TaskParameters.GUIMeta.TonicLaserTable.Style = 'table';
+    TaskParameters.GUIMeta.TonicLaserTable.String = 'Tonic Laser Blocks';
+    TaskParameters.GUIMeta.TonicLaserTable.ColumnLabel = {'Block#','Block Length','Tonic Laser On'};
     TaskParameters.GUIPanels.LaserGeneral = {'ControlSession','LaserTrials','LaserTrialPercent','LaserColor','LaserStimProtocol', 'TonicProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserRampDuration_ms','LaserTrainSpecifiedPhase','LaserTrainStart_s','LaserTrainEnd_s'};
-    TaskParameters.GUIPanels.LaserTaskEpochs = {'LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
+    TaskParameters.GUIPanels.LaserTaskEpochs = {'TonicLaserTable','LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     
     %% Video
     TaskParameters.GUI.Wire1VideoTrigger = false;

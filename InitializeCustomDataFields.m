@@ -77,16 +77,38 @@ TDTemp.RewardMagnitudeL(iTrial) = TaskParameters.GUI.RewardAmount * TaskParamete
 TDTemp.RewardMagnitudeR(iTrial) = TaskParameters.GUI.RewardAmount * TaskParameters.GUI.BlockTable.RewR(BlockTableMask);
 
 % -----------------------Tonic laser blocks---------------------- %
-if TDTemp.BlockNumber(iTrial) == 1 || TDTemp.BlockNumber(iTrial) == 3
-    TDTemp.TonicLaserBlock(iTrial) = 0;
-elseif TDTemp.BlockNumber(iTrial) == 2 || TDTemp.BlockNumber(iTrial) == 4
-    TDTemp.TonicLaserBlock(iTrial) = 1;
+TDTemp.TonicLaserTrial(iTrial) = 0;
+if TaskParameters.GUI.TonicProtocol == 1
+    if iTrial > 1
+        FinalBlock = max(TaskParameters.GUI.TonicLaserTable.BlockNumber);
+        if TDTemp.LaserBlockNumber(iTrial-1) < FinalBlock
+            LaserBlockNumberMask = TaskParameters.GUI.TonicLaserTable.BlockNumber == TDTemp.LaserBlockNumber(iTrial-1);
+            CurrBlockLength = TaskParameters.GUI.TonicLaserTable.BlockLen(LaserBlockNumberMask);
+            if TDTemp.LaserBlockTrial(iTrial-1) >= CurrBlockLength % Block transition
+                TDTemp.LaserBlockNumber(iTrial) = TDTemp.LaserBlockNumber(iTrial-1) + 1;
+                TDTemp.LaserBlockTrial(iTrial) = 1;
+            else  % continue in same block and increment block trial number
+                TDTemp.LaserBlockNumber(iTrial) = TDTemp.LaserBlockNumber(iTrial-1);
+                TDTemp.LaserBlockTrial(iTrial) = TDTemp.LaserBlockTrial(iTrial-1) + 1;
+            end
+        else % Final block
+            TDTemp.LaserBlockNumber(iTrial) = TDTemp.LaserBlockNumber(iTrial-1);
+            TDTemp.LaserBlockTrial(iTrial) = TDTemp.LaserBlockTrial(iTrial-1) + 1;
+        end
+    else  % First trial of first block
+        TDTemp.LaserBlockNumber(iTrial) = 1;
+        TDTemp.LaserBlockTrial(iTrial) = 1;
+    end
+    TonicLaserTableMask = TaskParameters.GUI.TonicLaserTable.BlockNumber == TDTemp.LaserBlockNumber(iTrial);
+    TDTemp.TonicLaserTrial(iTrial) = TaskParameters.GUI.TonicLaserTable.TonicLaserOn(TonicLaserTableMask);
+else
+    TDTemp.TonicLaserTrial(iTrial) = 0;
 end 
 % ---------------------------------------------------------------------- %
 
 
 
-% -----------------------Stimulus-specific----------------------------- %
+% -----------------------Stimulus-specific------------------------------ %
 TDTemp.DecisionVariable(iTrial) = NaN;  % e.g., relative click rate (previously DV)
 
 % -----Odor----- %
@@ -96,12 +118,12 @@ TDTemp.OdorPair(iTrial) = NaN; % ones(1,2)*2;
 
 % -----Laser----- %
 % determine if laser trial
-TDTemp.LaserTrial(iTrial) = false;
+TDTemp.PhasicLaserTrial(iTrial) = false;
 
-if TaskParameters.GUI.LaserTrials && iTrial > TaskParameters.GUI.StartEasyTrials
-    TDTemp.LaserTrial(iTrial) = rand(1,1)*100 < TaskParameters.GUI.LaserTrialPercent;
+if TaskParameters.GUI.LaserTrials && TaskParameters.GUI.TonicProtocol==0 && iTrial > TaskParameters.GUI.StartEasyTrials
+    TDTemp.PhasicLaserTrial(iTrial) = rand(1,1)*100 < TaskParameters.GUI.LaserTrialPercent;
 else
-    TDTemp.LaserTrial(iTrial) = false;
+    TDTemp.PhasicLaserTrial(iTrial) = false;
 end
 
 %Random train start not implemented in state matrix so far, not in GUI

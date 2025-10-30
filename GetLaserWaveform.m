@@ -16,7 +16,7 @@ SpecifiedPhase = TaskParameters.GUI.LaserTrainSpecifiedPhase;  %True-False   % S
 LaserTrainStart = TaskParameters.GUI.LaserTrainStart_s; %if RandomTrainStart=True, minimum number of s post trigger, where train can randomly start
 LaserTrainEnd = TaskParameters.GUI.LaserTrainEnd_s; %if RandomTrainStart=True, maximum number of s post trigger, where train can randomly start
 
-if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Mainen') || TaskParameters.GUI.TonicStimProtocol
+if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.LaserStimProtocol}, 'Mainen') || TaskParameters.GUI.TonicProtocol
     % e.g. 1s train of 50Hz with pulse duration 10ms
     Period = 1/StimulationFreq; % Period = 1/50Hz = 0.02s
     t = 0:1/SamplingRate:TrainDuration; %  t = 0:0.0001:1s
