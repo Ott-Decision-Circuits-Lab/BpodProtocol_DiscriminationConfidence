@@ -236,7 +236,7 @@ switch Action
         set(BpodSystem.GUIHandles.OutcomePlot.Catch, 'xdata', indxToPlot(ndxCatch), 'ydata', Ydata(ndxCatch));
 
         %Plot laser trials
-        ndxLaser = TDTemp.LaserTrial(indxToPlot) & ~ndxMiss;
+        ndxLaser = TDTemp.PhasicLaserTrial(indxToPlot) & ~ndxMiss;
         set(BpodSystem.GUIHandles.OutcomePlot.Laser, 'xdata', indxToPlot(ndxLaser), 'ydata', LaserYMarkers(ndxLaser));
         % --------------------------------------------------------------- %
 
