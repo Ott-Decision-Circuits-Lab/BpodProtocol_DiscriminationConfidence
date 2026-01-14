@@ -192,8 +192,9 @@ if isempty(fieldnames(TaskParameters))
     %% Laser
     TaskParameters.GUI.ControlSession = false; TaskParameters.GUIMeta.ControlSession.Style = 'checkbox';
     TaskParameters.GUI.LaserTrials = 0;
-    TaskParameters.GUI.LaserColor = 1; TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
     TaskParameters.GUI.LaserTrialPercent = 30;
+    TaskParameters.GUI.LaserColor = 1; TaskParameters.GUIMeta.LaserColor.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserColor.String = {'blue','red'};
+    TaskParameters.GUI.BrainArea = 1; TaskParameters.GUIMeta.BrainArea.Style = 'popupmenu'; TaskParameters.GUIMeta.BrainArea.String = {'PL','DRN','OFC'};
     TaskParameters.GUI.LaserStimProtocol = 1; TaskParameters.GUIMeta.LaserStimProtocol.Style = 'popupmenu'; TaskParameters.GUIMeta.LaserStimProtocol.String = {'Mainen','Doya'};
     TaskParameters.GUI.TonicProtocol = false; TaskParameters.GUIMeta.TonicProtocol.Style='checkbox';
     TaskParameters.GUI.LaserAmp = 2.5;
@@ -217,7 +218,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.TonicLaserTable.Style = 'table';
     TaskParameters.GUIMeta.TonicLaserTable.String = 'Tonic Laser Blocks';
     TaskParameters.GUIMeta.TonicLaserTable.ColumnLabel = {'Block#','Block Length','Tonic Laser On'};
-    TaskParameters.GUIPanels.LaserGeneral = {'ControlSession','LaserTrials','LaserTrialPercent','LaserColor','LaserStimProtocol', 'TonicProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
+    TaskParameters.GUIPanels.LaserGeneral = {'ControlSession','LaserTrials','LaserTrialPercent','LaserColor','BrainArea','LaserStimProtocol', 'TonicProtocol', 'LaserAmp','LaserStimFreq','LaserPulseDuration_ms'};
     TaskParameters.GUIPanels.LaserTrain = {'LaserTrainDuration_ms','LaserRampDuration_ms','LaserTrainSpecifiedPhase','LaserTrainStart_s','LaserTrainEnd_s'};
     TaskParameters.GUIPanels.LaserTaskEpochs = {'TonicLaserTable','LaserITI','LaserPreStim','LaserStim','LaserMov','LaserTimeInvestment','LaserRew','LaserFeedback'};
     
