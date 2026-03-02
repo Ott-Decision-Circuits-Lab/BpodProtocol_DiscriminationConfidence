@@ -175,58 +175,84 @@ subplot(nRows,nCols,4)
 hold on
 
 DVAxis = linspace(-1, 1, 21);
-nBlocks = max(GUISettings.BlockTable.BlockNumber);
-BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
-for i = 1:nBlocks
-    BlockBegin = BlockIdx(i) + 1;
-    BlockEnd = BlockIdx(i+1);
-    if BlockBegin < nTrials
-        if BlockEnd > nTrials
-            BlockEnd = nTrials - 1;
-        end
-        if i==1 | i>3
-            LocalColor = CondColors{i};
-        else
-            if GUISettings.BlockTable.RewL(i) > GUISettings.BlockTable.RewR(i)
-                LocalColor = CondColors{2};
-                CondStrings{i} = 'L>R';
+
+if GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
+    nBlocks = max(GUISettings.BlockTable.BlockNumber);
+    BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
+    for i = 1:nBlocks
+        BlockBegin = BlockIdx(i) + 1;
+        BlockEnd = BlockIdx(i+1);
+        if BlockBegin < nTrials
+            if BlockEnd > nTrials
+                BlockEnd = nTrials - 1;
+            end
+            if i==1 | i>3
+                LocalColor = CondColors{i};
             else
-                LocalColor = CondColors{3};
-                CondStrings{i} = 'R>L';
+                if GUISettings.BlockTable.RewL(i) > GUISettings.BlockTable.RewR(i)
+                    LocalColor = CondColors{2};
+                    CondStrings{i} = 'L>R';
+                else
+                    LocalColor = CondColors{3};
+                    CondStrings{i} = 'R>L';
+                end
+            end
+            CompletedTrialsBlock = CompletedTrials(BlockBegin:BlockEnd);
+            LeftChoicesBlock = ChoiceLeft(BlockBegin:BlockEnd);
+            LeftChoicesBlock = LeftChoicesBlock(CompletedTrialsBlock);
+            AudDV = ExperiencedDV(BlockBegin:BlockEnd);
+            AudDV = AudDV(CompletedTrialsBlock);
+            CorrectBlock = Correct(BlockBegin:BlockEnd);
+            CorrectBlock = CorrectBlock(CompletedTrialsBlock);
+            if ~isempty(AudDV)
+                BinIdx = discretize(AudDV, DVAxis);
+    
+                PsycY = grpstats(LeftChoicesBlock, BinIdx, 'mean');
+                PsycX = grpstats(AudDV, BinIdx, 'mean');
+                plot(PsycX,PsycY,'ok','MarkerFaceColor', LocalColor, ...
+                                      'MarkerEdgeColor', LocalColor, ...
+                                      'MarkerSize', 6);
+        
+                XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
+                YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
+                plot(XFit, YFit, 'Color', LocalColor, 'LineWidth', 2);
+        
+                xlabel('DV');
+                ylabel('p left')
+                
+                text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
+                    [num2str(round(nanmean(CorrectBlock)*100)), ...
+                     '% Correct, nTrials=',num2str(sum(CompletedTrialsBlock))], ...
+                     'Color', LocalColor);
             end
         end
-        CompletedTrialsBlock = CompletedTrials(BlockBegin:BlockEnd);
-        LeftChoicesBlock = ChoiceLeft(BlockBegin:BlockEnd);
-        LeftChoicesBlock = LeftChoicesBlock(CompletedTrialsBlock);
-        AudDV = ExperiencedDV(BlockBegin:BlockEnd);
-        AudDV = AudDV(CompletedTrialsBlock);
-        CorrectBlock = Correct(BlockBegin:BlockEnd);
-        CorrectBlock = CorrectBlock(CompletedTrialsBlock);
-        if ~isempty(AudDV)
-            BinIdx = discretize(AudDV, DVAxis);
-
-            PsycY = grpstats(LeftChoicesBlock, BinIdx, 'mean');
-            PsycX = grpstats(AudDV, BinIdx, 'mean');
-            plot(PsycX,PsycY,'ok','MarkerFaceColor', LocalColor, ...
-                                  'MarkerEdgeColor', LocalColor, ...
-                                  'MarkerSize', 6);
-    
-            XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
-            YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
-            plot(XFit, YFit, 'Color', LocalColor, 'LineWidth', 2);
-    
-            xlabel('DV');
-            ylabel('p left')
-            
-            text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
-                [num2str(round(nanmean(CorrectBlock)*100)), ...
-                 '% Correct, nTrials=',num2str(sum(CompletedTrialsBlock))], ...
-                 'Color', LocalColor);
-        end
     end
-end
-legend('',CondStrings{1},'',CondStrings{2},'',CondStrings{3},'',CondStrings{4}, 'Location', 'southeast')
+    legend('',CondStrings{1},'',CondStrings{2},'',CondStrings{3},'',CondStrings{4}, 'Location', 'southeast')
 
+else  % Session without reward-bias
+    AudDV = ExperiencedDV(CompletedTrials);
+    LeftChoices = ChoiceLeft(CompletedTrials);
+    if ~isempty(AudDV)
+        BinIdx = discretize(AudDV, DVAxis);
+
+        PsycY = grpstats(LeftChoices, BinIdx, 'mean');
+        PsycX = grpstats(AudDV, BinIdx, 'mean');
+        plot(PsycX,PsycY,'ok','MarkerFaceColor', 'black', ...
+          'MarkerEdgeColor', 'black', 'MarkerSize', 6);
+
+        XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
+        YFit = glmval(glmfit(AudDV, LeftChoices','binomial'),XFit,'logit');
+        plot(XFit, YFit, 'Color', 'black', 'LineWidth', 2);
+
+        xlabel('Decision Variable');
+        ylabel('P (left choice)')
+
+        text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
+            [num2str(round(nanmean(Correct(CompletedTrials))*100)), ...
+             '% Correct, nTrials=',num2str(sum(CompletedTrials))], ...
+             'Color', 'black');
+    end
+end    
 
 %% ---------------------------------------------------------------------
 %% sampling time
