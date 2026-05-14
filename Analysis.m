@@ -22,12 +22,20 @@ StimTime = GUISettings.AuditoryStimulusTime; %assumes same for each trial
 
 TaskType = GUISettings.FeedbackDelaySelection;
 
-if TaskType == 1  % reward-bias task
+if GUISettings.FeedbackDelaySelection == 1 && GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
+    TaskType = "reward-bias";
+elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) == GUISettings.BlockTable.RewR(2)
+    TaskType = "time-investment";
+elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
+    TaskType = "temporal-reward-bias";
+end 
+
+if TaskType == "reward-bias"
     MinWT = 0;
     MaxWT = GUISettings.FeedbackDelayMax;
-elseif TaskType == 3 % time-investment task
+elseif TaskType == "time-investment" ||  TaskType == "temporal-reward-bias"
     MinWT = GUISettings.VevaiometricMinWT; %assumes same for each trial
-    MaxWT = 10;
+    MaxWT = 12;
 end
 
 AudBin = 8; % Bins for psychometric
@@ -149,11 +157,11 @@ CondStrings = {'Equal-1', '', '', 'Equal-2'};
 %% ---------------------------------------------------------------------
 %%                      Start Figure Creation
 %% ---------------------------------------------------------------------
-if TaskType==1
+if TaskType=="reward-bias"
     FigPositionSize = [ 360         187        1500         600];
     nRows = 2;
     nCols = 3;
-elseif TaskType==3
+elseif TaskType=="time-investment" || TaskType=="temporal-reward-bias"
     if sum(CatchTrial)
         FigPositionSize = [ 360         187        1500         900];
         nRows = 3;
@@ -176,7 +184,7 @@ hold on
 
 DVAxis = linspace(-1, 1, 21);
 
-if GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
+if TaskType == "reward-bias" || TaskType == "temporal-reward-bias"
     nBlocks = max(GUISettings.BlockTable.BlockNumber);
     BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
     for i = 1:nBlocks
@@ -313,279 +321,296 @@ if ~all(isnan(GracePeriodsL)) && numel(center) > 1 && ~all(isnan(GracePeriodsR))
     text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.05,['n=',num2str(sum(~isnan(GracePeriods))),' (L=',num2str(sum(~isnan(GracePeriodsL))),'/R=',num2str(sum(~isnan(GracePeriodsR))),')']);
 end
 
-
-
-if TaskType==3
+if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
 %% ---------------------------------------------------------------------
 %% waiting time distributions
 %% ---------------------------------------------------------------------
-ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
-if length(LaserCond)==1
-    %no laser
-    subplot(nRows,nCols,6)
+    ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
+    if length(LaserCond)==1
+        %no laser
+        subplot(nRows,nCols,6)
+        hold on
+        xlabel('waiting time (s)'); ylabel ('n trials');
+        WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
+        WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
+        histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
+        histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor', CondColors{3});
+    
+        meanWTL = nanmean(WTnoFeedbackL);
+        meanWTR = nanmean(WTnoFeedbackR);
+        line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
+        line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
+        text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+            ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
+        text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+            ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
+        
+        PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
+        PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
+        text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
+        
+    % else%laser
+    %     subplot(3,4,7)
+    %     hold on
+    %     xlabel('waiting time (s)'); ylabel ('n trials');
+    %     subplot(3,4,8)
+    %     hold on
+    %     xlabel('waiting time (s)'); ylabel ('n trials');
+    %     PshortWTL=cell(1,2);PshortWTR=cell(1,2);
+    %     for i =1:length(LaserCond)
+    %     
+    %     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1 & LaserTrial==LaserCond(i));
+    %     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0 & LaserTrial==LaserCond(i));
+    %      meanWTL = nanmean(WTnoFeedbackL);
+    %     meanWTR = nanmean(WTnoFeedbackR);
+    %     subplot(3,4,7)
+    %     histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor',ColorsCond{i});
+    %     line([meanWTL,meanWTL],get(gca,'YLim'),'Color',ColorsCond{i});
+    %     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_l=',num2str(round(meanWTL*10)/10)],'Color',ColorsCond{i});
+    %     subplot(3,4,8)
+    %     histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor',ColorsCond{i});
+    %     line([meanWTR,meanWTR],get(gca,'YLim'),'Color',ColorsCond{i});
+    %     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_r=',num2str(round(meanWTR*10)/10)],'Color',ColorsCond{i});
+    % 
+    %     PshortWTL{i} = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
+    %     PshortWTR{i} = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
+    %     
+    %     end
+    %     for i =1:length(LaserCond)
+    %         text(max(get(gca,'XLim'))+0.03,(0.85/i)*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL{i}*100)/100),', R_{2}=',num2str(round(PshortWTR{i}*100)/100)],'Color',ColorsCond{i});
+    %     end
+    end
+    
+    
+    
+    if sum(CatchTrial)
+    %% ---------------------------------------------------------------------
+    %% conditioned psychometric
+    %% ---------------------------------------------------------------------
+    %
+    subplot(nRows,nCols,7)
     hold on
-    xlabel('waiting time (s)'); ylabel ('n trials');
-    WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
-    WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
-    histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
-    histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor', CondColors{3});
-
-    meanWTL = nanmean(WTnoFeedbackL);
-    meanWTR = nanmean(WTnoFeedbackR);
-    line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
-    line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
-    text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
-        ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
-    text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
-        ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
-    
-    PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
-    PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
-    text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
-    
-% else%laser
-%     subplot(3,4,7)
-%     hold on
-%     xlabel('waiting time (s)'); ylabel ('n trials');
-%     subplot(3,4,8)
-%     hold on
-%     xlabel('waiting time (s)'); ylabel ('n trials');
-%     PshortWTL=cell(1,2);PshortWTR=cell(1,2);
-%     for i =1:length(LaserCond)
-%     
-%     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1 & LaserTrial==LaserCond(i));
-%     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0 & LaserTrial==LaserCond(i));
-%      meanWTL = nanmean(WTnoFeedbackL);
-%     meanWTR = nanmean(WTnoFeedbackR);
-%     subplot(3,4,7)
-%     histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor',ColorsCond{i});
-%     line([meanWTL,meanWTL],get(gca,'YLim'),'Color',ColorsCond{i});
-%     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_l=',num2str(round(meanWTL*10)/10)],'Color',ColorsCond{i});
-%     subplot(3,4,8)
-%     histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor',ColorsCond{i});
-%     line([meanWTR,meanWTR],get(gca,'YLim'),'Color',ColorsCond{i});
-%     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_r=',num2str(round(meanWTR*10)/10)],'Color',ColorsCond{i});
-% 
-%     PshortWTL{i} = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
-%     PshortWTR{i} = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
-%     
-%     end
-%     for i =1:length(LaserCond)
-%         text(max(get(gca,'XLim'))+0.03,(0.85/i)*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL{i}*100)/100),', R_{2}=',num2str(round(PshortWTR{i}*100)/100)],'Color',ColorsCond{i});
-%     end
-end
-
-
-
-if sum(CatchTrial)
-%% ---------------------------------------------------------------------
-%% conditioned psychometric
-%% ---------------------------------------------------------------------
-%
-subplot(nRows,nCols,7)
-hold on
-%low
-WTmed=median(WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT));
-AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<=WTmed&WT>MinWT);
-if ~isempty(AudDV)
-    ChoiceLeftadj = ChoiceLeft(CompletedTrials&CatchTrial&WT<=WTmed&WT>MinWT);
-    BinIdx = discretize(AudDV,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBin+1));
-    PsycY = grpstats(ChoiceLeftadj,BinIdx,'mean');
-    PsycX = grpstats(AudDV,BinIdx,'mean');
-    h1=plot(PsycX,PsycY,'ok','MarkerFaceColor',[.5,.5,.5],'MarkerEdgeColor','w','MarkerSize',6);
-    XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
-    YFit = glmval(glmfit(AudDV,ChoiceLeftadj','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
-    plot(XFit,YFit,'Color',[.5,.5,.5]);
-    %high
-    AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT>WTmed&WT<MaxWT);
-    ChoiceLeftadj = ChoiceLeft(CompletedTrials&CatchTrial&WT>WTmed&WT<MaxWT);
-    BinIdx = discretize(AudDV,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBin+1));
-    PsycY = grpstats(ChoiceLeftadj,BinIdx,'mean');
-    PsycX = grpstats(AudDV,BinIdx,'mean');
-    h2=plot(PsycX,PsycY,'ok','MarkerFaceColor','k','MarkerEdgeColor','w','MarkerSize',6);
-    XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
-    YFit = glmval(glmfit(AudDV,ChoiceLeftadj','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
-    plot(XFit,YFit,'k');
-    xlabel('DV');ylabel('p left')
-    legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]},'Units','normalized','Position',[0.333,0.85,0.1,0.1])
-end
-
-
-
-%% ---------------------------------------------------------------------
-%% calibration
-%% ---------------------------------------------------------------------
-subplot(nRows,nCols,8)
-hold on
-xlabel('Waiting time (s)');ylabel('p correct')
-WTBin=5;
-ColorsCorrect = {[.1,.9,.1],[.1,.8,.6]};
-ColorsError = {[.9,.1,.1],[.9,.1,.6]};
-
-for i =1:length(LaserCond)
-    WTCatch = WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT & LaserTrial==LaserCond(i));
-    if ~isempty(WTCatch)
-        BinIdx = discretize(WTCatch,linspace(min(WTCatch)-10*eps,max(WTCatch)+10*eps,WTBin+1));
-        WTX = grpstats(WTCatch,BinIdx,'mean');
-        PerfY = grpstats(Correct(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i)),BinIdx,'mean');
-        plot(WTX,PerfY,'Color',CondColors{i},'LineWidth',2);
-        [r,p]=corr(WTCatch',Correct(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i))','type','Spearman');
-        text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.07*i,['r=',num2str(round(r*100)/100),', p=',num2str(round(p*100)/100)],'Color',CondColors{i});
+    %low
+    WTmed=median(WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT));
+    AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<=WTmed&WT>MinWT);
+    if ~isempty(AudDV)
+        ChoiceLeftadj = ChoiceLeft(CompletedTrials&CatchTrial&WT<=WTmed&WT>MinWT);
+        BinIdx = discretize(AudDV,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBin+1));
+        PsycY = grpstats(ChoiceLeftadj,BinIdx,'mean');
+        PsycX = grpstats(AudDV,BinIdx,'mean');
+        h1=plot(PsycX,PsycY,'ok','MarkerFaceColor',[.5,.5,.5],'MarkerEdgeColor','w','MarkerSize',6);
+        XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
+        YFit = glmval(glmfit(AudDV,ChoiceLeftadj','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
+        plot(XFit,YFit,'Color',[.5,.5,.5]);
+        %high
+        AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT>WTmed&WT<MaxWT);
+        ChoiceLeftadj = ChoiceLeft(CompletedTrials&CatchTrial&WT>WTmed&WT<MaxWT);
+        BinIdx = discretize(AudDV,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBin+1));
+        PsycY = grpstats(ChoiceLeftadj,BinIdx,'mean');
+        PsycX = grpstats(AudDV,BinIdx,'mean');
+        h2=plot(PsycX,PsycY,'ok','MarkerFaceColor','k','MarkerEdgeColor','w','MarkerSize',6);
+        XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
+        YFit = glmval(glmfit(AudDV,ChoiceLeftadj','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
+        plot(XFit,YFit,'k');
+        xlabel('DV');ylabel('p left')
+        legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]},'Units','normalized','Position',[0.333,0.85,0.1,0.1])
     end
-end
-
-
-
-%% ---------------------------------------------------------------------
-%% Vevaiometric
-%% ---------------------------------------------------------------------
-subplot(nRows,nCols,9)
-hold on
-
-xlabel('DV');ylabel('Waiting time (s)')
-AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<MaxWT&WT>MinWT);
-Rcatch=cell(1,2);Pcatch=cell(1,2);Rerror=cell(1,2);Perror=cell(1,2);
-
-
-for i =1:length(LaserCond)
     
-    WTCatch = WT(CompletedTrials&CatchTrial&Correct==1&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
-    DVCatch = ExperiencedDV(CompletedTrials&CatchTrial&Correct==1&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
-    if ~isempty(DVCatch)
-        BinIdx = discretize(DVCatch,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBinWT+1));
-        if ~all(isnan(BinIdx))
-            WTCatchY = grpstats(WTCatch,BinIdx,'mean');
-            DVCatchX = grpstats(DVCatch,BinIdx,'mean');
-            plot(DVCatchX,WTCatchY,'Color',ColorsCorrect{i},'LineWidth',2)
+    
+    
+    %% ---------------------------------------------------------------------
+    %% calibration
+    %% ---------------------------------------------------------------------
+    subplot(nRows,nCols,8)
+    hold on
+    xlabel('Waiting time (s)');ylabel('p correct')
+    WTBin=5;
+    ColorsCorrect = {[.1,.9,.1],[.1,.8,.6]};
+    ColorsError = {[.9,.1,.1],[.9,.1,.6]};
+    
+    for i =1:length(LaserCond)
+        WTCatch = WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT & LaserTrial==LaserCond(i));
+        if ~isempty(WTCatch)
+            BinIdx = discretize(WTCatch,linspace(min(WTCatch)-10*eps,max(WTCatch)+10*eps,WTBin+1));
+            WTX = grpstats(WTCatch,BinIdx,'mean');
+            PerfY = grpstats(Correct(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i)),BinIdx,'mean');
+            plot(WTX,PerfY,'Color',CondColors{i},'LineWidth',2);
+            [r,p]=corr(WTCatch',Correct(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i))','type','Spearman');
+            text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.07*i,['r=',num2str(round(r*100)/100),', p=',num2str(round(p*100)/100)],'Color',CondColors{i});
         end
-        WTError = WT(CompletedTrials&Correct==0&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
-        DVError = ExperiencedDV(CompletedTrials&Correct==0&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
-        BinIdx = discretize(DVError,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBinWT+1));
-        if ~all(isnan(BinIdx))
-            WTErrorY = grpstats(WTError,BinIdx,'mean');
-            DVErrorX = grpstats(DVError,BinIdx,'mean');
-            plot(DVErrorX,WTErrorY,'Color',ColorsError{i},'LineWidth',2)
+    end
+    
+    
+    
+    %% ---------------------------------------------------------------------
+    %% Vevaiometric
+    %% ---------------------------------------------------------------------
+    subplot(nRows,nCols,9)
+    hold on
+    
+    xlabel('DV');ylabel('Waiting time (s)')
+    AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<MaxWT&WT>MinWT);
+    Rcatch=cell(1,2);Pcatch=cell(1,2);Rerror=cell(1,2);Perror=cell(1,2);
+    
+    
+    for i =1:length(LaserCond)
+        
+        WTCatch = WT(CompletedTrials&CatchTrial&Correct==1&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
+        DVCatch = ExperiencedDV(CompletedTrials&CatchTrial&Correct==1&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
+        if ~isempty(DVCatch)
+            BinIdx = discretize(DVCatch,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBinWT+1));
+            if ~all(isnan(BinIdx))
+                WTCatchY = grpstats(WTCatch,BinIdx,'mean');
+                DVCatchX = grpstats(DVCatch,BinIdx,'mean');
+                plot(DVCatchX,WTCatchY,'Color',ColorsCorrect{i},'LineWidth',2)
+            end
+            WTError = WT(CompletedTrials&Correct==0&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
+            DVError = ExperiencedDV(CompletedTrials&Correct==0&WT>MinWT&WT<MaxWT  & LaserTrial==LaserCond(i));
+            BinIdx = discretize(DVError,linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,AudBinWT+1));
+            if ~all(isnan(BinIdx))
+                WTErrorY = grpstats(WTError,BinIdx,'mean');
+                DVErrorX = grpstats(DVError,BinIdx,'mean');
+                plot(DVErrorX,WTErrorY,'Color',ColorsError{i},'LineWidth',2)
+            end
+            
+            plot(DVCatch,WTCatch,'o','MarkerSize',2,'MarkerFaceColor',ColorsCorrect{i},'Color',ColorsCorrect{i})
+            plot(DVError,WTError,'o','MarkerSize',2,'MarkerFaceColor',ColorsError{i},'Color',ColorsError{i})
+            legend('Correct Catch','Error','Location','best')
+            %evaluate vevaiometric
+            [Rc,Pc] = EvaluateVevaiometric(DVCatch,WTCatch);
+            [Re,Pe] = EvaluateVevaiometric(DVError,WTError);
+            Rcatch{i}=Rc;Pcatch{i}=Pc;Rerror{i}=Re;Perror{i}=Pe;
+            %confidence auc
+            [auc(i),~,auc_sem(i)] = rocarea_torben(WTCatch,WTError,'bootstrap',200);
+            
         end
-        
-        plot(DVCatch,WTCatch,'o','MarkerSize',2,'MarkerFaceColor',ColorsCorrect{i},'Color',ColorsCorrect{i})
-        plot(DVError,WTError,'o','MarkerSize',2,'MarkerFaceColor',ColorsError{i},'Color',ColorsError{i})
-        legend('Correct Catch','Error','Location','best')
-        %evaluate vevaiometric
-        [Rc,Pc] = EvaluateVevaiometric(DVCatch,WTCatch);
-        [Re,Pe] = EvaluateVevaiometric(DVError,WTError);
-        Rcatch{i}=Rc;Pcatch{i}=Pc;Rerror{i}=Re;Perror{i}=Pe;
-        %confidence auc
-        [auc(i),~,auc_sem(i)] = rocarea_torben(WTCatch,WTError,'bootstrap',200);
-        
     end
-end
-for i =1:length(LaserCond)
-    if ~isempty(Rcatch{i}) && ~isempty(Pcatch{i}) && ~isempty(Rerror{i}) && ~isempty(Perror{i})
-        unit = max(get(gca,'YLim'))-min(get(gca,'YLim'));
-        text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.1+(i-1)*.5),['r_l=',num2str(round(Rcatch{i}(1)*100)/100),' r_r=',num2str(round(Rcatch{i}(2)*100)/100)],'Color',ColorsCorrect{i});
-        text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.2+(i-1)*.5),['r=',num2str(round(Rcatch{i}(3)*100)/100),', p=',num2str(round(Pcatch{i}(3)*100)/100)],'Color',ColorsCorrect{i});
-        text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.3+(i-1)*.5),['r_l=',num2str(round(Rerror{i}(1)*100)/100),' r_r=',num2str(round(Rerror{i}(2)*100)/100)],'Color',ColorsError{i});
-        text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.4+(i-1)*.5),['r=',num2str(round(Rerror{i}(3)*100)/100),', p=',num2str(round(Perror{i}(3)*100)/100)],'Color',ColorsError{i});
+    for i =1:length(LaserCond)
+        if ~isempty(Rcatch{i}) && ~isempty(Pcatch{i}) && ~isempty(Rerror{i}) && ~isempty(Perror{i})
+            unit = max(get(gca,'YLim'))-min(get(gca,'YLim'));
+            text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.1+(i-1)*.5),['r_l=',num2str(round(Rcatch{i}(1)*100)/100),' r_r=',num2str(round(Rcatch{i}(2)*100)/100)],'Color',ColorsCorrect{i});
+            text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.2+(i-1)*.5),['r=',num2str(round(Rcatch{i}(3)*100)/100),', p=',num2str(round(Pcatch{i}(3)*100)/100)],'Color',ColorsCorrect{i});
+            text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.3+(i-1)*.5),['r_l=',num2str(round(Rerror{i}(1)*100)/100),' r_r=',num2str(round(Rerror{i}(2)*100)/100)],'Color',ColorsError{i});
+            text(max(get(gca,'XLim'))+0.03,max(get(gca,'YLim'))-unit*(0.4+(i-1)*.5),['r=',num2str(round(Rerror{i}(3)*100)/100),', p=',num2str(round(Perror{i}(3)*100)/100)],'Color',ColorsError{i});
+        end
     end
-end
+    
+    %% ---------------------------------------------------------------------
+    %% confidence index
+    %% ---------------------------------------------------------------------
+    % subplot(nRows,nCols,8)
+    % hold on
+    % for i =1:length(LaserCond)
+    %     errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
+    % end
+    % xlabel('DV quantile')
+    % ylabel('AUC')
+    % 
+    % RedoTicks(gcf);
+    
+    end % if sum(CatchTrial)
+end % if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
 
 %% ---------------------------------------------------------------------
-%% confidence index
+%% System ITIs across session
 %% ---------------------------------------------------------------------
-% subplot(nRows,nCols,8)
-% hold on
-% for i =1:length(LaserCond)
-%     errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
-% end
-% xlabel('DV quantile')
-% ylabel('AUC')
-% 
-% RedoTicks(gcf);
+subplot(nRows, nCols, 1)
+hold on
 
-end % if sum(CatchTrial)
-end % if TaskType==3
+Rig = SessionData.Info.Rig;
+SessionDate = SessionData.Info.SessionDate;
+systemITI = zeros(length(SessionData.TrialStartTimestamp) - 1, 1);
+
+for i = 1:length(SessionData.TrialStartTimestamp) - 1
+    systemITI(i) = SessionData.TrialStartTimestamp(i+1) - SessionData.TrialEndTimestamp(i);
+end
+
+scatter(1:length(systemITI), systemITI, 10, 'filled', 'MarkerFaceAlpha', 0.4)
+xlabel('Trial')
+ylabel('System ITI (s)')
+title(sprintf(['SystemITI distribution: R%s, %s, rig %s'], Animal, SessionDate, Rig))
 
 %% ---------------------------------------------------------------------
 %% Event overview across session
 %% ---------------------------------------------------------------------
-TrialOverviewHandle = axes(FigHandle, 'Position', [0.025    0.7    0.55    0.28]);
-hold on
-set(TrialOverviewHandle,...
-    'TickDir', 'out',...
-    'YAxisLocation', 'right',...
-    'YLim', [0,9],...
-    'YTick', 1:8,...
-    'YTickLabel', {'NoTrialStart', 'BrokeFixation', 'EarlyWithdrawal',...
-                   'IncorrectChoice', 'Catch', 'Rewarded', ...
-                   'SkippedFeedback', 'ChoiceLeft'},...
-    'FontSize', 12);
-xlabel(TrialOverviewHandle, 'nTrial', 'FontSize', 14);
-
-idxTrial = 1:nTrials;
-NoTrialStartndxTrial = idxTrial(NoTrialStart == 1);
-NoTrialStartHandle = line(TrialOverviewHandle,...
-                          'xdata', NoTrialStartndxTrial,...
-                          'ydata', ones(size(NoTrialStartndxTrial)) * 1,...
-                          'LineStyle', 'none',...
-                          'Marker', '.',...
-                          'MarkerEdge', denim);
-
-BrokeFixationndxTrial = idxTrial(BrokeFixation == 1);
-BrokeFixationHandle = line(TrialOverviewHandle,...
-                           'xdata', BrokeFixationndxTrial,...
-                           'ydata', ones(size(BrokeFixationndxTrial)) * 2,...
-                           'LineStyle', 'none',...
-                           'Marker', '.',...
-                           'MarkerEdge', denim);
-
-EarlyWithdrawalndxTrial = idxTrial(EarlyWithdrawal == 1);
-EarlyWithdrawalHandle = line(TrialOverviewHandle,...
-                             'xdata', EarlyWithdrawalndxTrial,...
-                             'ydata', ones(size(EarlyWithdrawalndxTrial)) * 3,...
-                             'LineStyle', 'none',...
-                             'Marker', '.',...
-                             'MarkerEdge', turquoise);
-
-IncorrectChoicendxTrial = idxTrial(IncorrectChoice == 1);
-IncorrectChoiceHandle = line(TrialOverviewHandle,...
-                             'xdata', IncorrectChoicendxTrial,...
-                             'ydata', ones(size(IncorrectChoicendxTrial)) * 4,...
-                             'LineStyle', 'none',...
-                             'Marker', '.',...
-                             'MarkerEdge', scarlet);
-
-CatchndxTrial = idxTrial(CatchTrial == 1);
-CatchHandle = line(TrialOverviewHandle,...
-                    'xdata', CatchndxTrial,...
-                    'ydata', ones(size(CatchndxTrial)) * 5,...
-                    'LineStyle', 'none',...
-                    'Marker', '.',...
-                    'MarkerEdge', neon_green);
-
-RewardedndxTrial = idxTrial(Rewarded == 1);
-RewardedHandle = line(TrialOverviewHandle,...
-                    'xdata', RewardedndxTrial,...
-                    'ydata', ones(size(RewardedndxTrial)) * 6,...
-                    'LineStyle', 'none',...
-                    'Marker', '.',...
-                    'MarkerEdge', azure);
-
-
-SkippedFeedbackndxTrial = idxTrial(SkippedFeedback == 1); % Choice made is Baited but Skipped
-SkippedFeedbackHandle = line(TrialOverviewHandle,...
-                           'xdata', SkippedFeedbackndxTrial,...
-                           'ydata', ones(size(SkippedFeedbackndxTrial)) * 7,...
-                           'LineStyle', 'none',...
-                           'Marker', '.',...
-                           'MarkerEdge', neon_purple);
-
-ChoiceLeftndxTrial = idxTrial(ChoiceLeft == 1);
-ChoiceLeftHandle = line(TrialOverviewHandle,...
-                    'xdata', ChoiceLeftndxTrial,...
-                    'ydata', ones(size(ChoiceLeftndxTrial)) * 8,...
-                    'LineStyle', 'none',...
-                    'Marker', '.',...
-                    'MarkerEdge', sand);
+% TrialOverviewHandle = axes(FigHandle, 'Position', [0.025    0.7    0.55    0.28]);
+% hold on
+% set(TrialOverviewHandle,...
+%     'TickDir', 'out',...
+%     'YAxisLocation', 'right',...
+%     'YLim', [0,9],...
+%     'YTick', 1:8,...
+%     'YTickLabel', {'NoTrialStart', 'BrokeFixation', 'EarlyWithdrawal',...
+%                    'IncorrectChoice', 'Catch', 'Rewarded', ...
+%                    'SkippedFeedback', 'ChoiceLeft'},...
+%     'FontSize', 12);
+% xlabel(TrialOverviewHandle, 'nTrial', 'FontSize', 14);
+% 
+% idxTrial = 1:nTrials;
+% NoTrialStartndxTrial = idxTrial(NoTrialStart == 1);
+% NoTrialStartHandle = line(TrialOverviewHandle,...
+%                           'xdata', NoTrialStartndxTrial,...
+%                           'ydata', ones(size(NoTrialStartndxTrial)) * 1,...
+%                           'LineStyle', 'none',...
+%                           'Marker', '.',...
+%                           'MarkerEdge', denim);
+% 
+% BrokeFixationndxTrial = idxTrial(BrokeFixation == 1);
+% BrokeFixationHandle = line(TrialOverviewHandle,...
+%                            'xdata', BrokeFixationndxTrial,...
+%                            'ydata', ones(size(BrokeFixationndxTrial)) * 2,...
+%                            'LineStyle', 'none',...
+%                            'Marker', '.',...
+%                            'MarkerEdge', denim);
+% 
+% EarlyWithdrawalndxTrial = idxTrial(EarlyWithdrawal == 1);
+% EarlyWithdrawalHandle = line(TrialOverviewHandle,...
+%                              'xdata', EarlyWithdrawalndxTrial,...
+%                              'ydata', ones(size(EarlyWithdrawalndxTrial)) * 3,...
+%                              'LineStyle', 'none',...
+%                              'Marker', '.',...
+%                              'MarkerEdge', turquoise);
+% 
+% IncorrectChoicendxTrial = idxTrial(IncorrectChoice == 1);
+% IncorrectChoiceHandle = line(TrialOverviewHandle,...
+%                              'xdata', IncorrectChoicendxTrial,...
+%                              'ydata', ones(size(IncorrectChoicendxTrial)) * 4,...
+%                              'LineStyle', 'none',...
+%                              'Marker', '.',...
+%                              'MarkerEdge', scarlet);
+% 
+% CatchndxTrial = idxTrial(CatchTrial == 1);
+% CatchHandle = line(TrialOverviewHandle,...
+%                     'xdata', CatchndxTrial,...
+%                     'ydata', ones(size(CatchndxTrial)) * 5,...
+%                     'LineStyle', 'none',...
+%                     'Marker', '.',...
+%                     'MarkerEdge', neon_green);
+% 
+% RewardedndxTrial = idxTrial(Rewarded == 1);
+% RewardedHandle = line(TrialOverviewHandle,...
+%                     'xdata', RewardedndxTrial,...
+%                     'ydata', ones(size(RewardedndxTrial)) * 6,...
+%                     'LineStyle', 'none',...
+%                     'Marker', '.',...
+%                     'MarkerEdge', azure);
+% 
+% 
+% SkippedFeedbackndxTrial = idxTrial(SkippedFeedback == 1); % Choice made is Baited but Skipped
+% SkippedFeedbackHandle = line(TrialOverviewHandle,...
+%                            'xdata', SkippedFeedbackndxTrial,...
+%                            'ydata', ones(size(SkippedFeedbackndxTrial)) * 7,...
+%                            'LineStyle', 'none',...
+%                            'Marker', '.',...
+%                            'MarkerEdge', neon_purple);
+% 
+% ChoiceLeftndxTrial = idxTrial(ChoiceLeft == 1);
+% ChoiceLeftHandle = line(TrialOverviewHandle,...
+%                     'xdata', ChoiceLeftndxTrial,...
+%                     'ydata', ones(size(ChoiceLeftndxTrial)) * 8,...
+%                     'LineStyle', 'none',...
+%                     'Marker', '.',...
+%                     'MarkerEdge', sand);
 
 %% ---------------------------------------------------------------------
 %% Event count and ratio in session
