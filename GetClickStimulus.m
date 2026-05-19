@@ -75,8 +75,8 @@ end
 
 BpodSystem.Data.Custom.TrialData.LeftClickRate(iTrial) = LeftClickRate;
 BpodSystem.Data.Custom.TrialData.RightClickRate(iTrial) = RightClickRate;
-BpodSystem.Data.Custom.TrialData.LeftClickTrain{iTrial} = LeftClickTrain;
-BpodSystem.Data.Custom.TrialData.RightClickTrain{iTrial} = RightClickTrain;
+% BpodSystem.Data.Custom.TrialData.LeftClickTrain{iTrial} = LeftClickTrain;
+% BpodSystem.Data.Custom.TrialData.RightClickTrain{iTrial} = RightClickTrain;
 BpodSystem.Data.Custom.TrialData.DecisionVariable(iTrial) = (sum(LeftClickTrain)-sum(RightClickTrain))./(sum(LeftClickTrain)+sum(RightClickTrain));
 
 end

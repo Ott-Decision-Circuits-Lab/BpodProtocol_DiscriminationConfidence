@@ -145,12 +145,12 @@ TDTemp.AuditoryOmega(iTrial) = NaN;
 
 TDTemp.LeftClickRate(iTrial) = NaN;
 TDTemp.RightClickRate(iTrial) = NaN;
-TDTemp.LeftClickTrain{iTrial} = [];
-TDTemp.RightClickTrain{iTrial} = [];
+% TDTemp.LeftClickTrain{iTrial} = [];
+% TDTemp.RightClickTrain{iTrial} = [];
 
 TDTemp.AudFracHigh(iTrial) = NaN;
-TDTemp.AudCloud{iTrial} = [];
-TDTemp.AudSound{iTrial} = [];
+% TDTemp.AudCloud{iTrial} = [];
+% TDTemp.AudSound{iTrial} = [];
 TDTemp.MinSampleAud(iTrial) = TaskParameters.GUI.MinSampleAud;
 
 
