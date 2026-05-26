@@ -30,6 +30,7 @@ BpodSystem.Data.Custom.SessionMeta.OlfactometerStartup = false;
 BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
 % ---------------------------------------------------------------------%
 
+
 if TaskParameters.GUI.Photometry
     [FigNidaq1,FigNidaq2]=InitializeNidaq();
 end
@@ -94,11 +95,13 @@ while RunSession
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         InsertSessionDescription(iTrial);
         UpdateCustomDataFields(iTrial);
-        try
-            SaveBpodSessionData;
-        catch
-            warning("Save error, continuing")
-            SaveBpodSessionData;
+        if mod(iTrial, 10) == 0 || iTrial == 1
+             try
+                SaveBpodSessionData;
+            catch
+                warning("Save error, continuing")
+                SaveBpodSessionData;
+            end
         end
     end
     
