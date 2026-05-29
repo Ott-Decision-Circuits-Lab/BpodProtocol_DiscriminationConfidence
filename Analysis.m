@@ -20,14 +20,12 @@ end
 GracePeriodsMax = GUISettings.FeedbackDelayGrace; %assumes same for each trial
 StimTime = GUISettings.AuditoryStimulusTime; %assumes same for each trial
 
-TaskType = GUISettings.FeedbackDelaySelection;
-
 if GUISettings.FeedbackDelaySelection == 1 && GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
     TaskType = "reward-bias";
 elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) == GUISettings.BlockTable.RewR(2)
     TaskType = "time-investment";
 elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
-    TaskType = "temporal-reward-bias";
+    TaskType = "reward-bias-time-investment";
 end 
 
 if TaskType == "reward-bias"
@@ -47,6 +45,8 @@ Animal = str2double(SessionData.Info.Subject);
 if isnan(Animal)
     Animal = -1;
 end
+
+SessionDate = SessionData.Info.SessionDate;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nTrials = SessionData.nTrials;
@@ -174,6 +174,12 @@ end
 FigHandle = figure('Position', FigPositionSize, 'NumberTitle', 'off', ...
                    'Name', SessionData.Info.Subject);
 
+MetaInfoString = sprintf('Rat R%s, %s task, %s, rig %s', num2str(Animal), TaskType, SessionDate, SessionData.Info.Rig);
+
+dim = [0.5 0.89 0.1 0.1];
+pText = annotation('textbox', dim, 'String', MetaInfoString, 'FitBoxToText', 'on');
+pText.FontSize = 14;
+pText.EdgeColor = 'none';
 
 
 %% ---------------------------------------------------------------------
@@ -187,6 +193,7 @@ DVAxis = linspace(-1, 1, 21);
 if TaskType == "reward-bias" || TaskType == "temporal-reward-bias"
     nBlocks = max(GUISettings.BlockTable.BlockNumber);
     BlockIdx = [0; cumsum(GUISettings.BlockTable.BlockLen)];
+    title('Psychometric - reward bias blocks')
     for i = 1:nBlocks
         BlockBegin = BlockIdx(i) + 1;
         BlockEnd = BlockIdx(i+1);
@@ -225,8 +232,8 @@ if TaskType == "reward-bias" || TaskType == "temporal-reward-bias"
                 YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
                 plot(XFit, YFit, 'Color', LocalColor, 'LineWidth', 2);
         
-                xlabel('DV');
-                ylabel('p left')
+                xlabel('Decision variable');
+                ylabel('P (left choice)')
                 
                 text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
                     [num2str(round(nanmean(CorrectBlock)*100)), ...
@@ -238,6 +245,7 @@ if TaskType == "reward-bias" || TaskType == "temporal-reward-bias"
     legend('',CondStrings{1},'',CondStrings{2},'',CondStrings{3},'',CondStrings{4}, 'Location', 'southeast')
 
 else  % Session without reward-bias
+    title('Psychometric')
     AudDV = ExperiencedDV(CompletedTrials);
     LeftChoices = ChoiceLeft(CompletedTrials);
     if ~isempty(AudDV)
@@ -302,87 +310,88 @@ end
 %% ---------------------------------------------------------------------
 %% grace periods
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,5)
-%remove "full" grace periods
-GracePeriods(GracePeriods>=GracePeriodsMax-0.001 & GracePeriods<=GracePeriodsMax+0.001 )=[];
-GracePeriodsR(GracePeriodsR>=GracePeriodsMax-0.001 & GracePeriodsR<=GracePeriodsMax+0.001 )=[];
-GracePeriodsL(GracePeriodsL>=GracePeriodsMax-0.001 & GracePeriodsL<=GracePeriodsMax+0.001 )=[];
-center = 0:0.025:max(GracePeriods);
-if ~all(isnan(GracePeriodsL)) && numel(center) > 1 && ~all(isnan(GracePeriodsR))
-    g = hist(GracePeriods,center);g=g/sum(g);
-    gl = hist(GracePeriodsL,center);gl=gl/sum(gl);
-    gr = hist(GracePeriodsR,center);gr=gr/sum(gr);
-    hold on
-    plot(center,g,'k','LineWidth',2)
-    plot(center,gl, 'Color', CondColors{2},'LineWidth',2)
-    plot(center,gr, 'Color', CondColors{3},'LineWidth',2)
-    legend('Both','Left','Right', 'Location', 'east')
-    xlabel('Grace period (s)');ylabel('p');
-    text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.05,['n=',num2str(sum(~isnan(GracePeriods))),' (L=',num2str(sum(~isnan(GracePeriodsL))),'/R=',num2str(sum(~isnan(GracePeriodsR))),')']);
-end
+% subplot(nRows,nCols,5)
+% %remove "full" grace periods
+% GracePeriods(GracePeriods>=GracePeriodsMax-0.001 & GracePeriods<=GracePeriodsMax+0.001 )=[];
+% GracePeriodsR(GracePeriodsR>=GracePeriodsMax-0.001 & GracePeriodsR<=GracePeriodsMax+0.001 )=[];
+% GracePeriodsL(GracePeriodsL>=GracePeriodsMax-0.001 & GracePeriodsL<=GracePeriodsMax+0.001 )=[];
+% center = 0:0.025:max(GracePeriods);
+% if ~all(isnan(GracePeriodsL)) && numel(center) > 1 && ~all(isnan(GracePeriodsR))
+%     g = hist(GracePeriods,center);g=g/sum(g);
+%     gl = hist(GracePeriodsL,center);gl=gl/sum(gl);
+%     gr = hist(GracePeriodsR,center);gr=gr/sum(gr);
+%     hold on
+%     plot(center,g,'k','LineWidth',2)
+%     plot(center,gl, 'Color', CondColors{2},'LineWidth',2)
+%     plot(center,gr, 'Color', CondColors{3},'LineWidth',2)
+%     legend('Both','Left','Right', 'Location', 'east')
+%     xlabel('Grace period (s)');ylabel('p');
+% 
+%     text(min(get(gca,'XLim'))+0.05,max(get(gca,'YLim'))-0.05,['n=',num2str(sum(~isnan(GracePeriods))),' (L=',num2str(sum(~isnan(GracePeriodsL))),'/R=',num2str(sum(~isnan(GracePeriodsR))),')']);
+% end
 
-if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
 %% ---------------------------------------------------------------------
 %% waiting time distributions
 %% ---------------------------------------------------------------------
-    ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
-    if length(LaserCond)==1
-        %no laser
-        subplot(nRows,nCols,6)
-        hold on
-        xlabel('waiting time (s)'); ylabel ('n trials');
-        WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
-        WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
-        histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
-        histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor', CondColors{3});
+ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
+if length(LaserCond)==1
+    %no laser
+    subplot(nRows,nCols,5)
+    title('Waiting time distribution')
+    hold on
+    xlabel('Waiting time (s)'); ylabel ('n trials');
+    WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
+    WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
+    histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
+    histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor', CondColors{3});
+
+    meanWTL = nanmean(WTnoFeedbackL);
+    meanWTR = nanmean(WTnoFeedbackR);
+    line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
+    line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
+    text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+        ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
+    text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+        ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
     
-        meanWTL = nanmean(WTnoFeedbackL);
-        meanWTR = nanmean(WTnoFeedbackR);
-        line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
-        line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
-        text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
-            ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
-        text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
-            ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
-        
-        PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
-        PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
-        text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
-        
-    % else%laser
-    %     subplot(3,4,7)
-    %     hold on
-    %     xlabel('waiting time (s)'); ylabel ('n trials');
-    %     subplot(3,4,8)
-    %     hold on
-    %     xlabel('waiting time (s)'); ylabel ('n trials');
-    %     PshortWTL=cell(1,2);PshortWTR=cell(1,2);
-    %     for i =1:length(LaserCond)
-    %     
-    %     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1 & LaserTrial==LaserCond(i));
-    %     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0 & LaserTrial==LaserCond(i));
-    %      meanWTL = nanmean(WTnoFeedbackL);
-    %     meanWTR = nanmean(WTnoFeedbackR);
-    %     subplot(3,4,7)
-    %     histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor',ColorsCond{i});
-    %     line([meanWTL,meanWTL],get(gca,'YLim'),'Color',ColorsCond{i});
-    %     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_l=',num2str(round(meanWTL*10)/10)],'Color',ColorsCond{i});
-    %     subplot(3,4,8)
-    %     histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor',ColorsCond{i});
-    %     line([meanWTR,meanWTR],get(gca,'YLim'),'Color',ColorsCond{i});
-    %     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_r=',num2str(round(meanWTR*10)/10)],'Color',ColorsCond{i});
-    % 
-    %     PshortWTL{i} = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
-    %     PshortWTR{i} = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
-    %     
-    %     end
-    %     for i =1:length(LaserCond)
-    %         text(max(get(gca,'XLim'))+0.03,(0.85/i)*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL{i}*100)/100),', R_{2}=',num2str(round(PshortWTR{i}*100)/100)],'Color',ColorsCond{i});
-    %     end
-    end
+    PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
+    PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
+    text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
     
+% else%laser
+%     subplot(3,4,7)
+%     hold on
+%     xlabel('waiting time (s)'); ylabel ('n trials');
+%     subplot(3,4,8)
+%     hold on
+%     xlabel('waiting time (s)'); ylabel ('n trials');
+%     PshortWTL=cell(1,2);PshortWTR=cell(1,2);
+%     for i =1:length(LaserCond)
+%     
+%     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1 & LaserTrial==LaserCond(i));
+%     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0 & LaserTrial==LaserCond(i));
+%      meanWTL = nanmean(WTnoFeedbackL);
+%     meanWTR = nanmean(WTnoFeedbackR);
+%     subplot(3,4,7)
+%     histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor',ColorsCond{i});
+%     line([meanWTL,meanWTL],get(gca,'YLim'),'Color',ColorsCond{i});
+%     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_l=',num2str(round(meanWTL*10)/10)],'Color',ColorsCond{i});
+%     subplot(3,4,8)
+%     histogram(WTnoFeedbackR,10,'EdgeColor','none','FaceColor',ColorsCond{i});
+%     line([meanWTR,meanWTR],get(gca,'YLim'),'Color',ColorsCond{i});
+%     text(meanWTL-1,(1.05-0.1*(i-1))*(max(get(gca,'YLim'))-min(get(gca,'YLim'))),['m_r=',num2str(round(meanWTR*10)/10)],'Color',ColorsCond{i});
+% 
+%     PshortWTL{i} = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
+%     PshortWTR{i} = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
+%     
+%     end
+%     for i =1:length(LaserCond)
+%         text(max(get(gca,'XLim'))+0.03,(0.85/i)*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL{i}*100)/100),', R_{2}=',num2str(round(PshortWTR{i}*100)/100)],'Color',ColorsCond{i});
+%     end
+end
     
-    
+
+if TaskType=="time-investment" || TaskType=="temporal-reward-bias"    
     if sum(CatchTrial)
     %% ---------------------------------------------------------------------
     %% conditioned psychometric
@@ -415,8 +424,7 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
         xlabel('DV');ylabel('p left')
         legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]},'Units','normalized','Position',[0.333,0.85,0.1,0.1])
     end
-    
-    
+       
     
     %% ---------------------------------------------------------------------
     %% calibration
@@ -449,6 +457,7 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
     hold on
     
     xlabel('DV');ylabel('Waiting time (s)')
+    title('Vevaiometric')
     AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<MaxWT&WT>MinWT);
     Rcatch=cell(1,2);Pcatch=cell(1,2);Rerror=cell(1,2);Perror=cell(1,2);
     
@@ -517,18 +526,14 @@ end % if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
 subplot(nRows, nCols, 1)
 hold on
 
-Rig = SessionData.Info.Rig;
-SessionDate = SessionData.Info.SessionDate;
 systemITI = zeros(length(SessionData.TrialStartTimestamp) - 1, 1);
-
 for i = 1:length(SessionData.TrialStartTimestamp) - 1
     systemITI(i) = SessionData.TrialStartTimestamp(i+1) - SessionData.TrialEndTimestamp(i);
 end
-
 scatter(1:length(systemITI), systemITI, 10, 'filled', 'MarkerFaceAlpha', 0.4)
 xlabel('Trial')
 ylabel('System ITI (s)')
-title(sprintf(['SystemITI distribution: R%s, %s, rig %s'], num2str(Animal), SessionDate, Rig))
+title('SystemITI distribution')
 
 %% ---------------------------------------------------------------------
 %% Event overview across session
