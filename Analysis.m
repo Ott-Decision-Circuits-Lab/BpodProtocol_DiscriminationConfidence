@@ -25,7 +25,7 @@ if GUISettings.FeedbackDelaySelection == 1 && GUISettings.BlockTable.RewL(2) ~= 
 elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) == GUISettings.BlockTable.RewR(2)
     TaskType = "time-investment";
 elseif GUISettings.FeedbackDelaySelection == 3 && GUISettings.BlockTable.RewL(2) ~= GUISettings.BlockTable.RewR(2)
-    TaskType = "reward-bias-time-investment";
+    TaskType = "temporal-reward-bias";
 end 
 
 if TaskType == "reward-bias"
@@ -185,8 +185,11 @@ pText.EdgeColor = 'none';
 %% ---------------------------------------------------------------------
 %% Psychometric
 %% ---------------------------------------------------------------------
-subplot(nRows,nCols,4)
+subplot(nRows,nCols,1)
 hold on
+
+xlabel('Decision variable');
+ylabel('P (left choice)')
 
 DVAxis = linspace(-1, 1, 21);
 
@@ -231,9 +234,6 @@ if TaskType == "reward-bias" || TaskType == "temporal-reward-bias"
                 XFit = linspace(min(AudDV)-10*eps, max(AudDV)+10*eps, 100);
                 YFit = glmval(glmfit(AudDV, LeftChoicesBlock','binomial'),XFit,'logit');
                 plot(XFit, YFit, 'Color', LocalColor, 'LineWidth', 2);
-        
-                xlabel('Decision variable');
-                ylabel('P (left choice)')
                 
                 text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
                     [num2str(round(nanmean(CorrectBlock)*100)), ...
@@ -260,10 +260,7 @@ else  % Session without reward-bias
         YFit = glmval(glmfit(AudDV, LeftChoices','binomial'),XFit,'logit');
         plot(XFit, YFit, 'Color', 'black', 'LineWidth', 2);
 
-        xlabel('Decision Variable');
-        ylabel('P (left choice)')
-
-        text(0.95*min(get(gca,'XLim')),1-i*0.05, ...
+        text(0.95*min(get(gca,'XLim')),1-0.05, ...
             [num2str(round(nanmean(Correct(CompletedTrials))*100)), ...
              '% Correct, nTrials=',num2str(sum(CompletedTrials))], ...
              'Color', 'black');
@@ -334,12 +331,17 @@ end
 %% waiting time distributions
 %% ---------------------------------------------------------------------
 ColorsCond = {[.5,.5,.5],[.9,.1,.1]};
+if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
+    subplot(nRows, nCols, 4)
+elseif TaskType=="reward-bias"
+    subplot(nRows, nCols, 2)
+end
+hold on
+
 if length(LaserCond)==1
     %no laser
-    subplot(nRows,nCols,5)
     title('Waiting time distribution')
-    hold on
-    xlabel('Waiting time (s)'); ylabel ('n trials');
+    xlabel('Waiting time (s)'); ylabel ('Trials');
     WTnoFeedbackL = WT(~Feedback & ChoiceLeft == 1);
     WTnoFeedbackR = WT(~Feedback & ChoiceLeft == 0);
     histogram(WTnoFeedbackL,10,'EdgeColor','none','FaceColor', CondColors{2});
@@ -349,14 +351,15 @@ if length(LaserCond)==1
     meanWTR = nanmean(WTnoFeedbackR);
     line([meanWTL,meanWTL],get(gca,'YLim'),'Color', CondColors{2});
     line([meanWTR,meanWTR],get(gca,'YLim'),'Color', CondColors{3});
-    text(meanWTL-1,1.05*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+    text(meanWTL-1, 1.1*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
         ['m_l=',num2str(round(meanWTL*10)/10)],'Color', CondColors{2});
-    text(meanWTL-1,1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
+    text(meanWTR-1, 1.15*(max(get(gca,'YLim'))-min(get(gca,'YLim'))), ...
         ['m_r=',num2str(round(meanWTR*10)/10)],'Color', CondColors{3});
     
     PshortWTL = sum(WTnoFeedbackL<MinWT)/sum(~isnan(WTnoFeedbackL));
     PshortWTR = sum(WTnoFeedbackR<MinWT)/sum(~isnan(WTnoFeedbackR));
-    text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')),['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
+    text(max(get(gca,'XLim'))+0.03,0.85*(max(get(gca,'YLim'))-min(get(gca,'YLim')))+min(get(gca,'YLim')), ...
+        ['L_{2}=',num2str(round(PshortWTL*100)/100),', R_{2}=',num2str(round(PshortWTR*100)/100)],'Color',[0,0,0]);
     
 % else%laser
 %     subplot(3,4,7)
@@ -397,7 +400,10 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
     %% conditioned psychometric
     %% ---------------------------------------------------------------------
     %
-    subplot(nRows,nCols,7)
+    subplot(nRows,nCols,2)
+    title('Conditioned Psychometric')
+    ylabel('P (left choice)')
+    xlabel('Decision variable')
     hold on
     %low
     WTmed=median(WT(CompletedTrials&CatchTrial&WT>MinWT&WT<MaxWT));
@@ -421,17 +427,18 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
         XFit = linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100);
         YFit = glmval(glmfit(AudDV,ChoiceLeftadj','binomial'),linspace(min(AudDV)-10*eps,max(AudDV)+10*eps,100),'logit');
         plot(XFit,YFit,'k');
-        xlabel('DV');ylabel('p left')
-        legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]},'Units','normalized','Position',[0.333,0.85,0.1,0.1])
+        %legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]},'Units','normalized','Position', [0.3, 0.15, 0.04, 0.03])
+        legend([h2,h1],{['WT>',num2str(round(WTmed*100)/100)],['WT<',num2str(round(WTmed*100)/100)]}, 'Position', [0.42, 0.89, 0.04, 0.03])
     end
        
     
     %% ---------------------------------------------------------------------
     %% calibration
     %% ---------------------------------------------------------------------
-    subplot(nRows,nCols,8)
+    subplot(nRows,nCols,3)
     hold on
-    xlabel('Waiting time (s)');ylabel('p correct')
+    xlabel('Waiting time (s)');ylabel('P (correct choice)')
+    title('Calibration Curve')
     WTBin=5;
     ColorsCorrect = {[.1,.9,.1],[.1,.8,.6]};
     ColorsError = {[.9,.1,.1],[.9,.1,.6]};
@@ -453,10 +460,10 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
     %% ---------------------------------------------------------------------
     %% Vevaiometric
     %% ---------------------------------------------------------------------
-    subplot(nRows,nCols,9)
+    subplot(nRows,nCols,5)
     hold on
     
-    xlabel('DV');ylabel('Waiting time (s)')
+    xlabel('Decision variable');ylabel('Waiting time (s)')
     title('Vevaiometric')
     AudDV = ExperiencedDV(CompletedTrials&CatchTrial&WT<MaxWT&WT>MinWT);
     Rcatch=cell(1,2);Pcatch=cell(1,2);Rerror=cell(1,2);Perror=cell(1,2);
@@ -507,15 +514,16 @@ if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
     %% ---------------------------------------------------------------------
     %% confidence index
     %% ---------------------------------------------------------------------
-    % subplot(nRows,nCols,8)
-    % hold on
-    % for i =1:length(LaserCond)
-    %     errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
-    % end
-    % xlabel('DV quantile')
-    % ylabel('AUC')
-    % 
-    % RedoTicks(gcf);
+    subplot(nRows,nCols,9)
+    hold on
+    for i =1:length(LaserCond)
+        errorbar(1:size(auc,2),auc(i,:),auc_sem(i,:),'o','MarkerFaceColor',CondColors{i},'MarkerEdgeColor',CondColors{i},'LineWidth',2,'Color',CondColors{i})
+    end
+    xlabel('DV quantile')
+    ylabel('Confidence AUC')
+    title('Confidence index')
+    
+    RedoTicks(gcf);
     
     end % if sum(CatchTrial)
 end % if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
@@ -523,7 +531,11 @@ end % if TaskType=="time-investment" || TaskType=="temporal-reward-bias"
 %% ---------------------------------------------------------------------
 %% System ITIs across session
 %% ---------------------------------------------------------------------
-subplot(nRows, nCols, 1)
+if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
+    subplot(nRows, nCols, 8)
+elseif TaskType=="reward-bias"
+    subplot(nRows, nCols, 5)
+end
 hold on
 
 systemITI = zeros(length(SessionData.TrialStartTimestamp) - 1, 1);
@@ -620,7 +632,13 @@ title('SystemITI distribution')
 %% ---------------------------------------------------------------------
 %% Event count and ratio in session
 %% ---------------------------------------------------------------------
-EventOverviewHandle = subplot(nRows, nCols, 2.5);
+
+if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
+    EventOverviewHandle = subplot(nRows, nCols, 7);
+elseif TaskType=="reward-bias"
+    EventOverviewHandle = subplot(nRows, nCols, 4);
+end
+
 hold on
 
 idxTrial = 1:nTrials;
@@ -685,8 +703,7 @@ for i = 1:length(EventRatioHandle)
 end
 
 ChoiceLeftLegend = ["Right", "Left"];
-EventRatioLegendHandle = legend(EventOverviewHandle, ChoiceLeftLegend,...
-                                'NumColumns', 2);
+legend(EventOverviewHandle, ChoiceLeftLegend,'NumColumns', 2, 'Position', [0.165, 0.12, 0.02, 0.01]);
 
 
 end  % Analysis()
