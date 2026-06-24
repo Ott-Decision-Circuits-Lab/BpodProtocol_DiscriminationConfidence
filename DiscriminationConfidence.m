@@ -42,31 +42,50 @@ RunSession = true;
 iTrial = 1;
 
 while RunSession
+    
+    t_trial_start = tic;
+    t_before_init_custom = tic;
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
+    BpodSystem.Data.Custom.Timing.InitCustom(iTrial) = toc(t_before_init_custom);
     
     SoundLevel = 5;
     ClickLength = 2;
     if BpodSystem.EmulatorMode
         [LeftClickTrain, RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.AuditoryStimulusTime, 25000, ClickLength, SoundLevel, 'beta');
     else
-        LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
-        LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
-        InitiateOlfactometer(iTrial);
+        t_before_waveload = tic; 
+        LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength);
+        BpodSystem.Data.Custom.Timing.WaveLoad(iTrial) = toc(t_before_waveload);
+
+        %LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
+        %InitiateOlfactometer(iTrial);
+
+        t_before_psych = tic;
         InitiatePsychtoolbox(iTrial);
+        BpodSystem.Data.Custom.Timing.Psychtoolbox(iTrial) = toc(t_before_psych);
+
     end
     
+    t_before_gui = tic;
     TaskParameters = BpodParameterGUI('sync', TaskParameters);
+    BpodSystem.Data.Custom.Timing.GUISync(iTrial) = toc(t_before_gui);
     
+    t_before_sma = tic; 
     sma = StateMatrix(iTrial);
     SendStateMatrix(sma);
+    BpodSystem.Data.Custom.Timing.StateMatrix(iTrial) = toc(t_before_sma);
     
     % NIDAQ Get nidaq ready to start
     if TaskParameters.GUI.Photometry
         Nidaq_photometry('WaitToStart');
     end
     
+    if iTrial ~= 1
+        BpodSystem.Data.Custom.Timing.ITI(iTrial) = toc(t_before_end);
+    end
     % Run Trial
     RawEvents = RunStateMatrix;
+    t_before_end = tic;
     
     % NIDAQ Stop acquisition and save data in bpod structure
     if TaskParameters.GUI.Photometry
@@ -92,21 +111,43 @@ while RunSession
     
     % Bpod save and update custom data fields for this trial
     if ~isempty(fieldnames(RawEvents))
+        t_before_add_trial = tic;
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
+        BpodSystem.Data.Custom.Timing.AddTrialEvents(iTrial) = toc(t_before_add_trial);
+
+
         InsertSessionDescription(iTrial);
+
+        t_before_update = tic;
         UpdateCustomDataFields(iTrial);
-        if mod(iTrial, 10) == 0 || iTrial == 1
+        BpodSystem.Data.Custom.Timing.UpdateCustomData(iTrial) = toc(t_before_update);
+
+%         if mod(iTrial, 10) == 0
+%             parfeval(@save, 0, filename, 'SessionData');
+%          try
+%                 SaveBpodSessionData;
+%          catch
+%                 warning("Save error, continuing")
+%                 SaveBpodSessionData;
+%          end
+        if mod(iTrial, 20) == 0 || iTrial == 1
              try
+                t_before_save = tic;
                 SaveBpodSessionData;
+                BpodSystem.Data.Custom.Timing.Save(iTrial) = toc(t_before_save);
             catch
                 warning("Save error, continuing")
                 SaveBpodSessionData;
             end
         end
     end
+
+     
     
-    % pause conditions    
+    % pause conditions
+    t_before_pause = tic;
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
+    BpodSystem.Data.Custom.Timing.Pause(iTrial) = toc(t_before_pause);
     
     if BpodSystem.Status.BeingUsed == 0
         return
@@ -127,13 +168,19 @@ while RunSession
     TaskParameters.Figures.ParameterGUI.Position = BpodSystem.ProtocolFigures.ParameterGUI.Position;
     
     % update behavior plots
+    t_before_plot = tic;
     MainPlot(BpodSystem.GUIHandles.OutcomePlot,'update',iTrial);
+    BpodSystem.Data.Custom.Timing.Plot(iTrial) = toc(t_before_plot);
+    
     
     % update photometry plots
     if TaskParameters.GUI.Photometry
         PlotPhotometryData(iTrial, FigNidaq1, FigNidaq2, PhotoData, Photo2Data);
     end
     
+    BpodSystem.Data.Custom.Timing.TotalOverhead(iTrial) = toc(t_trial_start);
+    
+
     iTrial = iTrial + 1;
 end
 
