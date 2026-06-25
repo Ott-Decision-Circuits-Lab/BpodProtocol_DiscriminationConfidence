@@ -535,6 +535,8 @@ if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
     subplot(nRows, nCols, 8)
 elseif TaskType=="reward-bias"
     subplot(nRows, nCols, 5)
+else
+    subplot(nRows, nCols, 5)
 end
 hold on
 
@@ -636,6 +638,8 @@ title('SystemITI distribution')
 if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
     EventOverviewHandle = subplot(nRows, nCols, 7);
 elseif TaskType=="reward-bias"
+    EventOverviewHandle = subplot(nRows, nCols, 4);
+else
     EventOverviewHandle = subplot(nRows, nCols, 4);
 end
 

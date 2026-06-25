@@ -21,7 +21,7 @@ if strcmpi(TaskParameters.GUIMeta.LaserStimProtocol.String{TaskParameters.GUI.La
     Period = 1/StimulationFreq; % Period = 1/50Hz = 0.02s
     t = 0:1/SamplingRate:TrainDuration; %  t = 0:0.0001:1s
     numPulses = floor(TrainDuration/Period);
-    delays = (0:numPulses-1)*Period; % I guess this tries to get the off-set time of a pulse
+    delays = (0:numPulses-1)*Period;
 
     % Generate pulse train
     pulse = @(t) rectpuls(t-PulseDuration/2, PulseDuration); % Centered rectangular pulse <- shape of one pulse

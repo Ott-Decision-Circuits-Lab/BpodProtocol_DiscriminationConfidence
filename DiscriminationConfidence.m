@@ -6,7 +6,7 @@ global BpodSystem
 global TaskParameters
 
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
-BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
+%BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 % ------------------------Setup Stimuli--------------------------------%
 if ~BpodSystem.EmulatorMode
@@ -56,9 +56,16 @@ while RunSession
         t_before_waveload = tic; 
         LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength);
         BpodSystem.Data.Custom.Timing.WaveLoad(iTrial) = toc(t_before_waveload);
-
-        %LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
-        %InitiateOlfactometer(iTrial);
+        
+        t_before_laserload = tic;
+        if TaskParameters.GUI.LaserTrials
+            LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
+        end
+        BpodSystem.Data.Custom.Timing.LaserLoad(iTrial) = toc(t_before_laserload);
+    
+        t_before_olfacto = tic;
+        InitiateOlfactometer(iTrial);
+        BpodSystem.Data.Custom.Timing.Olfactometer(iTrial) = toc(t_before_olfacto);
 
         t_before_psych = tic;
         InitiatePsychtoolbox(iTrial);

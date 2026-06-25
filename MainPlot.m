@@ -343,11 +343,11 @@ switch Action
                     if iBlock <= numel(BpodSystem.GUIHandles.OutcomePlot.PsycAud) && ishandle(BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock))
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).YData = PsycY;
                         BpodSystem.GUIHandles.OutcomePlot.PsycAud(iBlock).XData = PsycX;
-%                         if sum(ValidTrials) > 5
-%                             BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
-%                             BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ValidTrials),...
-%                                 LeftAudTrialsInBlock','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
-%                         end
+                        if sum(ValidTrials) > 5
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.XData = linspace(min(AudDV),max(AudDV),100);
+                            BpodSystem.GUIHandles.OutcomePlot.PsycAudFit.YData = glmval(glmfit(AudDV(ValidTrials),...
+                                LeftAudTrialsInBlock','binomial'),linspace(min(AudDV),max(AudDV),100),'logit');
+                        end
                     else
                         lineColor = rgb2hsv([0.8314    0.5098    0.4157]);
                         bias = tanh(.3 * [1 -1] * TDTemp.RewardMagnitude(:, find(BlockIdx,1)));
