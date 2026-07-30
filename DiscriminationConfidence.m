@@ -6,7 +6,7 @@ global BpodSystem
 global TaskParameters
 
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
-BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
+% BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 
 % ------------------------Setup Stimuli--------------------------------%
 if ~BpodSystem.EmulatorMode
@@ -50,8 +50,7 @@ while RunSession
         [LeftClickTrain, RightClickTrain] = GetClickStimulus(iTrial, TaskParameters.GUI.AuditoryStimulusTime, 25000, ClickLength, SoundLevel, 'beta');
     else
         LoadTrialDependentWaveform(Player, iTrial, SoundLevel, ClickLength); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
-        LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
-        InitiateOlfactometer(iTrial);
+        %LoadTrialDependentLaserWaveform(Player)   % load laser waveform for each trial
         InitiatePsychtoolbox(iTrial);
     end
     
@@ -95,13 +94,19 @@ while RunSession
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         InsertSessionDescription(iTrial);
         UpdateCustomDataFields(iTrial);
-        if mod(iTrial, 10) == 0 || iTrial == 1
-             try
+%          try
+%              SaveBpodSessionData;
+%          catch
+%              warning("Save error, continuing")
+%              SaveBpodSessionData;
+%          end
+        if mod(iTrial, 20) == 0 || iTrial == 1
+            try
                 SaveBpodSessionData;
             catch
                 warning("Save error, continuing")
                 SaveBpodSessionData;
-            end
+           end
         end
     end
     
