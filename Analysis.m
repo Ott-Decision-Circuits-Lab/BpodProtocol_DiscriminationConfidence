@@ -535,6 +535,8 @@ if TaskType == "time-investment" || TaskType == "temporal-reward-bias"
     subplot(nRows, nCols, 8)
 elseif TaskType=="reward-bias"
     subplot(nRows, nCols, 5)
+else
+     subplot(nRows, nCols, 5)
 end
 hold on
 
